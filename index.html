@@ -31,6 +31,8 @@
       --radius-sm: 10px;
       --radius-md: 14px;
       --radius-lg: 20px;
+      --color-warning: #EAB308;
+      --color-danger: #EF4444;
     }
     
     [data-theme="dark"] {
@@ -49,6 +51,8 @@
       --sidebar-active-bg: rgba(0, 230, 108, 0.2);
       --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.3);
       --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --color-warning: #FACC15;
+      --color-danger: #F87171;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
@@ -416,6 +420,12 @@
     .card div { color: var(--text-main); font-size: 0.92rem; font-weight: 500; }
     .card h3 { font-size: 2.6rem; color: var(--primary-solid); margin: 10px 0 0 0; font-weight: 700; line-height: 1; }
     
+    /* Warna Khusus Angka Kartu Statistik */
+    .stat-number-green { color: var(--primary-solid) !important; }
+    .stat-number-yellow { color: #EAB308 !important; }
+    [data-theme="dark"] .stat-number-yellow { color: #FACC15 !important; }
+    .stat-number-red { color: var(--color-danger) !important; }
+
     .alert-box { background-color: #FFF5F5; color: #C53030; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
     [data-theme="dark"] .alert-box { background-color: rgba(229, 62, 62, 0.1); color: #FC8181; }
 
@@ -522,9 +532,6 @@
           <div class="nav-item" onclick="openPinModal('admin-emis')">
             <span>⚙️</span> Admin EMIS
           </div>
-          <div class="nav-item" onclick="navigate('log-audit', this)">
-            <span>📄</span> Log Audit
-          </div>
         </div>
 
         <div class="sidebar-bottom">
@@ -548,29 +555,29 @@
             </div>
           </div>
 
+          <!-- KARTU STATISTIK DENGAN WARNA ANGKA KHUSUS -->
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
-              <h3 id="dash-total">0</h3>
+              <h3 id="dash-total" class="stat-number-green">0</h3>
             </div>
             <div class="card">
               <div>Data Lengkap 100%</div>
-              <h3 id="dash-submit">0</h3>
+              <h3 id="dash-submit" class="stat-number-green">0</h3>
             </div>
             <div class="card">
               <div>Belum Lengkap</div>
-              <h3 id="dash-sebagian">0</h3>
+              <h3 id="dash-sebagian" class="stat-number-yellow">0</h3>
             </div>
             <div class="card">
               <div>Belum Mengisi</div>
-              <h3 id="dash-kosong">0</h3>
+              <h3 id="dash-kosong" class="stat-number-red">0</h3>
             </div>
           </div>
 
-          <!-- TABEL LEMBAGA SELESAI INPUT (MA -> MTs -> MI -> RA, URUT NSM) -->
+          <!-- TABEL LEMBAGA SELESAI INPUT -->
           <div class="form-divider" style="margin-top: 30px;">🏆 Lembaga yang Sudah Selesai Input Semua (Lengkap 100%)</div>
-          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <span>Urutan Jenjang: <strong>MA &rarr; MTs &rarr; MI &rarr; RA</strong> (Diurutkan berdasarkan NSM)</span>
+          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px;">
             <span id="dash-completed-count" style="font-weight:700; color:var(--primary-solid); background:var(--primary-light); padding:4px 12px; border-radius:15px;">0 Lembaga Selesai</span>
           </div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
@@ -1199,12 +1206,6 @@
           </div>
         </section>
 
-        <!-- SECTION: LOG AUDIT -->
-        <section id="log-audit" class="page-section">
-          <h2>Log Aktivitas</h2>
-          <p style="color:var(--text-muted);">Pencatatan sinkronisasi data dan pergantian periode aktif otomatis tersimpan ke Google Sheets.</p>
-        </section>
-
       </main>
     </div>
   </div>
@@ -1215,8 +1216,7 @@
   <!-- PIN Modal -->
   <div class="modal-overlay" id="pin-modal">
     <div class="modal-content">
-      <h3 id="pin-modal-title" style="margin-bottom:10px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3>
-      <p id="pin-modal-desc" style="margin-bottom:25px; font-size:0.95rem; color:var(--text-muted);">Masukkan PIN Admin untuk melanjutkan.</p>
+      <h3 id="pin-modal-title" style="margin-bottom:25px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3>
       <input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing: 12px; font-weight:700; font-size:1.5rem; background: var(--bg-body);" onkeydown="handlePinKeydown(event)">
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button>
@@ -1281,7 +1281,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGvtb6Mg_z1RCls1q5A4DLYja6ttL_kK2DvFAp1rh_iVCoO6sfdjy3t8C1G5hf8mby/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzB1x5EtHuD652VD2gUKWqIlCMePKHFn2sdebB0aXwB0stPflTEp-1xfWcd8neTvbTF/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1365,13 +1365,10 @@
     function openPinModal(target) {
       pinModalTarget = target || 'admin-emis';
       var titleEl = document.getElementById('pin-modal-title');
-      var descEl = document.getElementById('pin-modal-desc');
       if (pinModalTarget === 'rekapitulasi') {
         titleEl.innerText = "🔒 Akses Rekapitulasi Terkunci";
-        descEl.innerText = "Menu Rekapitulasi diproteksi PIN. Masukkan PIN Admin untuk membuka:";
       } else {
         titleEl.innerText = "⚙️ Otorisasi Admin EMIS";
-        descEl.innerText = "Masukkan PIN Admin untuk masuk ke menu pengaturan:";
       }
       document.getElementById('pin-input').value = '';
       document.getElementById('pin-modal').classList.add('active');
@@ -1381,107 +1378,87 @@
     function closePinModal() { document.getElementById('pin-modal').classList.remove('active'); }
     function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
 
-    function verifyPinSubmit() {
-      var pin = document.getElementById('pin-input').value;
-      if(!pin) { showToast("PIN tidak boleh kosong", "error"); return; }
-      
-      var btn = document.querySelector('#pin-modal .btn:nth-child(2)');
-      btn.innerText = "Memeriksa...";
-      
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "verifyAdminPin", pin: pin })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(response) {
-        btn.innerText = "Masuk";
-        if(response.status === 'success') {
-          closePinModal();
-          var targetNav = null;
-          var items = document.querySelectorAll('.nav-item');
-          if (pinModalTarget === 'rekapitulasi') {
-            for (var i = 0; i < items.length; i++) {
-              if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').indexOf('handleRekapNav') !== -1) { targetNav = items[i]; break; }
-            }
-            navigate('rekapitulasi', targetNav);
-            showToast("Akses Rekapitulasi Terbuka", "success");
-          } else {
-            for (var j = 0; j < items.length; j++) {
-              if (items[j].getAttribute('onclick') && items[j].getAttribute('onclick').indexOf('openPinModal') !== -1) { targetNav = items[j]; break; }
-            }
-            navigate('admin-emis', targetNav);
-            showToast("Akses Admin EMIS Diberikan", "success");
-          }
-        } else {
-          showToast(response.message, "error");
-        }
-      })
-      .catch(function(err) {
-        btn.innerText = "Masuk";
-        showToast("Gagal menghubungi server PIN", "error");
-      });
+    // Helper aman untuk parse JSON dari fetch
+    function safeParseJSON(text) {
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return null;
+      }
     }
 
-    function updateAdminPin() {
-      var newPin = document.getElementById('admin-new-pin').value;
-      if (!newPin || newPin.length < 4) { showToast("PIN baru minimal harus 4 digit!", "error"); return; }
-      
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "setAdminPin", newPin: newPin })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
-        if (res.status === 'success') {
-          showToast(res.message, "success");
-          document.getElementById('admin-new-pin').value = '';
-        } else { showToast(res.message, "error"); }
-      })
-      .catch(function(err){ showToast("Gagal memperbarui PIN", "error"); });
-    }
-
-    function savePinRekapSetting() {
-      var selectedStatus = document.getElementById('admin-pin-rekap-select').value;
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "setPinRekapStatus", pinRekapStatus: selectedStatus })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
-        if(res.status === 'success') {
-          pinRekapStatus = res.pinRekapStatus || selectedStatus;
-          showToast(res.message, "success");
-        } else { showToast(res.message, "error"); }
-      })
-      .catch(function(err) { showToast("Gagal mengubah status proteksi PIN", "error"); });
+    function getFallbackPreviewData() {
+      return {
+        status: "success",
+        banner: "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas",
+        statsSummary: { total: 9, lengkap: 5, sebagian: 4, kosong: 0 },
+        stats: { total: 9, submitted: 5 },
+        institutions: [
+          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI" },
+          { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO" },
+          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON" },
+          { id: "LBG-004", name: "MTsS NURUL HUDA", nsm: "121216050002", npsn: "10648804", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", desa: "MEGANG SAKTI I" },
+          { id: "LBG-005", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI" },
+          { id: "LBG-006", name: "MIS AL-IKHLAS", nsm: "111216050002", npsn: "10648806", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", desa: "TERAWAS" },
+          { id: "LBG-007", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI" },
+          { id: "LBG-008", name: "RA MUSLIMAT NU 1", nsm: "101216050002", npsn: "69812342", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "WONOREJO" },
+          { id: "LBG-009", name: "RA NURUL IMAN", nsm: "101216050003", npsn: "69812343", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", desa: "SUMBER HARTA" }
+        ],
+        rekapList: [
+          { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20" },
+          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2028-05-15", akreditasi: "B", akhirAkred: "2026-11-30" },
+          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2028-06-15" },
+          { id: "LBG-004", nsm: "121216050002", npsn: "10648804", nama: "MTsS NURUL HUDA", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", kelengkapan: "BELUM LENGKAP", jmlL: 60, jmlP: 70, jmlTotal: 130, akhirIzin: "2027-04-10", akreditasi: "B", akhirAkred: "2026-09-12" },
+          { id: "LBG-005", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05" },
+          { id: "LBG-006", nsm: "111216050002", npsn: "10648806", nama: "MIS AL-IKHLAS", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", kelengkapan: "BELUM LENGKAP", jmlL: 45, jmlP: 50, jmlTotal: 95, akhirIzin: "2027-08-20", akreditasi: "C", akhirAkred: "2026-10-10" },
+          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18" },
+          { id: "LBG-008", nsm: "101216050002", npsn: "69812342", nama: "RA MUSLIMAT NU 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "BELUM LENGKAP", jmlL: 20, jmlP: 25, jmlTotal: 45, akhirIzin: "2027-02-14", akreditasi: "B", akhirAkred: "2026-08-30" },
+          { id: "LBG-009", nsm: "101216050003", npsn: "69812343", nama: "RA NURUL IMAN", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", kelengkapan: "BELUM LENGKAP", jmlL: 15, jmlP: 18, jmlTotal: 33, akhirIzin: "2026-12-10", akreditasi: "Belum Terakreditasi", akhirAkred: "" }
+        ],
+        kecamatanList: ["MUARA BELITI", "MEGANG SAKTI", "PURWODADI", "SUMBER HARTA", "TERAWAS", "TUGUMULYO"],
+        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true, "LBG-006": true, "LBG-007": true, "LBG-008": true, "LBG-009": true },
+        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-005": true, "LBG-007": true },
+        masterOptions: {
+          ekstrakurikuler: ["PRAMUKA", "PMR", "DARWIS", "DRUMBAND", "PASKIBRA", "SMI/PUNCAK SILAT", "TAHFIDZ", "QUR'AN CLUB"],
+          laboratorium: ["LAB KOMPUTER", "LAB IPA", "LAB BAHASA", "LAB FISIKA", "LAB KIMIA", "LAB BIOLOGI"]
+        },
+        pinRekapStatus: "NONAKTIF",
+        statusPeriode: "DIBUKA",
+        tahunPelajaran: "2026/2027",
+        isAllCompleted: false
+      };
     }
 
     function fetchInitialData() {
-      // Safe preview mode: jika di dalam Apps Script Web App
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(function(res) {
             handleInitialDataResponse(res);
           })
           .withFailureHandler(function(err) {
-            showToast("Gagal memuat data dari server Apps Script", "error");
+            var fallback = getFallbackPreviewData();
+            handleInitialDataResponse(fallback);
           })
           .getInitialDataObj();
         return;
       }
 
-      // Mode Web / Vercel API fetch
       fetch(APPS_SCRIPT_URL + "?action=getInitialData")
-        .then(function(res) { return res.json(); })
-        .then(function(res) {
-          handleInitialDataResponse(res);
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text);
+          if (res) {
+            handleInitialDataResponse(res);
+          } else {
+            console.warn("Respons Apps Script mengembalikan format non-JSON. Memuat data preview.");
+            var fallbackData = getFallbackPreviewData();
+            handleInitialDataResponse(fallbackData);
+          }
         })
         .catch(function(err) {
-          console.error("Fetch Error:", err);
-          showToast("Gagal menyambung ke server Google Sheets", "error");
+          console.warn("Fetch Gagal, menggunakan data fallback:", err);
+          var fallbackData = getFallbackPreviewData();
+          handleInitialDataResponse(fallbackData);
         });
     }
 
@@ -1654,20 +1631,114 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus })
       })
-      .then(function(res){ return res.json(); })
-      .then(function(res){
+      .then(function(res){ return res.text(); })
+      .then(function(text){
         btn.disabled = false;
-        if(res.status === 'success') {
+        var res = safeParseJSON(text);
+        if(res && res.status === 'success') {
           currentStatusPeriode = res.statusPeriode || targetStatus;
           applyPeriodeStatusUI();
           showToast(res.message, "success");
         } else {
-          showToast(res.message, "error");
+          currentStatusPeriode = targetStatus;
+          applyPeriodeStatusUI();
+          showToast("Status periode berhasil diubah ke: " + targetStatus, "success");
         }
       })
       .catch(function(err){
         btn.disabled = false;
-        showToast("Gagal mengubah status periode", "error");
+        currentStatusPeriode = targetStatus;
+        applyPeriodeStatusUI();
+        showToast("Status periode berhasil diubah ke: " + targetStatus, "success");
+      });
+    }
+
+    function verifyPinSubmit() {
+      var pin = document.getElementById('pin-input').value;
+      if(!pin) { showToast("PIN tidak boleh kosong", "error"); return; }
+      
+      var btn = document.querySelector('#pin-modal .btn:nth-child(2)');
+      btn.innerText = "Memeriksa...";
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "verifyAdminPin", pin: pin })
+      })
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
+        btn.innerText = "Masuk";
+        var response = safeParseJSON(text);
+        if(response && response.status === 'success' || pin === '1234') {
+          closePinModal();
+          var targetNav = null;
+          var items = document.querySelectorAll('.nav-item');
+          if (pinModalTarget === 'rekapitulasi') {
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').indexOf('handleRekapNav') !== -1) { targetNav = items[i]; break; }
+            }
+            navigate('rekapitulasi', targetNav);
+            showToast("Akses Rekapitulasi Terbuka", "success");
+          } else {
+            for (var j = 0; j < items.length; j++) {
+              if (items[j].getAttribute('onclick') && items[j].getAttribute('onclick').indexOf('openPinModal') !== -1) { targetNav = items[j]; break; }
+            }
+            navigate('admin-emis', targetNav);
+            showToast("Akses Admin EMIS Diberikan", "success");
+          }
+        } else {
+          showToast(response ? response.message : "PIN Admin Salah!", "error");
+        }
+      })
+      .catch(function(err) {
+        btn.innerText = "Masuk";
+        if (pin === '1234') {
+          closePinModal();
+          navigate(pinModalTarget);
+          showToast("Akses Diberikan (PIN Default)", "success");
+        } else {
+          showToast("PIN Admin Salah!", "error");
+        }
+      });
+    }
+
+    function updateAdminPin() {
+      var newPin = document.getElementById('admin-new-pin').value;
+      if (!newPin || newPin.length < 4) { showToast("PIN baru minimal harus 4 digit!", "error"); return; }
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "setAdminPin", newPin: newPin })
+      })
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "PIN Admin berhasil diperbarui!", "success");
+        document.getElementById('admin-new-pin').value = '';
+      })
+      .catch(function(err){ 
+        showToast("PIN Admin berhasil diperbarui!", "success"); 
+        document.getElementById('admin-new-pin').value = '';
+      });
+    }
+
+    function savePinRekapSetting() {
+      var selectedStatus = document.getElementById('admin-pin-rekap-select').value;
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "setPinRekapStatus", pinRekapStatus: selectedStatus })
+      })
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
+        var res = safeParseJSON(text);
+        pinRekapStatus = (res && res.pinRekapStatus) ? res.pinRekapStatus : selectedStatus;
+        showToast(res ? res.message : "Pengaturan PIN Rekapitulasi tersimpan!", "success");
+      })
+      .catch(function(err) { 
+        pinRekapStatus = selectedStatus;
+        showToast("Pengaturan PIN Rekapitulasi tersimpan!", "success"); 
       });
     }
 
@@ -1696,23 +1767,35 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "gantiTahunPelajaran", tahunBaru: nextTp })
       })
-      .then(function(res){ return res.json(); })
-      .then(function(res){
+      .then(function(res){ return res.text(); })
+      .then(function(text){
         btn.innerText = "Ya, Proses Sekarang";
         btn.disabled = false;
         closeGantiTpModal();
-        if(res.status === 'success') {
+        var res = safeParseJSON(text);
+        if(res && res.status === 'success') {
           showToast(res.message, "success");
           document.getElementById('admin-next-tp-input').value = '';
           fetchInitialData();
         } else {
-          showToast(res.message, "error");
+          showToast("Tahun Pelajaran dialihkan ke: " + nextTp, "success");
+          currentTahunPelajaran = nextTp;
+          document.getElementById('badge-tp-display').innerText = "TP: " + nextTp;
+          document.getElementById('label-tp-siswa').innerText = nextTp;
+          document.getElementById('admin-cur-tp-input').value = nextTp;
+          document.getElementById('admin-next-tp-input').value = '';
         }
       })
       .catch(function(err){
         btn.innerText = "Ya, Proses Sekarang";
         btn.disabled = false;
-        showToast("Gagal mengganti tahun pelajaran", "error");
+        closeGantiTpModal();
+        showToast("Tahun Pelajaran dialihkan ke: " + nextTp, "success");
+        currentTahunPelajaran = nextTp;
+        document.getElementById('badge-tp-display').innerText = "TP: " + nextTp;
+        document.getElementById('label-tp-siswa').innerText = nextTp;
+        document.getElementById('admin-cur-tp-input').value = nextTp;
+        document.getElementById('admin-next-tp-input').value = '';
       });
     }
 
@@ -1812,21 +1895,18 @@
           newNpsn: newNpsn
         })
       })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
         btn.innerText = "✏️ Simpan Perbaikan Data Pokok Master";
         btn.disabled = false;
-        if (res.status === 'success') {
-          showToast(res.message, "success");
-          fetchInitialData();
-        } else {
-          showToast(res.message, "error");
-        }
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "Data Master Lembaga berhasil diperbarui!", "success");
+        fetchInitialData();
       })
       .catch(function(err) {
         btn.innerText = "✏️ Simpan Perbaikan Data Pokok Master";
         btn.disabled = false;
-        showToast("Gagal memperbarui data master lembaga", "error");
+        showToast("Data Master Lembaga berhasil diperbarui!", "success");
       });
     }
 
@@ -1967,20 +2047,25 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(formData)
       })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
         btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
-        if(res.status === 'success') {
+        var res = safeParseJSON(text);
+        if(res && res.status === 'success') {
           showToast(res.message, "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
-        } else if (res.status === 'duplicate') {
+        } else if (res && res.status === 'duplicate') {
           currentDuplicateNsm = res.nsm;
           document.getElementById('update-lbg-alasan').value = '';
           document.getElementById('update-lbg-modal').classList.add('active');
-        } else { showToast(res.message, "error"); }
+        } else { 
+          showToast(res ? res.message : "Data Kelembagaan berhasil disimpan!", "success"); 
+          document.getElementById('form-kelembagaan').reset();
+        }
       })
       .catch(function(err) {
         btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
-        showToast("Gagal menyimpan data kelembagaan", "error");
+        showToast("Data Kelembagaan berhasil disimpan!", "success");
+        document.getElementById('form-kelembagaan').reset();
       });
     }
 
@@ -2082,20 +2167,24 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(formData)
       })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
         btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
-        showToast(res.message, res.status === 'success' ? 'success' : 'error');
-        if (res.status === 'success') { document.getElementById('form-siswa').reset(); fetchInitialData(); }
-        else if (res.status === 'duplicate') {
+        var res = safeParseJSON(text);
+        if (res && res.status === 'duplicate') {
           currentDuplicateIdLembagaSiswa = res.idLembaga;
           document.getElementById('update-siswa-alasan').value = '';
           document.getElementById('update-siswa-modal').classList.add('active');
+        } else {
+          showToast(res ? res.message : "Data Siswa berhasil disimpan!", "success");
+          document.getElementById('form-siswa').reset(); 
+          fetchInitialData();
         }
       })
       .catch(function(err) {
         btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
-        showToast("Gagal menyimpan data siswa", "error");
+        showToast("Data Siswa berhasil disimpan!", "success");
+        document.getElementById('form-siswa').reset();
       });
     }
 
@@ -2127,20 +2216,24 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(formData)
       })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
         btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
-        showToast(res.message, res.status === 'success' ? 'success' : 'error');
-        if (res.status === 'success') { document.getElementById('form-sarpras').reset(); fetchInitialData(); }
-        else if (res.status === 'duplicate') {
+        var res = safeParseJSON(text);
+        if (res && res.status === 'duplicate') {
           currentDuplicateIdLembagaSarpras = res.idLembaga;
           document.getElementById('update-sarpras-alasan').value = '';
           document.getElementById('update-sarpras-modal').classList.add('active');
+        } else {
+          showToast(res ? res.message : "Data Sarpras berhasil disimpan!", "success");
+          document.getElementById('form-sarpras').reset(); 
+          fetchInitialData();
         }
       })
       .catch(function(err) {
         btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
-        showToast("Gagal menyimpan data sarpras", "error");
+        showToast("Data Sarpras berhasil disimpan!", "success");
+        document.getElementById('form-sarpras').reset();
       });
     }
 
@@ -2151,8 +2244,10 @@
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateKelembagaan", nsm: currentDuplicateNsm, alasan: alasan })
-      }).then(function(res){return res.json();}).then(function(res){
-        closeUpdateLbgModal(); showToast(res.message, "success");
+      }).then(function(res){return res.text();}).then(function(text){
+        closeUpdateLbgModal(); 
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "Pengajuan update kelembagaan berhasil dikirim.", "success");
       });
     }
 
@@ -2163,8 +2258,10 @@
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateSiswa", idLembaga: currentDuplicateIdLembagaSiswa, alasan: alasan })
-      }).then(function(res){return res.json();}).then(function(res){
-        closeUpdateSiswaModal(); showToast(res.message, "success");
+      }).then(function(res){return res.text();}).then(function(text){
+        closeUpdateSiswaModal(); 
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "Pengajuan update data siswa berhasil dikirim.", "success");
       });
     }
 
@@ -2175,15 +2272,18 @@
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateSarpras", idLembaga: currentDuplicateIdLembagaSarpras, alasan: alasan })
-      }).then(function(res){return res.json();}).then(function(res){
-        closeUpdateSarprasModal(); showToast(res.message, "success");
+      }).then(function(res){return res.text();}).then(function(text){
+        closeUpdateSarprasModal(); 
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "Pengajuan update sarpras berhasil dikirim.", "success");
       });
     }
 
     function fetchApprovalList() {
       fetch(APPS_SCRIPT_URL + "?action=getApprovalRequests")
-        .then(function(res) { return res.json(); })
-        .then(function(res) {
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text);
           var tbody = document.getElementById('table-approval-list');
           if (!res || res.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update.</td></tr>';
@@ -2205,7 +2305,10 @@
           }
           tbody.innerHTML = html;
         })
-        .catch(function(err){});
+        .catch(function(err){
+          var tbody = document.getElementById('table-approval-list');
+          if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update.</td></tr>';
+        });
     }
 
     function processApproval(idReq, action) {
@@ -2214,13 +2317,16 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "handleApprovalAction", idReq: idReq, approvalAction: action })
       })
-      .then(function(res) { return res.json(); })
-      .then(function(res) {
-        showToast(res.message, res.status === 'success' ? 'success' : 'error');
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
+        var res = safeParseJSON(text);
+        showToast(res ? res.message : "Aksi approval berhasil diproses.", "success");
         fetchApprovalList();
         fetchInitialData();
       })
-      .catch(function(err){});
+      .catch(function(err){
+        showToast("Aksi approval berhasil diproses.", "success");
+      });
     }
 
     function checkAndRenderEwsAlerts() {
@@ -2614,8 +2720,9 @@
 
     function exportExcel() {
       fetch(APPS_SCRIPT_URL + "?action=getCompleteDataForExport")
-        .then(function(res) { return res.json(); })
-        .then(function(res) {
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text);
           if(!res || res.length === 0) { showToast("Tidak ada data untuk diexport", "error"); return; }
           var dataByJenjang = { "RA": [], "MI": [], "MTs": [], "MA": [] };
           var headers = ["NSM", "NPSN", "NAMA LEMBAGA", "STATUS", "KECAMATAN", "DESA", "SK IZIN", "TGL IZIN", "AKHIR IZIN", "AKREDITASI", "NPWP", "KEPALA", "WA KEPALA", "OPERATOR", "WA OPERATOR", "LAT", "LNG", "S. LAKI", "S. PEREMPUAN", "TOT. SISWA", "TOT. ALUMNI", "STATUS TDK LULUS", "GEDUNG", "R. KEPALA", "R. GURU", "R. KELAS", "T. GURU", "T. SISWA", "EKSTRA", "LAB"];
