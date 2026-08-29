@@ -566,6 +566,30 @@
               <h3 id="dash-kosong">-</h3>
             </div>
           </div>
+
+          <!-- TABEL LEMBAGA SELESAI INPUT (MA -> MTs -> MI -> RA, URUT NSM) -->
+          <div class="form-divider" style="margin-top: 30px;">🏆 Lembaga yang Sudah Selesai Input Semua (Lengkap 100%)</div>
+          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span>Urutan Jenjang: <strong>MA &rarr; MTs &rarr; MI &rarr; RA</strong> (Diurutkan berdasarkan NSM)</span>
+            <span id="dash-completed-count" style="font-weight:700; color:var(--primary-solid); background:var(--primary-light); padding:4px 12px; border-radius:15px;">0 Lembaga Selesai</span>
+          </div>
+          <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <table>
+              <thead>
+                <tr style="background:var(--bg-body);">
+                  <th style="width:50px; text-align:center;">NO</th>
+                  <th style="width:90px; text-align:center;">JENJANG</th>
+                  <th style="width:160px;">NSM</th>
+                  <th>NAMA LEMBAGA</th>
+                  <th>KECAMATAN</th>
+                  <th style="width:130px; text-align:center;">STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="table-dashboard-completed">
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat data lembaga selesai...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <!-- SECTION: INPUT KELEMBAGAAN -->
@@ -1257,7 +1281,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6PSrlanvh9w1-gBj_oBC1aN9Qb_CkpkZDj_PszEtr6FKOGNAZpbHjP4mP9kXfPoYb/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKg_eZgkJF5j87nkR2bZcKT_7ysQ6v0auGBvxYQyHCteo4PTqJ6ncf1wJRZ0BCNcoA/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1298,6 +1322,9 @@
       var targetSection = document.getElementById(sectionId);
       if(targetSection) targetSection.classList.add('active');
       
+      if (sectionId === 'dashboard') {
+        renderDashboardCompletedList();
+      }
       if (sectionId === 'admin-emis') {
         fetchApprovalList();
         renderAdminEditLembagaDropdown();
@@ -1477,6 +1504,7 @@
             }
             
             applyPeriodeStatusUI();
+            renderDashboardCompletedList();
             renderMasterLembagaDropdown();
             renderAdminEditLembagaDropdown();
             renderLembagaDropdowns();
@@ -1487,6 +1515,66 @@
           }
         })
         .catch(function(err) {});
+    }
+
+    function renderDashboardCompletedList() {
+      var tbody = document.getElementById('table-dashboard-completed');
+      var badgeCount = document.getElementById('dash-completed-count');
+      if (!tbody) return;
+
+      var completedList = fullRekapData.filter(function(item) {
+        return item.kelengkapan === "LENGKAP";
+      });
+
+      if (badgeCount) {
+        badgeCount.innerText = completedList.length + " Lembaga Selesai";
+      }
+
+      if (completedList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Belum ada lembaga yang menyelesaikan seluruh pengisian data (Kelembagaan, Siswa, dan Sarpras).</td></tr>';
+        return;
+      }
+
+      var jenjangPriority = { "MA": 1, "MTS": 2, "MI": 3, "RA": 4 };
+
+      completedList.sort(function(a, b) {
+        var jgA = (a.jenjang || "").toUpperCase();
+        var jgB = (b.jenjang || "").toUpperCase();
+        var prioA = jenjangPriority[jgA] || 99;
+        var prioB = jenjangPriority[jgB] || 99;
+
+        if (prioA !== prioB) {
+          return prioA - prioB;
+        }
+
+        var nsmA = String(a.nsm || "");
+        var nsmB = String(b.nsm || "");
+        return nsmA.localeCompare(nsmB, undefined, { numeric: true });
+      });
+
+      var html = '';
+      for (var i = 0; i < completedList.length; i++) {
+        var row = completedList[i];
+        var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+        var jgBadgeColor = 'var(--primary-solid)';
+        var jgName = (row.jenjang || '-').toUpperCase();
+
+        if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+        else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+        else if (jgName === 'MI') { jgBadgeBg = 'rgba(0, 192, 90, 0.15)'; jgBadgeColor = 'var(--primary-solid)'; }
+        else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+        html += '<tr>' +
+          '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+          '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (row.jenjang || '-') + '</span></td>' +
+          '<td style="font-weight:600; letter-spacing:0.5px;">' + (row.nsm || '-') + '</td>' +
+          '<td style="font-weight:700; color:var(--text-main);">' + (row.nama || '-') + '</td>' +
+          '<td><span style="display:inline-flex; align-items:center; gap:4px;">📍 ' + (row.kecamatan || '-') + '</span></td>' +
+          '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid); font-weight:700;">✅ LENGKAP</span></td>' +
+        '</tr>';
+      }
+
+      tbody.innerHTML = html;
     }
 
     function applyPeriodeStatusUI() {
