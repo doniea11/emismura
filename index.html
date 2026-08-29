@@ -425,16 +425,6 @@
       box-shadow: 0 10px 25px var(--primary-light); 
       border-color: var(--primary-solid);
     }
-    .card-click-hint {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      opacity: 0.85;
-    }
     .card div { color: var(--text-main); font-size: 0.92rem; font-weight: 500; }
     .card h3 { font-size: 2.6rem; color: var(--primary-solid); margin: 10px 0 0 0; font-weight: 700; line-height: 1; }
     
@@ -646,7 +636,7 @@
             </div>
           </div>
 
-          <!-- INTERACTIVE DASHBOARD CARDS -->
+          <!-- INTERACTIVE DASHBOARD CARDS DENGAN OTORISASI PIN -->
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
@@ -656,15 +646,13 @@
               <div>Data Lengkap 100%</div>
               <h3 id="dash-submit" class="stat-number-green">0</h3>
             </div>
-            <div class="card clickable-card" onclick="openModalBelumLengkap()" title="Klik untuk melihat rincian lembaga yang belum lengkap">
+            <div class="card clickable-card" onclick="handleCardPinAccess('modal-belum-lengkap')" title="Klik untuk melihat rincian lembaga yang belum lengkap">
               <div>Belum Lengkap</div>
               <h3 id="dash-sebagian" class="stat-number-yellow">0</h3>
-              <div class="card-click-hint">🔍 Klik untuk Rincian Modul</div>
             </div>
-            <div class="card clickable-card" onclick="openModalBelumMengisi()" title="Klik untuk melihat rincian lembaga yang belum mengisi data sama sekali">
+            <div class="card clickable-card" onclick="handleCardPinAccess('modal-belum-mengisi')" title="Klik untuk melihat rincian lembaga yang belum mengisi data sama sekali">
               <div>Belum Mengisi</div>
               <h3 id="dash-kosong" class="stat-number-red">0</h3>
-              <div class="card-click-hint">🔍 Klik untuk Rincian & WA</div>
             </div>
           </div>
 
@@ -1340,7 +1328,7 @@
             <span>⏳</span> Rincian Lembaga Belum Lengkap Pengisian Data
           </h3>
           <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
-            Menampilkan lembaga yang baru mengisi sebagian modul (Kelembagaan / Siswa / Sarpras) pada TP <strong id="modal-bl-tp-label">2026/2027</strong>.
+            Menampilkan lembaga yang baru mengisi sebagian modul (Kelembagaan / Siswa / Sarana Prasarana) pada TP <strong id="modal-bl-tp-label">2026/2027</strong>.
           </p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -1372,7 +1360,7 @@
               <th style="text-align:center; width:100px;">KELEMBAGAAN</th>
               <th style="text-align:center; width:90px;">SISWA</th>
               <th style="text-align:center; width:90px;">SARPRAS</th>
-              <th style="text-align:center; width:90px;">INGATKAN</th>
+              <th style="text-align:center; width:120px;">CHAT OPERATOR</th>
             </tr>
           </thead>
           <tbody id="table-modal-belum-lengkap">
@@ -1422,8 +1410,8 @@
               <th style="width:140px;">NSM / NPSN</th>
               <th>NAMA LEMBAGA</th>
               <th>KECAMATAN</th>
-              <th>KONTAK KEPALA / OPERATOR</th>
-              <th style="text-align:center; width:100px;">AKSI HUBUNGI</th>
+              <th>OPERATOR & KONTAK</th>
+              <th style="text-align:center; width:120px;">CHAT OPERATOR</th>
             </tr>
           </thead>
           <tbody id="table-modal-belum-mengisi">
@@ -1460,7 +1448,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWEOsK2iU1Zebbbt9GDnY_2EY81vR96SSSInytgvl5BXYEk_0kdNbjtbCYz3xbItEn/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUszkH_TNWuGkI-13GNzlz7ZICpOrtg7LYXNMcOKj1qc9QE2l3fG7nZwxCjf05zLSK/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1519,6 +1507,10 @@
       }
     }
 
+    function handleCardPinAccess(targetModal) {
+      openPinModal(targetModal);
+    }
+
     function showToast(message, type) {
       var container = document.getElementById('toast-container');
       var toast = document.createElement('div');
@@ -1543,6 +1535,10 @@
       var titleEl = document.getElementById('pin-modal-title');
       if (pinModalTarget === 'rekapitulasi') {
         titleEl.innerText = "🔒 Akses Rekapitulasi Terkunci";
+      } else if (pinModalTarget === 'modal-belum-lengkap') {
+        titleEl.innerText = "🔒 Otorisasi: Data Belum Lengkap";
+      } else if (pinModalTarget === 'modal-belum-mengisi') {
+        titleEl.innerText = "🔒 Otorisasi: Data Belum Mengisi";
       } else {
         titleEl.innerText = "⚙️ Otorisasi Admin EMIS";
       }
@@ -1756,8 +1752,19 @@
     }
 
     // ====================================================
-    // FITUR INTERAKTIF: MODAL BELUM LENGKAP & BELUM MENGISI
+    // FITUR INTERAKTIF: FORMAT WHATSAPP & MODAL RINCIAN
     // ====================================================
+
+    function formatMissingModulesText(missingModules) {
+      if (!missingModules || missingModules.length === 0) return "Kelembagaan, Siswa, dan Sarana Prasarana";
+      var mapped = missingModules.map(function(m) {
+        if (m === "Sarpras") return "Sarana Prasarana";
+        return m;
+      });
+      if (mapped.length === 1) return mapped[0];
+      if (mapped.length === 2) return mapped[0] + " dan " + mapped[1];
+      return mapped.slice(0, -1).join(", ") + ", dan " + mapped[mapped.length - 1];
+    }
 
     function formatWaUrl(phone, text) {
       if (!phone) return "";
@@ -1796,21 +1803,26 @@
           var badgeSsw = item.hasSiswa ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
           var badgeSpr = item.hasSarpras ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
 
-          var waTarget = item.waOp || item.waKepala || "";
-          var contactName = item.namaOp || item.namaKepala || "Operator/Kepala";
-          var missingText = (item.missingModules && item.missingModules.length > 0) ? item.missingModules.join(", ") : "beberapa modul";
+          var waTarget = item.waOp || "";
+          var missingText = formatMissingModulesText(item.missingModules);
           
-          var waReminderText = "Assalamu'alaikum Wr. Wb. Yth. " + contactName + " (" + item.nama + "). Mengingatkan untuk segera melengkapi data isian pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ". Bagian yang belum selesai diinput: " + missingText + ". Terima kasih.";
+          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
+            "Kepada Yth. Operator " + item.nama + "\n" +
+            "Mohon maaf sebelumnya, kami mengingatkan untuk segera melengkapi data isian pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ". Bagian yang belum selesai diinput adalah bagian " + missingText + ".\n" +
+            "Terima kasih.\n" +
+            "Wassalamu'alaikum Wr. Wb.\n\n" +
+            "_Notifikasi dibuat otomatis oleh Portal Pendataan_";
+
           var waLink = formatWaUrl(waTarget, waReminderText);
 
           var btnWa = waLink ? 
-            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat WA Langsung">💬 Chat</a>' : 
-            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat ke No WA Operator (' + (item.waOp || '-') + ')">💬 Chat WA</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA Op -</span>';
 
           html += '<tr>' +
             '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
             '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (item.jenjang || '-') + '</span></td>' +
-            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong><br><small style="color:var(--text-muted); font-weight:600;">NSM: ' + (item.nsm || '-') + '</small></td>' +
+            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong><br><small style="color:var(--text-muted); font-weight:600;">NSM: ' + (item.nsm || '-') + (item.namaOp ? ' | Op: ' + item.namaOp : '') + '</small></td>' +
             '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
             '<td style="text-align:center;">' + badgeLbg + '</td>' +
             '<td style="text-align:center;">' + badgeSsw + '</td>' +
@@ -1853,18 +1865,23 @@
           else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
           else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
 
-          var waTarget = item.waOp || item.waKepala || "";
-          var contactName = item.namaOp || item.namaKepala || "Operator/Kepala";
-          var contactInfo = (item.namaKepala ? 'Kepala: ' + item.namaKepala : '') + 
-            (item.namaOp ? (item.namaKepala ? '<br>' : '') + 'Operator: ' + item.namaOp : '');
+          var waTarget = item.waOp || "";
+          var contactInfo = (item.namaOp ? 'Operator: <strong>' + item.namaOp + '</strong>' + (item.waOp ? '<br><small style="color:var(--text-muted);">' + item.waOp + '</small>' : '') : '') + 
+            (item.namaKepala ? (item.namaOp ? '<br>' : '') + '<small style="color:var(--text-muted);">Kepala: ' + item.namaKepala + '</small>' : '');
           if (!contactInfo) contactInfo = '<span style="color:var(--text-muted);">-</span>';
 
-          var waReminderText = "Assalamu'alaikum Wr. Wb. Yth. " + contactName + " (" + item.nama + "). Diinformasikan bahwa saat ini data madrasah/RA Anda masih berstatus BELUM MENGISI di Portal Pendataan Kemenag Musi Rawas untuk Tahun Pelajaran " + currentTahunPelajaran + ". Mohon kesediaannya untuk segera melakukan input data kelembagaan, siswa, dan sarpras. Terima kasih.";
+          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
+            "Kepada Yth. Operator " + item.nama + "\n" +
+            "Mohon maaf sebelumnya, kami mengingatkan untuk segera melengkapi data isian pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ". Bagian yang belum selesai diinput adalah bagian Kelembagaan, Siswa, dan Sarana Prasarana.\n" +
+            "Terima kasih.\n" +
+            "Wassalamu'alaikum Wr. Wb.\n\n" +
+            "_Notifikasi dibuat otomatis oleh Portal Pendataan_";
+
           var waLink = formatWaUrl(waTarget, waReminderText);
 
           var btnWa = waLink ? 
-            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat WA Langsung">💬 Chat WA</a>' : 
-            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat ke No WA Operator (' + (item.waOp || '-') + ')">💬 Chat WA</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA Op -</span>';
 
           html += '<tr>' +
             '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
@@ -1893,21 +1910,23 @@
         return;
       }
 
-      var text = "📢 *PEMBERITAHUAN MONITORING PENDATAAN EMIS*\n";
+      var text = "Assalamu'alaikum Wr. Wb.\n\n";
+      text += "📢 *PEMBERITAHUAN MONITORING PENDATAAN EMIS*\n";
       text += "Kantor Kementerian Agama Kabupaten Musi Rawas\n";
       text += "Tahun Pelajaran: *" + currentTahunPelajaran + "*\n\n";
+      text += "Mohon maaf sebelumnya, kami mengingatkan kepada Operator Lembaga terkait untuk segera melengkapi data isian pada Portal Pendataan.\n\n";
       text += "⚠️ *DAFTAR LEMBAGA BELUM LENGKAP PENGISIAN (" + list.length + " LEMBAGA):*\n";
       text += "━━━━━━━━━━━━━━━━━━━━\n";
 
       for (var i = 0; i < list.length; i++) {
         var itm = list[i];
-        var missing = (itm.missingModules && itm.missingModules.length > 0) ? itm.missingModules.join(", ") : "Siswa/Sarpras";
+        var missing = formatMissingModulesText(itm.missingModules);
         text += (i + 1) + ". *" + itm.nama + "* (" + itm.jenjang + " - Kec. " + itm.kecamatan + ")\n";
-        text += "   ↳ Belum Lengkap: _" + missing + "_\n";
+        text += "   ↳ Bagian Belum Selesai: _" + missing + "_\n";
       }
 
       text += "━━━━━━━━━━━━━━━━━━━━\n";
-      text += "Dimohon kepada Kepala Madrasah/RA dan Operator terkait untuk segera melengkapi data melalui Portal Pendataan.\n\n_Seksi Pendidikan Madrasah Kemenag Musi Rawas_";
+      text += "Terima kasih.\nWassalamu'alaikum Wr. Wb.\n\n_Notifikasi dibuat otomatis oleh Portal Pendataan_";
 
       var shareUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
       window.open(shareUrl, "_blank");
@@ -1920,9 +1939,11 @@
         return;
       }
 
-      var text = "📢 *PEMBERITAHUAN PENTING - PORTAL PENDATAAN EMIS*\n";
+      var text = "Assalamu'alaikum Wr. Wb.\n\n";
+      text += "📢 *PEMBERITAHUAN MONITORING PENDATAAN EMIS*\n";
       text += "Kantor Kementerian Agama Kabupaten Musi Rawas\n";
       text += "Tahun Pelajaran: *" + currentTahunPelajaran + "*\n\n";
+      text += "Mohon maaf sebelumnya, kami mengingatkan kepada Operator Lembaga terkait untuk segera melakukan pengisian data pada Portal Pendataan.\n\n";
       text += "❌ *DAFTAR LEMBAGA BELUM MENGISI DATA (" + list.length + " LEMBAGA):*\n";
       text += "━━━━━━━━━━━━━━━━━━━━\n";
 
@@ -1932,7 +1953,7 @@
       }
 
       text += "━━━━━━━━━━━━━━━━━━━━\n";
-      text += "Mohon perhatian khusus bagi Bapak/Ibu Kepala Madrasah & Operator tertera untuk segera melakukan pengisian data pokok kelembagaan, siswa, dan sarpras.\n\n_Seksi Pendidikan Madrasah Kemenag Musi Rawas_";
+      text += "Terima kasih.\nWassalamu'alaikum Wr. Wb.\n\n_Notifikasi dibuat otomatis oleh Portal Pendataan_";
 
       var shareUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
       window.open(shareUrl, "_blank");
@@ -2147,20 +2168,30 @@
         btn.innerText = "Masuk";
         var response = safeParseJSON(text);
         if((response && response.status === 'success') || pin === '1234') {
+          var targetAction = pinModalTarget;
           closePinModal();
-          var targetNav = null;
-          var items = document.querySelectorAll('.nav-item');
-          if (pinModalTarget === 'rekapitulasi') {
+          
+          if (targetAction === 'rekapitulasi') {
+            var targetNav = null;
+            var items = document.querySelectorAll('.nav-item');
             for (var i = 0; i < items.length; i++) {
               if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').indexOf('handleRekapNav') !== -1) { targetNav = items[i]; break; }
             }
             navigate('rekapitulasi', targetNav);
             showToast("Akses Rekapitulasi Terbuka", "success");
+          } else if (targetAction === 'modal-belum-lengkap') {
+            openModalBelumLengkap();
+            showToast("Akses Rincian Belum Lengkap Terbuka", "success");
+          } else if (targetAction === 'modal-belum-mengisi') {
+            openModalBelumMengisi();
+            showToast("Akses Rincian Belum Mengisi Terbuka", "success");
           } else {
-            for (var j = 0; j < items.length; j++) {
-              if (items[j].getAttribute('onclick') && items[j].getAttribute('onclick').indexOf('openPinModal') !== -1) { targetNav = items[j]; break; }
+            var targetNavAdmin = null;
+            var itemsAdmin = document.querySelectorAll('.nav-item');
+            for (var j = 0; j < itemsAdmin.length; j++) {
+              if (itemsAdmin[j].getAttribute('onclick') && itemsAdmin[j].getAttribute('onclick').indexOf('openPinModal') !== -1) { targetNavAdmin = itemsAdmin[j]; break; }
             }
-            navigate('admin-emis', targetNav);
+            navigate('admin-emis', targetNavAdmin);
             showToast("Akses Admin EMIS Diberikan", "success");
           }
         } else {
@@ -2170,8 +2201,15 @@
       .catch(function(err) {
         btn.innerText = "Masuk";
         if (pin === '1234') {
+          var targetAction = pinModalTarget;
           closePinModal();
-          navigate(pinModalTarget);
+          if (targetAction === 'modal-belum-lengkap') {
+            openModalBelumLengkap();
+          } else if (targetAction === 'modal-belum-mengisi') {
+            openModalBelumMengisi();
+          } else {
+            navigate(targetAction);
+          }
           showToast("Akses Diberikan (PIN Default)", "success");
         } else {
           showToast("PIN Admin Salah!", "error");
