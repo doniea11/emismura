@@ -138,7 +138,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       
-      /* Animasi Cahaya Berjalan Dibuat Lebih Lambat & Halus (8 Detik) */
+      /* Animasi Cahaya Berjalan Dibuat Lambat & Halus (8 Detik) */
       animation: shimmerLightSweep 8s ease-in-out infinite;
       
       /* Efek 3D Menggelembung (Bubble & Depth Drop-Shadow) */
@@ -1151,7 +1151,7 @@
 
           <!-- 5. PENGATURAN PIN REKAP -->
           <div class="form-divider">5. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
-          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px;">
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <div class="form-group">
               <label>Status Proteksi PIN Rekapitulasi</label>
               <select id="admin-pin-rekap-select" style="background:var(--bg-container); font-weight:600;">
@@ -1160,6 +1160,54 @@
               </select>
             </div>
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan PIN Rekap</button>
+          </div>
+
+          <!-- 6. PERBAIKAN DATA POKOK MASTER (NAMA, NSM, NPSN) -->
+          <div class="form-divider">6. Perbaikan Data Pokok Lembaga Master (Nama, NSM, NPSN)</div>
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:750px;">
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:15px;">
+              Gunakan form ini untuk memperbaiki penulisan <strong>Nama Lembaga, NSM, atau NPSN</strong> yang salah. Perubahan ini akan otomatis disinkronkan ke seluruh sistem dan tetap terkunci saat pengisian data oleh lembaga.
+            </p>
+            <div class="form-group">
+              <label style="font-weight:600; color:var(--primary-solid);">Pilih Lembaga yang Ingin Diperbaiki</label>
+              <select id="admin-edit-lbg-select" onchange="onSelectAdminEditLembaga()" style="background:var(--bg-container); font-weight:600;">
+                <option value="">-- Pilih Lembaga --</option>
+              </select>
+            </div>
+
+            <div class="form-divider" style="font-size:0.88rem; margin:15px 0 10px 0;">Data Saat Ini (Tercatat di Database)</div>
+            <div class="grid-cards" style="margin-bottom:15px;">
+              <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                <label>Nama Lembaga Saat Ini</label>
+                <input type="text" id="admin-edit-lbg-old-name" readonly style="font-weight:700;">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>NSM Saat Ini</label>
+                <input type="text" id="admin-edit-lbg-old-nsm" readonly style="font-weight:700;">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>NPSN Saat Ini</label>
+                <input type="text" id="admin-edit-lbg-old-npsn" readonly style="font-weight:700;">
+              </div>
+            </div>
+
+            <div class="form-divider" style="font-size:0.88rem; margin:15px 0 10px 0;">Data Perbaikan Baru</div>
+            <div class="grid-cards" style="margin-bottom:20px;">
+              <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                <label style="font-weight:600; color:var(--text-main);">Nama Lembaga Baru (Huruf Kapital)</label>
+                <input type="text" id="admin-edit-lbg-new-name" class="uppercase-input" placeholder="CONTOH: RA MUSLIMAT NU 2" style="background:var(--bg-container); font-weight:700;">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label style="font-weight:600; color:var(--text-main);">NSM Baru (Hanya Angka)</label>
+                <input type="text" id="admin-edit-lbg-new-nsm" placeholder="Nomor NSM" maxlength="15" oninput="validateNumberOnlyInput(this)" style="background:var(--bg-container); font-weight:700;">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label style="font-weight:600; color:var(--text-main);">NPSN Baru (Hanya Angka)</label>
+                <input type="text" id="admin-edit-lbg-new-npsn" placeholder="Nomor NPSN" maxlength="10" oninput="validateNumberOnlyInput(this)" style="background:var(--bg-container); font-weight:700;">
+              </div>
+            </div>
+
+            <button class="btn" id="btn-submit-edit-lbg" onclick="submitPerbaikanDataMasterLembaga()" style="background:var(--primary-solid); width:100%; font-size:1rem; padding:14px;">✏️ Simpan Perbaikan Data Pokok Master</button>
           </div>
         </section>
 
@@ -1247,7 +1295,7 @@
 
   <script>
     // URL Web App Google Apps Script
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNYzOQo2Pg28HRnyIaYwDC20_N-KaBvarJNkoksEkEhBglXGwtLM-r_-2AzHXZRJCP/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylc36IU2itOO5UuOB-xLn-P7opthRokKcddd5_oTf4Q-fqFB8bHjQ4fT_Yg4eh4ZM/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1290,6 +1338,7 @@
       
       if (sectionId === 'admin-emis') {
         fetchApprovalList();
+        renderAdminEditLembagaDropdown();
       }
       if (sectionId === 'rekapitulasi') {
         renderRekapTable();
@@ -1456,6 +1505,7 @@
             
             applyPeriodeStatusUI();
             renderMasterLembagaDropdown();
+            renderAdminEditLembagaDropdown();
             renderLembagaDropdowns();
             renderSarprasDropdowns();
             renderKecamatanSubFilters();
@@ -1589,6 +1639,109 @@
       select.innerHTML = html;
     }
 
+    function renderAdminEditLembagaDropdown() {
+      var select = document.getElementById('admin-edit-lbg-select');
+      if (!select) return;
+      var html = '<option value="">-- Pilih Lembaga untuk Memperbaiki Data Pokok --</option>';
+      for (var i = 0; i < globalInstitutions.length; i++) {
+        var inst = globalInstitutions[i];
+        html += '<option value="' + inst.id + '" data-name="' + inst.name + '" data-nsm="' + inst.nsm + '" data-npsn="' + (inst.npsn || '') + '">' + inst.name + ' (' + inst.jenjang + ' - NSM: ' + inst.nsm + ')</option>';
+      }
+      select.innerHTML = html;
+    }
+
+    function onSelectAdminEditLembaga() {
+      var select = document.getElementById('admin-edit-lbg-select');
+      var oldNameInput = document.getElementById('admin-edit-lbg-old-name');
+      var oldNsmInput = document.getElementById('admin-edit-lbg-old-nsm');
+      var oldNpsnInput = document.getElementById('admin-edit-lbg-old-npsn');
+      
+      var newNameInput = document.getElementById('admin-edit-lbg-new-name');
+      var newNsmInput = document.getElementById('admin-edit-lbg-new-nsm');
+      var newNpsnInput = document.getElementById('admin-edit-lbg-new-npsn');
+      
+      if (select.selectedIndex > 0) {
+        var selectedOpt = select.options[select.selectedIndex];
+        var curName = selectedOpt.getAttribute('data-name') || '';
+        var curNsm = selectedOpt.getAttribute('data-nsm') || '';
+        var curNpsn = selectedOpt.getAttribute('data-npsn') || '';
+
+        oldNameInput.value = curName;
+        oldNsmInput.value = curNsm;
+        oldNpsnInput.value = curNpsn;
+
+        newNameInput.value = curName;
+        newNsmInput.value = curNsm;
+        newNpsnInput.value = curNpsn;
+
+        newNameInput.focus();
+      } else {
+        oldNameInput.value = '';
+        oldNsmInput.value = '';
+        oldNpsnInput.value = '';
+        newNameInput.value = '';
+        newNsmInput.value = '';
+        newNpsnInput.value = '';
+      }
+    }
+
+    function submitPerbaikanDataMasterLembaga() {
+      var select = document.getElementById('admin-edit-lbg-select');
+      var idLembaga = select.value;
+      var newNama = document.getElementById('admin-edit-lbg-new-name').value.trim();
+      var newNsm = document.getElementById('admin-edit-lbg-new-nsm').value.trim();
+      var newNpsn = document.getElementById('admin-edit-lbg-new-npsn').value.trim();
+      var btn = document.getElementById('btn-submit-edit-lbg');
+
+      if (!idLembaga) {
+        showToast("Pilih lembaga yang ingin diperbaiki terlebih dahulu!", "error");
+        return;
+      }
+      if (!newNama) {
+        showToast("Nama lembaga baru tidak boleh kosong!", "error");
+        return;
+      }
+      if (!newNsm) {
+        showToast("NSM baru tidak boleh kosong!", "error");
+        return;
+      }
+      if (!newNpsn) {
+        showToast("NPSN baru tidak boleh kosong!", "error");
+        return;
+      }
+
+      btn.innerText = "Menyimpan Perbaikan Data Master...";
+      btn.disabled = true;
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "updateMasterLembaga",
+          idLembaga: idLembaga,
+          newNama: newNama,
+          newNsm: newNsm,
+          newNpsn: newNpsn
+        })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        btn.innerText = "✏️ Simpan Perbaikan Data Pokok Master";
+        btn.disabled = false;
+        if (res.status === 'success') {
+          showToast(res.message, "success");
+          fetchInitialData();
+        } else {
+          showToast(res.message, "error");
+        }
+      })
+      .catch(function(err) {
+        btn.innerText = "✏️ Simpan Perbaikan Data Pokok Master";
+        btn.disabled = false;
+        showToast("Gagal memperbarui data master lembaga", "error");
+      });
+    }
+
     function onSelectMasterKelembagaan() {
       var nsmVal = document.getElementById('k-select-master-lbg').value;
       if (!nsmVal) {
@@ -1650,7 +1803,7 @@
         if (globalInstitutions.length === 0) {
           selectSarpras.innerHTML = '<option value="">-- Belum ada lembaga terdaftar --</option>';
         } else {
-          var html = '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
+          var html = '<option value="">-- Pilih Lembaga --</option>';
           for (var i = 0; i < globalInstitutions.length; i++) {
             var inst = globalInstitutions[i];
             html += '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
