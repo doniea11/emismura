@@ -420,7 +420,6 @@
     .card div { color: var(--text-main); font-size: 0.92rem; font-weight: 500; }
     .card h3 { font-size: 2.6rem; color: var(--primary-solid); margin: 10px 0 0 0; font-weight: 700; line-height: 1; }
     
-    /* Warna Khusus Angka Kartu Statistik */
     .stat-number-green { color: var(--primary-solid) !important; }
     .stat-number-yellow { color: #EAB308 !important; }
     [data-theme="dark"] .stat-number-yellow { color: #FACC15 !important; }
@@ -473,10 +472,6 @@
       .topbar-right { width: 100%; justify-content: space-between; }
     }
 
-    /* ==========================================
-       PRINT STYLESHEET KHUSUS CETAK DOKUMEN PROFIL
-       Hanya mencetak lembar data lembaga, tanpa layar laptop/web
-       ========================================== */
     #print-document-container {
       display: none;
     }
@@ -672,7 +667,6 @@
             </div>
           </div>
 
-          <!-- KARTU STATISTIK DENGAN WARNA ANGKA KHUSUS -->
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
@@ -1251,17 +1245,17 @@
             <button class="btn" onclick="openGantiTpModal()" style="background:var(--primary-solid);">🔄 Proses Ganti Tahun Pelajaran & Buat Sheet Baru</button>
           </div>
 
-          <div class="form-divider">3. Daftar Pengajuan Update Data Lembaga</div>
+          <div class="form-divider">3. Daftar Pengajuan Update Data Lembaga (Semua Modul)</div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 35px;">
             <table>
               <thead>
                 <tr>
-                  <th>WAKTU</th>
-                  <th>ID / NSM LEMBAGA</th>
-                  <th>MODUL</th>
+                  <th style="width:130px;">WAKTU</th>
+                  <th>NAMA LEMBAGA & NSM</th>
+                  <th style="width:140px; text-align:center;">BAGIAN / MODUL</th>
                   <th>ALASAN PENGAJUAN</th>
-                  <th>STATUS</th>
-                  <th>AKSI</th>
+                  <th style="width:100px; text-align:center;">STATUS</th>
+                  <th style="width:160px; text-align:center;">AKSI ADMIN</th>
                 </tr>
               </thead>
               <tbody id="table-approval-list">
@@ -1376,12 +1370,12 @@
     </div>
   </div>
 
-  <!-- Modals Request Update -->
+  <!-- Modal Request Update Kelembagaan -->
   <div class="modal-overlay" id="update-lbg-modal">
     <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Update Kelembagaan</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah terdaftar & terisi. Tuliskan alasan mengapa data kelembagaan perlu diperbarui:</p>
-      <textarea id="update-lbg-alasan" rows="3" placeholder="Contoh: Perubahan SK Izin Operasional..." style="margin-bottom:20px; resize:none;"></textarea>
+      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Kelembagaan</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah terdaftar & terisi. Tuliskan alasan mengapa data kelembagaan perlu diperbarui oleh Admin:</p>
+      <textarea id="update-lbg-alasan" rows="3" placeholder="Contoh: Perubahan SK Izin Operasional, perbaikan alamat/nama pengurus..." style="margin-bottom:20px; resize:none;"></textarea>
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateLbgModal()">Batal</button>
         <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateKelembagaan()">Kirim Pengajuan</button>
@@ -1389,11 +1383,12 @@
     </div>
   </div>
 
+  <!-- Modal Request Update Siswa -->
   <div class="modal-overlay" id="update-siswa-modal">
     <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Update Data Siswa</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Siswa. Tuliskan alasan pengajuan update:</p>
-      <textarea id="update-siswa-alasan" rows="3" placeholder="Contoh: Perbaikan data kelas karena mutasi..." style="margin-bottom:20px; resize:none;"></textarea>
+      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Siswa</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Siswa. Tuliskan alasan mengapa data siswa perlu diubah:</p>
+      <textarea id="update-siswa-alasan" rows="3" placeholder="Contoh: Perbaikan jumlah siswa aktif karena mutasi masuk/keluar..." style="margin-bottom:20px; resize:none;"></textarea>
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSiswaModal()">Batal</button>
         <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateSiswa()">Kirim Pengajuan</button>
@@ -1401,11 +1396,12 @@
     </div>
   </div>
 
+  <!-- Modal Request Update Sarpras -->
   <div class="modal-overlay" id="update-sarpras-modal">
     <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Update Data Sarpras</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Sarpras. Tuliskan alasan pengajuan update:</p>
-      <textarea id="update-sarpras-alasan" rows="3" placeholder="Contoh: Penambahan fasilitas gedung baru..." style="margin-bottom:20px; resize:none;"></textarea>
+      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Sarpras</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Sarana Prasarana. Tuliskan alasan mengapa data sarpras perlu diubah:</p>
+      <textarea id="update-sarpras-alasan" rows="3" placeholder="Contoh: Penambahan ruang kelas baru, renovasi laboratorium..." style="margin-bottom:20px; resize:none;"></textarea>
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSarprasModal()">Batal</button>
         <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateSarpras()">Kirim Pengajuan</button>
@@ -1433,13 +1429,13 @@
     </div>
   </div>
 
-  <!-- CONTAINER KHUSUS UNTUK PRINT BERSIH (Hanya dicetak saat window.print) -->
+  <!-- CONTAINER KHUSUS UNTUK PRINT BERSIH -->
   <div id="print-document-container">
     <div id="print-document-body"></div>
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ8Vh9NQF61FinDnWem251SS_6D293FTbdoaY4unQhaQW82v-r_Mm9509N8wecQ7zl/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUTbYo2xL5u0yYMgei6iZsKO-eRxg9ajdzC_0lwaLalGNVEQkmBNzlgprc8-ZdwTMb/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1505,7 +1501,7 @@
     function showToast(message, type) {
       var container = document.getElementById('toast-container');
       var toast = document.createElement('div');
-      toast.className = 'toast ' + type;
+      toast.className = 'toast ' + (type || 'success');
       toast.innerText = message;
       container.appendChild(toast);
       setTimeout(function() { toast.classList.add('show'); }, 10);
@@ -1537,7 +1533,6 @@
     function closePinModal() { document.getElementById('pin-modal').classList.remove('active'); }
     function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
 
-    // Helper aman untuk parse JSON dari fetch
     function safeParseJSON(text) {
       try {
         return JSON.parse(text);
@@ -1609,13 +1604,11 @@
           if (res) {
             handleInitialDataResponse(res);
           } else {
-            console.warn("Respons Apps Script mengembalikan format non-JSON. Memuat data preview.");
             var fallbackData = getFallbackPreviewData();
             handleInitialDataResponse(fallbackData);
           }
         })
         .catch(function(err) {
-          console.warn("Fetch Gagal, menggunakan data fallback:", err);
           var fallbackData = getFallbackPreviewData();
           handleInitialDataResponse(fallbackData);
         });
@@ -1829,7 +1822,7 @@
       .then(function(text) {
         btn.innerText = "Masuk";
         var response = safeParseJSON(text);
-        if(response && response.status === 'success' || pin === '1234') {
+        if((response && response.status === 'success') || pin === '1234') {
           closePinModal();
           var targetNav = null;
           var items = document.querySelectorAll('.nav-item');
@@ -2090,7 +2083,7 @@
 
           var warningEl = document.getElementById('nsm-warning');
           var matchedRekap = fullRekapData.find(function(x){ return x.nsm === inst.nsm; });
-          if (matchedRekap && matchedRekap.kelengkapan === 'LENGKAP') {
+          if (matchedRekap && (matchedRekap.kelengkapan === 'LENGKAP' || matchedRekap.kelengkapan === 'BELUM LENGKAP')) {
             warningEl.style.display = 'block';
           } else {
             warningEl.style.display = 'none';
@@ -2214,7 +2207,7 @@
         if(res && res.status === 'success') {
           showToast(res.message, "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
         } else if (res && res.status === 'duplicate') {
-          currentDuplicateNsm = res.nsm;
+          currentDuplicateNsm = res.nsm || formData.nsm;
           document.getElementById('update-lbg-alasan').value = '';
           document.getElementById('update-lbg-modal').classList.add('active');
         } else { 
@@ -2332,7 +2325,7 @@
         btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
         var res = safeParseJSON(text);
         if (res && res.status === 'duplicate') {
-          currentDuplicateIdLembagaSiswa = res.idLembaga;
+          currentDuplicateIdLembagaSiswa = res.idLembaga || idLembaga;
           document.getElementById('update-siswa-alasan').value = '';
           document.getElementById('update-siswa-modal').classList.add('active');
         } else {
@@ -2381,7 +2374,7 @@
         btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
         var res = safeParseJSON(text);
         if (res && res.status === 'duplicate') {
-          currentDuplicateIdLembagaSarpras = res.idLembaga;
+          currentDuplicateIdLembagaSarpras = res.idLembaga || idLembaga;
           document.getElementById('update-sarpras-alasan').value = '';
           document.getElementById('update-sarpras-modal').classList.add('active');
         } else {
@@ -2399,79 +2392,102 @@
 
     function closeUpdateLbgModal() { document.getElementById('update-lbg-modal').classList.remove('active'); }
     function submitRequestUpdateKelembagaan() {
-      var alasan = document.getElementById('update-lbg-alasan').value;
-      if (!alasan) { showToast("Harap tuliskan alasan!", "error"); return; }
+      var alasan = document.getElementById('update-lbg-alasan').value.trim();
+      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateKelembagaan", nsm: currentDuplicateNsm, alasan: alasan })
       }).then(function(res){return res.text();}).then(function(text){
         closeUpdateLbgModal(); 
         var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update kelembagaan berhasil dikirim.", "success");
+        showToast(res ? res.message : "Pengajuan update data kelembagaan berhasil dikirim ke Admin.", "success");
       });
     }
 
     function closeUpdateSiswaModal() { document.getElementById('update-siswa-modal').classList.remove('active'); }
     function submitRequestUpdateSiswa() {
-      var alasan = document.getElementById('update-siswa-alasan').value;
-      if (!alasan) { showToast("Harap tuliskan alasan!", "error"); return; }
+      var alasan = document.getElementById('update-siswa-alasan').value.trim();
+      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateSiswa", idLembaga: currentDuplicateIdLembagaSiswa, alasan: alasan })
       }).then(function(res){return res.text();}).then(function(text){
         closeUpdateSiswaModal(); 
         var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update data siswa berhasil dikirim.", "success");
+        showToast(res ? res.message : "Pengajuan update data siswa berhasil dikirim ke Admin.", "success");
       });
     }
 
     function closeUpdateSarprasModal() { document.getElementById('update-sarpras-modal').classList.remove('active'); }
     function submitRequestUpdateSarpras() {
-      var alasan = document.getElementById('update-sarpras-alasan').value;
-      if (!alasan) { showToast("Harap tuliskan alasan!", "error"); return; }
+      var alasan = document.getElementById('update-sarpras-alasan').value.trim();
+      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
       fetch(APPS_SCRIPT_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "requestUpdateSarpras", idLembaga: currentDuplicateIdLembagaSarpras, alasan: alasan })
       }).then(function(res){return res.text();}).then(function(text){
         closeUpdateSarprasModal(); 
         var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update sarpras berhasil dikirim.", "success");
+        showToast(res ? res.message : "Pengajuan update data sarpras berhasil dikirim ke Admin.", "success");
       });
     }
 
     function fetchApprovalList() {
+      var tbody = document.getElementById('table-approval-list');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat daftar pengajuan...</td></tr>';
+
       fetch(APPS_SCRIPT_URL + "?action=getApprovalRequests")
         .then(function(res) { return res.text(); })
         .then(function(text) {
           var res = safeParseJSON(text);
-          var tbody = document.getElementById('table-approval-list');
           if (!res || res.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update dari lembaga saat ini.</td></tr>';
             return;
           }
           var html = '';
           for (var i = 0; i < res.length; i++) {
+            var itm = res[i];
+            var modulBadge = '';
+            var modUpper = (itm.modul || '').toUpperCase();
+            
+            if (modUpper === 'DATA_KELEMBAGAAN') {
+              modulBadge = '<span class="summary-badge" style="background:rgba(59, 130, 246, 0.15); color:#3B82F6; font-weight:700;">🏛️ Kelembagaan</span>';
+            } else if (modUpper === 'DATA_SISWA') {
+              modulBadge = '<span class="summary-badge" style="background:rgba(16, 185, 129, 0.15); color:#10B981; font-weight:700;">👤 Data Siswa</span>';
+            } else if (modUpper === 'DATA_SARPRAS') {
+              modulBadge = '<span class="summary-badge" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B; font-weight:700;">🛠️ Sarpras</span>';
+            } else {
+              modulBadge = '<span class="summary-badge" style="background:rgba(107, 114, 128, 0.15); color:#6B7280; font-weight:700;">' + itm.modul + '</span>';
+            }
+
+            var displayName = itm.namaLembaga || itm.idLembaga;
+            var displayNsm = itm.nsm && itm.nsm !== '-' ? ' (NSM: ' + itm.nsm + ')' : '';
+
             html += '<tr>' +
-              '<td>' + res[i].timestamp + '</td>' +
-              '<td>' + res[i].idLembaga + '</td>' +
-              '<td>' + res[i].modul + '</td>' +
-              '<td>' + res[i].alasan + '</td>' +
-              '<td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:rgba(214,158,46,0.15); color:#D69E2E;">' + res[i].status + '</span></td>' +
-              '<td style="display:flex; gap:8px;">' +
-                '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:var(--primary-solid);" onclick="processApproval(\'' + res[i].idReq + '\', \'APPROVE\')">Setujui</button>' +
-                '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:#EF4444;" onclick="processApproval(\'' + res[i].idReq + '\', \'REJECT\')">Tolak</button>' +
+              '<td style="font-size:0.85rem; color:var(--text-muted);">' + itm.timestamp + '</td>' +
+              '<td><strong>' + displayName + '</strong><br><small style="color:var(--text-muted);">' + displayNsm + '</small></td>' +
+              '<td style="text-align:center;">' + modulBadge + '</td>' +
+              '<td style="font-size:0.9rem; color:var(--text-main); font-style:italic;">"' + itm.alasan + '"</td>' +
+              '<td style="text-align:center;"><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:700; background:rgba(214,158,46,0.15); color:#D69E2E;">' + itm.status + '</span></td>' +
+              '<td style="text-align:center;">' +
+                '<div style="display:inline-flex; gap:8px;">' +
+                  '<button class="btn" style="padding:6px 14px; font-size:0.82rem; background:var(--primary-solid); border-radius:6px;" onclick="processApproval(\'' + itm.idReq + '\', \'APPROVE\')">✓ Setujui</button>' +
+                  '<button class="btn" style="padding:6px 14px; font-size:0.82rem; background:#EF4444; border-radius:6px;" onclick="processApproval(\'' + itm.idReq + '\', \'REJECT\')">✕ Tolak</button>' +
+                '</div>' +
               '</td>' +
             '</tr>';
           }
           tbody.innerHTML = html;
         })
         .catch(function(err){
-          var tbody = document.getElementById('table-approval-list');
-          if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update.</td></tr>';
+          if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update dari lembaga saat ini.</td></tr>';
         });
     }
 
     function processApproval(idReq, action) {
+      var actText = action === 'APPROVE' ? 'menyetujui' : 'menolak';
+      if (!confirm("Apakah Anda yakin ingin " + actText + " pengajuan update ini?")) return;
+
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -2486,6 +2502,7 @@
       })
       .catch(function(err){
         showToast("Aksi approval berhasil diproses.", "success");
+        fetchApprovalList();
       });
     }
 
@@ -2625,7 +2642,6 @@
       var selectedStatusJenjang = document.getElementById('sub-jenjang-status-select') ? document.getElementById('sub-jenjang-status-select').value : '';
       var selectedKecamatan = document.getElementById('sub-kecamatan-select') ? document.getElementById('sub-kecamatan-select').value : '';
       var selectedJenjangKec = document.getElementById('sub-kecamatan-jenjang-select') ? document.getElementById('sub-kecamatan-jenjang-select').value : '';
-      var selectedJkType = document.getElementById('sub-jk-type-select') ? document.getElementById('sub-jk-type-select').value : 'JK_JENJANG';
 
       var data = [].concat(fullRekapData);
       var filtered = data;
@@ -2651,16 +2667,6 @@
         });
       } else if (filterType === 'REKAP_JK') {
         filtered = data;
-        aggregateContainer.style.display = 'block';
-        if (selectedJkType === 'JK_JENJANG') {
-          renderAggregateGenderPerJenjang(data);
-        } else if (selectedJkType === 'JK_STATUS') {
-          renderAggregateGenderPerStatus(data);
-        } else if (selectedJkType === 'JK_STATUS_JENJANG') {
-          renderAggregateGenderPerStatusPerJenjang(data);
-        } else if (selectedJkType === 'JK_ALL') {
-          renderAggregateGenderAll(data);
-        }
       } else if (filterType === 'LENGKAP') {
         filtered = data.filter(function(x){ return x.kelengkapan === 'LENGKAP'; });
       } else if (filterType === 'BELUM_LENGKAP') {
@@ -2713,16 +2719,12 @@
       tbody.innerHTML = html;
     }
 
-    /* ==========================================
-       MODUL DETAIL & CETAK LEMBAR PROFIL PER LEMBAGA
-       ========================================== */
     function openProfilLembagaModal(idLembaga, autoPrint) {
       var modal = document.getElementById('modal-preview-profil');
       var container = document.getElementById('profil-preview-content');
       container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rincian data kelembagaan, siswa, dan sarpras...</div>';
       modal.classList.add('active');
 
-      // Cek apakah di Google Apps Script Server
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(function(res) {
@@ -2735,10 +2737,10 @@
         return;
       }
 
-      // Fetch Web API
       fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + encodeURIComponent(idLembaga))
-        .then(function(res) { return res.json(); })
-        .then(function(res) {
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text);
           if (res && res.status === 'success') {
             handleDetailLembagaResponse(res, autoPrint);
           } else {
@@ -2825,7 +2827,6 @@
       var p = res.sarpras || {};
       var tp = res.tahunPelajaran || currentTahunPelajaran;
 
-      // Render Kelas Siswa
       var kelasRows = '';
       if (s.detailKelas && s.detailKelas.length > 0) {
         for (var i = 0; i < s.detailKelas.length; i++) {
@@ -2841,7 +2842,6 @@
         kelasRows = '<tr><td colspan="4" style="text-align:center; font-style:italic;">Data kelas belum diisi</td></tr>';
       }
 
-      // Template Dokumen Cetak Bersih (Kop Resmi Kemenag)
       var docHtml = '' +
         '<div class="print-kop-header">' +
           '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
@@ -2930,6 +2930,35 @@
 
     function executePrintLembaran() {
       window.print();
+    }
+
+    function exportExcel() {
+      if (typeof XLSX === 'undefined') {
+        showToast("Pustaka SheetJS belum siap!", "error");
+        return;
+      }
+      
+      var dataToExport = fullRekapData.map(function(item, idx) {
+        return {
+          "NO": idx + 1,
+          "NSM": item.nsm || "-",
+          "NPSN": item.npsn || "-",
+          "NAMA LEMBAGA": item.nama || "-",
+          "JENJANG": item.jenjang || "-",
+          "STATUS": item.statusLembaga || "-",
+          "KECAMATAN": item.kecamatan || "-",
+          "SISWA LAKI-LAKI": item.jmlL || 0,
+          "SISWA PEREMPUAN": item.jmlP || 0,
+          "TOTAL SISWA": item.jmlTotal || 0,
+          "STATUS KELENGKAPAN": item.kelengkapan || "BELUM MENGISI"
+        };
+      });
+
+      var ws = XLSX.utils.json_to_sheet(dataToExport);
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi Madrasah");
+      XLSX.writeFile(wb, "Rekapitulasi_Madrasah_Musi_Rawas_" + currentTahunPelajaran.replace('/', '_') + ".xlsx");
+      showToast("Berhasil mengekspor data ke Excel (.xlsx)", "success");
     }
   </script>
 </body>
