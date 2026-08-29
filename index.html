@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seksi Pendidikan Madrasah - Kemenag Musi Rawas</title>
   
-  <!-- Google Fonts: Poppins, Fredoka (Bubble Font), & Font Kaligrafi Etnik Jawa (Yatra One, Metamorphous, Rozha One) -->
+  <!-- Google Fonts: Poppins, Fredoka (Bubble Font), & Font Kaligrafi Etnik Jawa -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Yatra+One&family=Metamorphous&family=Rozha+One&display=swap" rel="stylesheet">
   
   <!-- SheetJS untuk Export Excel (.xlsx) -->
@@ -72,7 +72,6 @@
     }
     .banner marquee { font-weight: 500; letter-spacing: 0.3px; display: flex; align-items: center; }
 
-    /* Desain Tipografi Aksara Jawa Samakan dengan @2026 by masdonie */
     .aksara-jawa-style-text {
       font-family: 'Yatra One', 'Metamorphous', 'Rozha One', 'Poppins', serif !important;
       font-size: 0.95rem !important;
@@ -125,8 +124,6 @@
       letter-spacing: 0.6px; 
       line-height: 1.25; 
       display: inline-block;
-      
-      /* Gradasi Emas dengan Cahaya Putih Berjalan di Tengah */
       background: linear-gradient(
         115deg, 
         #B8860B 0%, 
@@ -140,11 +137,7 @@
       background-size: 250% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      
-      /* Animasi Cahaya Berjalan Pelan & Halus (8 Detik) */
       animation: shimmerLightSweep 8s ease-in-out infinite;
-      
-      /* Efek 3D Menggelembung (Bubble & Depth Drop-Shadow) */
       filter: drop-shadow(0 2px 0px rgba(184, 134, 11, 0.45)) 
               drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
       transform: perspective(300px) translateZ(0);
@@ -191,7 +184,6 @@
       gap: 16px;
     }
 
-    /* Pill Theme Switcher */
     .theme-switch-pill {
       background-color: var(--primary-solid);
       border-radius: 30px;
@@ -258,7 +250,6 @@
       font-size: 14px;
     }
 
-    /* Main Container & Sidebar */
     .main-content { display: flex; flex: 1; }
     
     .sidebar { 
@@ -325,7 +316,6 @@
       opacity: 0.92;
     }
 
-    /* Content Area */
     .content-area { flex: 1; padding: 35px 40px; overflow-y: auto; }
     .page-section { 
       display: none; 
@@ -338,7 +328,6 @@
     .page-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* Section Headings */
     h2 { 
       margin-bottom: 25px; 
       color: var(--primary-solid); 
@@ -359,7 +348,6 @@
       background: var(--primary-solid);
     }
     
-    /* Forms & Inputs */
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
     
@@ -382,7 +370,6 @@
     input:disabled, input[readonly] { opacity: 0.85; cursor: not-allowed; background-color: rgba(148, 163, 184, 0.15) !important; }
     .uppercase-input { text-transform: uppercase; }
     
-    /* Buttons */
     .btn { 
       background-color: var(--primary-solid); 
       color: #fff; 
@@ -412,7 +399,6 @@
       box-shadow: none !important;
     }
     
-    /* Statistical Green Border Cards */
     .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; margin-bottom: 15px; }
     .card { 
       background: var(--bg-container); 
@@ -439,14 +425,12 @@
     .toast.success { background-color: var(--primary-solid); }
     .toast.error { background-color: #EF4444; }
     
-    /* Tables */
     table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 750px; }
     th { background: var(--bg-body); color: var(--text-main); font-weight: 600; padding: 14px 12px; text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.88rem; }
     td { padding: 13px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background-color: var(--primary-light); }
     
-    /* Modals */
     .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -505,12 +489,10 @@
         <div class="sublogo">Kantor Kementerian Agama Kabupaten Musi Rawas</div>
       </div>
       <div class="topbar-right">
-        <!-- Pill Dark / Light Switcher -->
         <div class="theme-switch-pill" onclick="toggleTheme()" title="Ganti Mode Tema">
           <div class="theme-pill-btn theme-moon">🌙</div>
           <div class="theme-pill-btn theme-sun">☀️</div>
         </div>
-        <!-- User Badge -->
         <div class="user-profile-badge">
           <div class="user-avatar-circle">👤</div>
           <span id="badge-tp-display">TP: 2026/2027</span>
@@ -559,7 +541,6 @@
         <section id="dashboard" class="page-section active">
           <h2>Dashboard Statistik</h2>
 
-          <!-- Status Periode Global Alert -->
           <div id="dashboard-periode-alert" style="display:none;" class="period-closed-banner">
             <span>🔒</span>
             <div>
@@ -567,7 +548,6 @@
             </div>
           </div>
 
-          <!-- 4 Outline Green Border Cards -->
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
@@ -598,16 +578,16 @@
 
           <!-- Quick Select Lembaga Master -->
           <div class="form-group" style="background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:25px;">
-            <label style="color:var(--primary-solid); font-weight:700;">🏫 Pilih Lembaga Terdaftar (Data Pokok Terkunci Otomatis)</label>
+            <label style="color:var(--primary-solid); font-weight:700;">🏫 Pilih Lembaga Terdaftar (Pilihan Cepat / Opsional)</label>
             <select id="k-select-master-lbg" onchange="onSelectMasterKelembagaan()">
-              <option value="">-- Pilih Lembaga Terdaftar untuk Mengisi Data --</option>
+              <option value="">-- Pilih Lembaga untuk Memuat Data Otomatis (atau isi form di bawah) --</option>
             </select>
-            <small style="color:var(--text-muted); display:block; margin-top:6px;">Pilih lembaga untuk memuat NSM, NPSN, dan Nama Lembaga yang sudah terkunci secara resmi.</small>
+            <small style="color:var(--text-muted); display:block; margin-top:6px;">Pilih lembaga untuk mengisi otomatis, atau ketik langsung Nama Lembaga, NSM, dan NPSN pada form di bawah ini.</small>
           </div>
 
           <form id="form-kelembagaan" onsubmit="event.preventDefault(); submitKelembagaan();">
             
-            <div class="form-divider">1. Identitas Utama (Terkunci dari Master)</div>
+            <div class="form-divider">1. Identitas Utama Lembaga</div>
             <div class="grid-cards">
               <div class="form-group">
                 <label>Jenjang</label>
@@ -631,17 +611,17 @@
 
             <div class="grid-cards">
               <div class="form-group" style="grid-column: 1 / -1;">
-                <label>Nama Lembaga (Terkunci)</label>
-                <input type="text" id="k-nama" class="uppercase-input" required placeholder="CONTOH: MIS AL-IKHLAS" readonly style="font-weight:700;">
+                <label>Nama Lembaga</label>
+                <input type="text" id="k-nama" class="uppercase-input" required placeholder="CONTOH: MIS AL-IKHLAS" oninput="validateSchoolNameInput(this)" style="font-weight:700;">
               </div>
               <div class="form-group">
-                <label>NSM (Nomor Statistik Madrasah - Terkunci)</label>
-                <input type="text" id="k-nsm" required placeholder="NSM Terkunci" readonly style="font-weight:700;">
+                <label>NSM (Nomor Statistik Madrasah)</label>
+                <input type="text" id="k-nsm" required placeholder="Contoh: 111216050001" maxlength="15" oninput="validateNumberOnlyInput(this)" style="font-weight:700;">
                 <small id="nsm-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah mengisi data kelembagaan. Submit ulang akan memicu pengajuan update ke Admin.</small>
               </div>
               <div class="form-group">
-                <label>NPSN (Terkunci)</label>
-                <input type="text" id="k-npsn" required placeholder="NPSN Terkunci" readonly style="font-weight:700;">
+                <label>NPSN (Nomor Pokok Sekolah Nasional)</label>
+                <input type="text" id="k-npsn" required placeholder="Contoh: 69812345" maxlength="10" oninput="validateNumberOnlyInput(this)" style="font-weight:700;">
               </div>
             </div>
 
@@ -918,10 +898,8 @@
         <section id="rekapitulasi" class="page-section">
           <h2>Rekapitulasi & Statistik Data Madrasah</h2>
           
-          <!-- EWS CONTAINER -->
           <div id="rekap-ews-container" style="margin-bottom: 20px;"></div>
 
-          <!-- SUMMARY STAT CARDS -->
           <div class="grid-cards" style="margin-bottom: 25px;" id="stats-summary-cards">
             <div class="card">
               <div>Total Lembaga Terfilter</div>
@@ -941,7 +919,6 @@
             </div>
           </div>
 
-          <!-- FILTER CONTROL BOX -->
           <div class="form-group" style="background:var(--bg-body); padding:22px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
             <label style="font-weight:700; color:var(--primary-solid); margin-bottom:12px; font-size:1rem;">⚙️ Kategori Filter Laporan Rekapitulasi</label>
             
@@ -964,7 +941,6 @@
               </div>
             </div>
 
-            <!-- SUB FILTER: STATUS SWASTA / NEGERI -->
             <div id="sub-filter-status-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
@@ -978,7 +954,6 @@
               </div>
             </div>
 
-            <!-- SUB FILTER: JENJANG -->
             <div id="sub-filter-jenjang-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0;">
@@ -1002,7 +977,6 @@
               </div>
             </div>
 
-            <!-- SUB FILTER: KECAMATAN -->
             <div id="sub-filter-kecamatan-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0;">
@@ -1024,7 +998,6 @@
               </div>
             </div>
 
-            <!-- SUB FILTER: REKAP JK KHUSUS -->
             <div id="sub-filter-jk-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
@@ -1041,7 +1014,7 @@
 
           </div>
 
-          <!-- SUMMARY AGGREGATE TABLE (REKAP JK) -->
+          <!-- SUMMARY AGGREGATE TABLE -->
           <div id="container-rekap-aggregate" style="display:none; margin-bottom: 25px; overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
             <table>
               <thead id="aggregate-table-head"></thead>
@@ -1080,7 +1053,6 @@
         <section id="admin-emis" class="page-section">
           <h2>Admin EMIS & Kontrol Periode Madrasah</h2>
           
-          <!-- 1. KONTROL PERIODE PENGISIAN & TOMBOL TUTUP -->
           <div class="form-divider" style="margin-top:0;">1. Kontrol Periode Pengisian Portal</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:35px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
@@ -1097,11 +1069,10 @@
             </div>
           </div>
 
-          <!-- 2. GANTI TAHUN PELAJARAN -->
           <div class="form-divider">2. Pergantian Tahun Pelajaran & Buat Sheet Baru</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:35px;">
             <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">
-              Fitur ini akan mengarsipkan sheet periode berjalan, membersihkan data isian siswa & sarpras, serta membuat sheet aktif baru dengan <strong>hanya menyalin NAMA LEMBAGA, NSM, dan NPSN</strong> yang terkunci secara permanen untuk periode berikutnya.
+              Fitur ini akan mengarsipkan sheet periode berjalan, membersihkan data isian siswa & sarpras, serta membuat sheet aktif baru untuk periode berikutnya.
             </p>
             <div class="grid-cards" style="margin-bottom:15px; align-items:end;">
               <div class="form-group" style="margin-bottom:0;">
@@ -1116,7 +1087,6 @@
             <button class="btn" onclick="openGantiTpModal()" style="background:var(--primary-solid);">🔄 Proses Ganti Tahun Pelajaran & Buat Sheet Baru</button>
           </div>
 
-          <!-- 3. APPROVAL PENGAJUAN UPDATE -->
           <div class="form-divider">3. Daftar Pengajuan Update Data Lembaga</div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 35px;">
             <table>
@@ -1136,7 +1106,6 @@
             </table>
           </div>
 
-          <!-- 4. UBAH PIN ADMIN -->
           <div class="form-divider">4. Ubah PIN Akses Menu Admin EMIS</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <div class="form-group">
@@ -1146,7 +1115,6 @@
             <button class="btn" onclick="updateAdminPin()" style="background:var(--primary-solid);">Simpan PIN Admin Baru</button>
           </div>
 
-          <!-- 5. PENGATURAN PIN REKAP -->
           <div class="form-divider">5. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <div class="form-group">
@@ -1159,11 +1127,10 @@
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan PIN Rekap</button>
           </div>
 
-          <!-- 6. PERBAIKAN DATA POKOK MASTER (NAMA, NSM, NPSN) -->
           <div class="form-divider">6. Perbaikan Data Pokok Lembaga Master (Nama, NSM, NPSN)</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:750px;">
             <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:15px;">
-              Gunakan form ini untuk memperbaiki penulisan <strong>Nama Lembaga, NSM, atau NPSN</strong> yang salah. Perubahan ini akan otomatis disinkronkan ke seluruh sistem dan tetap terkunci saat pengisian data oleh lembaga.
+              Gunakan form ini untuk memperbaiki penulisan <strong>Nama Lembaga, NSM, atau NPSN</strong> yang salah.
             </p>
             <div class="form-group">
               <label style="font-weight:600; color:var(--primary-solid);">Pilih Lembaga yang Ingin Diperbaiki</label>
@@ -1243,8 +1210,7 @@
         <strong>Sistem akan melakukan:</strong><br>
         1. Mengarsipkan seluruh data tahun ini ke sheet backup terpisah.<br>
         2. Mengosongkan data isian siswa & sarpras untuk periode baru.<br>
-        3. <strong>Mengunci data Nama Lembaga, NSM, dan NPSN</strong> agar tidak bisa diubah user saat pengisian.<br>
-        4. Membuka periode pengisian baru.
+        3. Membuka periode pengisian baru.
       </p>
       <div style="display:flex; gap:15px; margin-top:25px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeGantiTpModal()">Batal</button>
@@ -1291,8 +1257,7 @@
   </div>
 
   <script>
-    // URL Web App Google Apps Script
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAzQNWhsTbUvydHVLJOsqmulH4gDbKJn9LxpzpZM6bsd_OVtMnIWrTVg6lrZpLx-vv/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6PSrlanvh9w1-gBj_oBC1aN9Qb_CkpkZDj_PszEtr6FKOGNAZpbHjP4mP9kXfPoYb/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1474,8 +1439,6 @@
           if(res.status === 'success') {
             var marqueeContainer = document.getElementById('marquee-text');
             var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
-            
-            // Format kata RA/Madrasah menjadi 'RA dan Madrasah' jika masih berformat lama dari spreadsheet
             var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
 
             if (marqueeContainer) {
@@ -1641,7 +1604,7 @@
     function renderMasterLembagaDropdown() {
       var select = document.getElementById('k-select-master-lbg');
       if (!select) return;
-      var html = '<option value="">-- Pilih Lembaga Terdaftar untuk Mengisi Data --</option>';
+      var html = '<option value="">-- Pilih Lembaga untuk Memuat Data Otomatis (atau isi form di bawah) --</option>';
       for (var i = 0; i < globalInstitutions.length; i++) {
         var inst = globalInstitutions[i];
         html += '<option value="' + inst.nsm + '">' + inst.name + ' (' + inst.jenjang + ' - NSM: ' + inst.nsm + ')</option>';
@@ -1755,13 +1718,6 @@
     function onSelectMasterKelembagaan() {
       var nsmVal = document.getElementById('k-select-master-lbg').value;
       if (!nsmVal) {
-        document.getElementById('k-nama').value = '';
-        document.getElementById('k-nsm').value = '';
-        document.getElementById('k-npsn').value = '';
-        document.getElementById('k-jenjang').value = '';
-        document.getElementById('k-status').value = '';
-        document.getElementById('k-desa').value = '';
-        document.getElementById('k-kecamatan').value = '';
         document.getElementById('nsm-warning').style.display = 'none';
         return;
       }
