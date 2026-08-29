@@ -143,7 +143,6 @@
 <body data-theme="light">
 
   <div class="app-wrapper">
-    <!-- Marquee Banner -->
     <div class="banner">
       <marquee id="marquee-text">Memuat informasi server...</marquee>
     </div>
@@ -160,15 +159,14 @@
     </header>
 
     <div class="main-content">
-      <!-- Sidebar Navigation -->
       <nav class="sidebar">
         <div class="sidebar-menu">
           <div class="nav-item active" onclick="navigate('dashboard', this)">📊 Dashboard</div>
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)">🏫 Input Kelembagaan</div>
           <div class="nav-item" onclick="navigate('input-siswa', this)">👨‍🎓 Input Siswa</div>
           <div class="nav-item" onclick="navigate('input-sarpras', this)">🏢 Input Sarpras</div>
-          <div class="nav-item" onclick="navigate('rekapitulasi', this)">🖨️ Rekapitulasi</div>
-          <div class="nav-item" onclick="openPinModal('admin-emis')">⚙️ Admin EMIS</div>
+          <div class="nav-item" id="nav-rekapitulasi" onclick="handleRekapNav(this)">🖨️ Rekapitulasi</div>
+          <div class="nav-item" id="nav-admin-emis" onclick="openPinModal('admin-emis')">⚙️ Admin EMIS</div>
           <div class="nav-item" onclick="navigate('log-audit', this)">📝 Log Audit</div>
         </div>
         <div class="watermark-donie">@doniepenmadmura</div>
@@ -177,7 +175,6 @@
       <!-- Content Area -->
       <main class="content-area">
         
-        <!-- SECTION: DASHBOARD -->
         <section id="dashboard" class="page-section active">
           <h2>Dashboard Statistik</h2>
 
@@ -203,7 +200,6 @@
           <div id="dashboard-ews-container" style="margin-top: 25px;"></div>
         </section>
 
-        <!-- SECTION: INPUT KELEMBAGAAN -->
         <section id="input-kelembagaan" class="page-section">
           <h2>Form Kelembagaan</h2>
           <form id="form-kelembagaan" onsubmit="event.preventDefault(); submitKelembagaan();">
@@ -343,7 +339,6 @@
           </form>
         </section>
 
-        <!-- SECTION: INPUT SISWA -->
         <section id="input-siswa" class="page-section">
           <h2>Data Siswa</h2>
           
@@ -436,7 +431,6 @@
           </form>
         </section>
         
-        <!-- SECTION: INPUT SARPRAS -->
         <section id="input-sarpras" class="page-section">
           <h2>Sarana & Prasarana</h2>
           <form id="form-sarpras" onsubmit="event.preventDefault(); submitSarpras();">
@@ -506,7 +500,6 @@
           </form>
         </section>
 
-        <!-- SECTION: REKAPITULASI -->
         <section id="rekapitulasi" class="page-section">
           <h2>Rekapitulasi & Statistik Data Madrasah</h2>
           
@@ -538,19 +531,32 @@
               <div class="form-group" style="margin-bottom:0; grid-column: 1 / span 2;">
                 <select id="rekap-filter-type" onchange="onRekapFilterChange()" style="font-weight:600;">
                   <option value="KESELURUHAN">📊 1. REKAP KESELURUHAN</option>
-                  <option value="PER_KECAMATAN">📍 2. REKAP PER KECAMATAN</option>
-                  <option value="PER_JENJANG">🎓 3. REKAP PER JENJANG</option>
-                  <option value="PER_GENDER_ALL">👥 4. REKAP PER JENIS KELAMIN SELURUH JENJANG</option>
-                  <option value="PER_GENDER_KECAMATAN">🗺️ 5. REKAP JENIS KELAMIN PER KECAMATAN</option>
-                  <option value="PER_STATUS">🏛️ 6. REKAP PER STATUS (SWASTA / NEGERI)</option>
-                  <option value="LENGKAP">✅ 7. LEMBAGA YANG SUDAH LENGKAP</option>
-                  <option value="BELUM_LENGKAP">⏳ 8. LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
-                  <option value="BELUM_MENGISI">❌ 9. LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
+                  <option value="REKAP_JK">👥 2. REKAP JK (Rekap Jenis Kelamin)</option>
+                  <option value="PER_KECAMATAN">📍 3. REKAP PER KECAMATAN</option>
+                  <option value="PER_JENJANG">🎓 4. REKAP PER JENJANG</option>
+                  <option value="PER_STATUS">🏛️ 5. REKAP PER STATUS (SWASTA / NEGERI)</option>
+                  <option value="LENGKAP">✅ 6. LEMBAGA YANG SUDAH LENGKAP</option>
+                  <option value="BELUM_LENGKAP">⏳ 7. LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
+                  <option value="BELUM_MENGISI">❌ 8. LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
                 </select>
               </div>
               <div class="form-group" style="margin-bottom:0; display:flex; gap:10px;">
                 <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-container); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
                 <button class="btn" onclick="exportExcel()" style="flex:1; background:#10B981; box-shadow:none;">📥 Export Excel (.xlsx)</button>
+              </div>
+            </div>
+
+            <!-- SUB FILTER: REKAP JK (JENIS KELAMIN) -->
+            <div id="sub-filter-jk-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
+              <div class="grid-cards" style="margin-bottom:0;">
+                <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Sub-Kategori Rekapitulasi Jenis Kelamin</label>
+                  <select id="sub-jk-type" onchange="renderRekapTable()">
+                    <option value="JK_JENJANG">🎓 Rekap Jenis Kelamin per Jenjang Pendidikan</option>
+                    <option value="JK_KECAMATAN">🗺️ Rekap Jenis Kelamin per Kecamatan</option>
+                    <option value="JK_STATUS">🏛️ Rekap Jenis Kelamin per Status Lembaga (Negeri & Swasta)</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -602,25 +608,13 @@
 
             <!-- SUB FILTER: STATUS SWASTA / NEGERI -->
             <div id="sub-filter-status-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
-              <div class="grid-cards" style="margin-bottom:0;">
+              <div class="grid-cards" style="margin-bottom:0; grid-column: 1 / -1;">
                 <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
                   <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Status Lembaga</label>
                   <select id="sub-status-select" onchange="renderRekapTable()">
                     <option value="">-- Semua Status (Negeri & Swasta) --</option>
                     <option value="NEGERI">NEGERI</option>
                     <option value="SWASTA">SWASTA</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- SUB FILTER: GENDER PER KECAMATAN -->
-            <div id="sub-filter-gender-kecamatan-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
-              <div class="grid-cards" style="margin-bottom:0;">
-                <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
-                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Kecamatan Spesifik</label>
-                  <select id="sub-gender-kecamatan-select" onchange="renderRekapTable()">
-                    <option value="">-- Tampilkan Rekapitulasi Semua Kecamatan --</option>
                   </select>
                 </div>
               </div>
@@ -662,7 +656,6 @@
           </div>
         </section>
 
-        <!-- SECTION: ADMIN EMIS -->
         <section id="admin-emis" class="page-section">
           <h2>Admin EMIS & Approval Pengajuan Update</h2>
           
@@ -686,12 +679,25 @@
           </div>
 
           <div class="form-divider">2. Ubah PIN Akses Menu Admin EMIS</div>
-          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px;">
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:30px;">
             <div class="form-group">
               <label>PIN Admin Baru (4-6 digit angka)</label>
               <input type="password" id="admin-new-pin" placeholder="••••" maxlength="6" style="background:var(--bg-container); font-size:1.2rem; font-weight:bold; letter-spacing:4px;">
             </div>
             <button class="btn" onclick="updateAdminPin()" style="background:#10B981;">Simpan PIN Admin Baru</button>
+          </div>
+
+          <div class="form-divider">3. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px;">
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">Tentukan apakah pengguna diwajibkan memasukkan PIN Admin saat membuka menu Rekapitulasi.</p>
+            <div class="form-group">
+              <label style="font-weight:600;">Status Proteksi PIN Rekapitulasi</label>
+              <select id="admin-pin-rekap-status" style="font-weight:600; background:var(--bg-container);">
+                <option value="NONAKTIF">🔓 NONAKTIF (Menu Rekapitulasi Dapat Dibuka Bebas Tanpa PIN)</option>
+                <option value="AKTIF">🔒 AKTIF (Wajib Masukkan PIN Admin Sebelum Membuka Menu Rekapitulasi)</option>
+              </select>
+            </div>
+            <button class="btn" onclick="savePinRekapSetting()" style="background:#10B981;">Simpan Pengaturan PIN Rekapitulasi</button>
           </div>
         </section>
 
@@ -711,12 +717,12 @@
   <!-- PIN Modal -->
   <div class="modal-overlay" id="pin-modal">
     <div class="modal-content">
-      <h3 style="margin-bottom:10px; color:var(--text-main); font-weight:700;">Otorisasi Admin EMIS</h3>
-      <p style="margin-bottom:25px; font-size:0.95rem; color:var(--text-muted);">Masukkan PIN Admin untuk masuk ke menu pengaturan.</p>
+      <h3 id="pin-modal-title" style="margin-bottom:10px; color:var(--text-main); font-weight:700;">Otorisasi Admin EMIS</h3>
+      <p id="pin-modal-desc" style="margin-bottom:25px; font-size:0.95rem; color:var(--text-muted);">Masukkan PIN Admin untuk masuk ke menu pengaturan.</p>
       <input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing: 12px; font-weight:700; font-size:1.5rem; background: var(--bg-body);" onkeydown="handlePinKeydown(event)">
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button>
-        <button class="btn" style="flex:1;" onclick="verifyPinSubmit()">Masuk</button>
+        <button class="btn" style="flex:1;" id="btn-pin-submit" onclick="verifyPinSubmit()">Masuk</button>
       </div>
     </div>
   </div>
@@ -760,13 +766,15 @@
 
   <script>
     // URL Web App Google Apps Script
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLfq8Pw5-80lwKJj4UnSIm_6I3x3xM9vAaeesGjYGu-ZjiDPLdbQvlnCSuDDwXOXv/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwb7V4LGfP7wkPOFR8FQ786jCi94aLVb_cYeFStszi91SzY_7AlGHr3BpwUHCgZamA4/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
     var masterLabList = [];
     var fullRekapData = [];
     var kecamatanListGlobal = [];
+    var globalPinRekapStatus = "NONAKTIF";
+    var currentPinTarget = "admin-emis";
     var currentDuplicateNsm = "";
     var currentDuplicateIdLembagaSiswa = "";
     var currentDuplicateIdLembagaSarpras = "";
@@ -805,6 +813,14 @@
       }
     }
 
+    function handleRekapNav(navEl) {
+      if (globalPinRekapStatus === "AKTIF") {
+        openPinModal('rekapitulasi');
+      } else {
+        navigate('rekapitulasi', navEl);
+      }
+    }
+
     function showToast(message, type) {
       var container = document.getElementById('toast-container');
       var toast = document.createElement('div');
@@ -835,8 +851,20 @@
       if (found) { warningEl.style.display = 'block'; } else { warningEl.style.display = 'none'; }
     }
 
-    function openPinModal() {
+    function openPinModal(target) {
+      currentPinTarget = target || 'admin-emis';
       document.getElementById('pin-input').value = '';
+      
+      var titleEl = document.getElementById('pin-modal-title');
+      var descEl = document.getElementById('pin-modal-desc');
+      if (currentPinTarget === 'rekapitulasi') {
+        titleEl.innerText = "Proteksi Menu Rekapitulasi";
+        descEl.innerText = "Masukkan PIN Admin untuk melihat laporan dan rekapitulasi data.";
+      } else {
+        titleEl.innerText = "Otorisasi Admin EMIS";
+        descEl.innerText = "Masukkan PIN Admin untuk masuk ke menu pengaturan.";
+      }
+
       document.getElementById('pin-modal').classList.add('active');
       setTimeout(function() { document.getElementById('pin-input').focus(); }, 100);
     }
@@ -848,7 +876,7 @@
       var pin = document.getElementById('pin-input').value;
       if(!pin) { showToast("PIN tidak boleh kosong", "error"); return; }
       
-      var btn = document.querySelector('#pin-modal .btn:nth-child(2)');
+      var btn = document.getElementById('btn-pin-submit');
       btn.innerText = "Memeriksa...";
       
       fetch(APPS_SCRIPT_URL, {
@@ -861,13 +889,15 @@
         btn.innerText = "Masuk";
         if(response.status === 'success') {
           closePinModal();
-          var adminNav = null;
-          var items = document.querySelectorAll('.nav-item');
-          for (var i = 0; i < items.length; i++) {
-            if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').indexOf('openPinModal') !== -1) { adminNav = items[i]; break; }
+          if (currentPinTarget === 'rekapitulasi') {
+            var rekapNav = document.getElementById('nav-rekapitulasi');
+            navigate('rekapitulasi', rekapNav);
+            showToast("Akses Rekapitulasi Diberikan", "success");
+          } else {
+            var adminNav = document.getElementById('nav-admin-emis');
+            navigate('admin-emis', adminNav);
+            showToast("Akses Admin EMIS Diberikan", "success");
           }
-          navigate('admin-emis', adminNav);
-          showToast("Akses Admin EMIS Diberikan", "success");
         } else {
           showToast(response.message, "error");
         }
@@ -897,6 +927,28 @@
       .catch(function(err){ showToast("Gagal memperbarui PIN", "error"); });
     }
 
+    function savePinRekapSetting() {
+      var statusVal = document.getElementById('admin-pin-rekap-status').value;
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "setPinRekapStatus", pinRekapStatus: statusVal })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        if (res.status === 'success') {
+          globalPinRekapStatus = res.pinRekapStatus;
+          showToast(res.message, "success");
+        } else {
+          showToast(res.message, "error");
+        }
+      })
+      .catch(function(err) {
+        showToast("Gagal menyimpan pengaturan PIN Rekapitulasi", "error");
+      });
+    }
+
     function fetchInitialData() {
       fetch(APPS_SCRIPT_URL + "?action=getInitialData")
         .then(function(res) { return res.json(); })
@@ -908,6 +960,12 @@
             document.getElementById('dash-sebagian').innerText = res.statsSummary.sebagian;
             document.getElementById('dash-kosong').innerText = res.statsSummary.kosong;
             
+            globalPinRekapStatus = res.pinRekapStatus || "NONAKTIF";
+            var pinRekapSelect = document.getElementById('admin-pin-rekap-status');
+            if (pinRekapSelect) {
+              pinRekapSelect.value = globalPinRekapStatus;
+            }
+
             globalInstitutions = res.institutions || [];
             masterEkstraList = res.masterOptions.ekstrakurikuler || [];
             masterLabList = res.masterOptions.laboratorium || [];
@@ -970,36 +1028,33 @@
 
     function renderKecamatanSubFilters() {
       var selKec = document.getElementById('sub-kecamatan-select');
-      var selKecGender = document.getElementById('sub-gender-kecamatan-select');
-      
       var html = '<option value="">-- Semua Kecamatan --</option>';
       for (var i = 0; i < kecamatanListGlobal.length; i++) {
         html += '<option value="' + kecamatanListGlobal[i] + '">' + kecamatanListGlobal[i] + '</option>';
       }
       if (selKec) selKec.innerHTML = html;
-      if (selKecGender) selKecGender.innerHTML = html;
     }
 
     function onRekapFilterChange() {
       var filterType = document.getElementById('rekap-filter-type').value;
+      var subContainerJk = document.getElementById('sub-filter-jk-container');
       var subContainerKec = document.getElementById('sub-filter-kecamatan-container');
       var subContainerJg = document.getElementById('sub-filter-jenjang-container');
       var subContainerStatus = document.getElementById('sub-filter-status-container');
-      var subContainerGenderKec = document.getElementById('sub-filter-gender-kecamatan-container');
       
+      subContainerJk.style.display = 'none';
       subContainerKec.style.display = 'none';
       subContainerJg.style.display = 'none';
       subContainerStatus.style.display = 'none';
-      subContainerGenderKec.style.display = 'none';
 
-      if (filterType === 'PER_KECAMATAN') {
+      if (filterType === 'REKAP_JK') {
+        subContainerJk.style.display = 'block';
+      } else if (filterType === 'PER_KECAMATAN') {
         subContainerKec.style.display = 'block';
       } else if (filterType === 'PER_JENJANG') {
         subContainerJg.style.display = 'block';
       } else if (filterType === 'PER_STATUS') {
         subContainerStatus.style.display = 'block';
-      } else if (filterType === 'PER_GENDER_KECAMATAN') {
-        subContainerGenderKec.style.display = 'block';
       }
       renderRekapTable();
     }
@@ -1009,23 +1064,31 @@
       var tbody = document.getElementById('table-rekap');
       var infoText = document.getElementById('rekap-info-text');
       var aggregateContainer = document.getElementById('container-rekap-aggregate');
-      var aggThead = document.getElementById('aggregate-table-head');
-      var aggTbody = document.getElementById('table-rekap-aggregate');
 
+      var subJkType = document.getElementById('sub-jk-type') ? document.getElementById('sub-jk-type').value : 'JK_JENJANG';
       var selectedKecamatan = document.getElementById('sub-kecamatan-select') ? document.getElementById('sub-kecamatan-select').value : '';
       var selectedJenjangKec = document.getElementById('sub-kecamatan-jenjang-select') ? document.getElementById('sub-kecamatan-jenjang-select').value : '';
       var selectedJenjang = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : '';
       var selectedStatusJenjang = document.getElementById('sub-jenjang-status-select') ? document.getElementById('sub-jenjang-status-select').value : '';
       var selectedStatus = document.getElementById('sub-status-select') ? document.getElementById('sub-status-select').value : '';
-      var selectedGenderKec = document.getElementById('sub-gender-kecamatan-select') ? document.getElementById('sub-gender-kecamatan-select').value : '';
 
       var data = [].concat(fullRekapData);
       var filtered = data;
       aggregateContainer.style.display = 'none';
 
-      // Logika Penyaringan Berdasarkan 9 Pilihan
+      // Logika Filter
       if (filterType === 'KESELURUHAN') {
         filtered = data;
+      } else if (filterType === 'REKAP_JK') {
+        filtered = data;
+        aggregateContainer.style.display = 'block';
+        if (subJkType === 'JK_JENJANG') {
+          renderAggregateGenderPerJenjang(data);
+        } else if (subJkType === 'JK_KECAMATAN') {
+          renderAggregateGenderPerKecamatan(data);
+        } else if (subJkType === 'JK_STATUS') {
+          renderAggregateGenderPerStatus(data);
+        }
       } else if (filterType === 'PER_KECAMATAN') {
         filtered = data.filter(function(x) {
           var matchKec = !selectedKecamatan || x.kecamatan === selectedKecamatan;
@@ -1042,20 +1105,6 @@
         filtered = data.filter(function(x) {
           return !selectedStatus || x.statusLembaga === selectedStatus;
         });
-      } else if (filterType === 'PER_GENDER_ALL') {
-        filtered = data;
-        // Tampilkan Tabel Akumulasi Per Jenjang
-        aggregateContainer.style.display = 'block';
-        renderAggregateGenderPerJenjang(data);
-      } else if (filterType === 'PER_GENDER_KECAMATAN') {
-        if (selectedGenderKec) {
-          filtered = data.filter(function(x) { return x.kecamatan === selectedGenderKec; });
-        } else {
-          filtered = data;
-        }
-        // Tampilkan Tabel Akumulasi Per Kecamatan
-        aggregateContainer.style.display = 'block';
-        renderAggregateGenderPerKecamatan(data, selectedGenderKec);
       } else if (filterType === 'LENGKAP') {
         filtered = data.filter(function(x){ return x.kelengkapan === 'LENGKAP'; });
       } else if (filterType === 'BELUM_LENGKAP') {
@@ -1125,7 +1174,7 @@
 
       var thead = document.getElementById('aggregate-table-head');
       var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">📊 REKAPITULASI TOTAL SISWA MENURUT JENJANG PENDIDIKAN</th></tr>' +
+      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">📊 REKAPITULASI TOTAL JENIS KELAMIN PER JENJANG PENDIDIKAN</th></tr>' +
         '<tr><th>JENJANG</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
       
       var html = '';
@@ -1152,12 +1201,11 @@
       tbody.innerHTML = html;
     }
 
-    function renderAggregateGenderPerKecamatan(allData, selectedKec) {
+    function renderAggregateGenderPerKecamatan(allData) {
       var kecMap = {};
       for(var d=0; d<allData.length; d++) {
         var row = allData[d];
         var kec = row.kecamatan || "TIDAK DIKETAHUI";
-        if(selectedKec && kec !== selectedKec) continue;
         if(!kecMap[kec]) { kecMap[kec] = { totalLbg: 0, l: 0, p: 0, total: 0 }; }
         kecMap[kec].totalLbg++;
         kecMap[kec].l += (row.jmlL || 0);
@@ -1167,7 +1215,7 @@
 
       var thead = document.getElementById('aggregate-table-head');
       var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">🗺️ REKAPITULASI TOTAL SISWA PER KECAMATAN</th></tr>' +
+      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">🗺️ REKAPITULASI TOTAL JENIS KELAMIN PER KECAMATAN</th></tr>' +
         '<tr><th>KECAMATAN</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
       
       var html = '';
@@ -1186,7 +1234,53 @@
         '</tr>';
       }
       html += '<tr style="background:var(--bg-body); font-weight:700;">' +
-        '<td>TOTAL ' + (selectedKec ? selectedKec : 'SEMUA KECAMATAN') + '</td>' +
+        '<td>TOTAL KESELURUHAN</td>' +
+        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
+        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right; color:var(--primary); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
+      '</tr>';
+      tbody.innerHTML = html;
+    }
+
+    function renderAggregateGenderPerStatus(allData) {
+      var statuses = ["NEGERI", "SWASTA"];
+      var stats = {};
+      for(var i=0; i<statuses.length; i++) {
+        stats[statuses[i]] = { totalLbg: 0, l: 0, p: 0, total: 0 };
+      }
+      for(var d=0; d<allData.length; d++) {
+        var row = allData[d];
+        var st = (row.statusLembaga || "").toUpperCase();
+        if(stats[st]) {
+          stats[st].totalLbg++;
+          stats[st].l += (row.jmlL || 0);
+          stats[st].p += (row.jmlP || 0);
+          stats[st].total += (row.jmlTotal || 0);
+        }
+      }
+
+      var thead = document.getElementById('aggregate-table-head');
+      var tbody = document.getElementById('table-rekap-aggregate');
+      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">🏛️ REKAPITULASI TOTAL JENIS KELAMIN PER STATUS LEMBAGA</th></tr>' +
+        '<tr><th>STATUS LEMBAGA</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
+      
+      var html = '';
+      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
+      for(var j=0; j<statuses.length; j++) {
+        var stName = statuses[j];
+        var s = stats[stName];
+        grandLbg += s.totalLbg; grandL += s.l; grandP += s.p; grandTot += s.total;
+        html += '<tr>' +
+          '<td style="font-weight:700; color:var(--primary);">' + stName + '</td>' +
+          '<td style="text-align:center;">' + s.totalLbg + ' Lembaga</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.l.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.p.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:700; color:var(--primary);">' + s.total.toLocaleString('id-ID') + '</td>' +
+        '</tr>';
+      }
+      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
+        '<td>TOTAL KESELURUHAN</td>' +
         '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
         '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
         '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
