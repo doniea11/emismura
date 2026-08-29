@@ -95,14 +95,14 @@
     
     .uppercase-input { text-transform: uppercase; }
     
-    .btn { background-color: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; transition: all 0.3s ease; box-shadow: 0 4px 12px var(--primary-light); }
+    .btn { background-color: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; transition: all 0.3s ease; box-shadow: 0 4px 12px var(--primary-light); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
     .btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 15px var(--primary-light); }
     
-    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 10px; }
-    .card { background: var(--bg-container); padding: 25px; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-sm); transition: transform 0.3s ease; }
-    .card:hover { transform: translateY(-5px); }
-    .card div { color: var(--text-main); font-size: 0.95rem; font-weight: 500; }
-    .card h3 { font-size: 2.5rem; color: var(--primary); margin: 10px 0 0 0; font-weight: 700; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 10px; }
+    .card { background: var(--bg-container); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-sm); transition: transform 0.3s ease; }
+    .card:hover { transform: translateY(-3px); }
+    .card div { color: var(--text-muted); font-size: 0.88rem; font-weight: 600; }
+    .card h3 { font-size: 2.2rem; color: var(--primary); margin: 8px 0 0 0; font-weight: 700; }
     
     .alert-box { background-color: #FFF5F5; color: #C53030; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
     [data-theme="dark"] .alert-box { background-color: rgba(229, 62, 62, 0.1); color: #FC8181; }
@@ -113,10 +113,11 @@
     .toast.success { background-color: #10B981; }
     .toast.error { background-color: #EF4444; }
     
-    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 600px; }
-    th { background: var(--bg-body); color: var(--text-main); font-weight: 600; padding: 15px; text-align: left; border-bottom: 2px solid var(--border-color); }
-    td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.95rem; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 750px; }
+    th { background: var(--bg-body); color: var(--text-main); font-weight: 600; padding: 14px 12px; text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.88rem; }
+    td { padding: 13px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; }
     tr:last-child td { border-bottom: none; }
+    tr:hover td { background-color: var(--primary-light); }
     
     .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
@@ -124,6 +125,8 @@
     .modal-content { background: var(--bg-container); padding: 40px; border-radius: var(--radius-lg); width: 90%; max-width: 420px; box-shadow: var(--shadow-md); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
     
     .form-divider { font-size: 1rem; color: var(--primary); font-weight: 600; margin: 25px 0 15px 0; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
+
+    .summary-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; display: inline-block; }
 
     @media (max-width: 768px) {
       .main-content { flex-direction: column; }
@@ -180,12 +183,20 @@
 
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
-              <div>Total Lembaga</div>
+              <div>Total Lembaga Terdaftar</div>
               <h3 id="dash-total">-</h3>
             </div>
             <div class="card">
-              <div>Telah Submit</div>
-              <h3 id="dash-submit">-</h3>
+              <div>Data Lengkap 100%</div>
+              <h3 id="dash-submit" style="color:#10B981;">-</h3>
+            </div>
+            <div class="card">
+              <div>Belum Lengkap</div>
+              <h3 id="dash-sebagian" style="color:#D69E2E;">-</h3>
+            </div>
+            <div class="card">
+              <div>Belum Mengisi</div>
+              <h3 id="dash-kosong" style="color:#EF4444;">-</h3>
             </div>
           </div>
           
@@ -222,7 +233,7 @@
             <div class="grid-cards">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Nama Lembaga</label>
-                <input type="text" id="k-nama" class="uppercase-input" required placeholder="CONTOH: MIS ZETTBOS" oninput="validateSchoolNameInput(this)">
+                <input type="text" id="k-nama" class="uppercase-input" required placeholder="CONTOH: MIS AL-IKHLAS" oninput="validateSchoolNameInput(this)">
               </div>
               <div class="form-group">
                 <label>NSM (Nomor Statistik Madrasah - Hanya Angka)</label>
@@ -497,52 +508,59 @@
 
         <!-- SECTION: REKAPITULASI -->
         <section id="rekapitulasi" class="page-section">
-          <h2>Rekapitulasi & Statistik Data</h2>
+          <h2>Rekapitulasi & Statistik Data Madrasah</h2>
           
+          <!-- SUMMARY CARDS -->
           <div class="grid-cards" style="margin-bottom: 25px;" id="stats-summary-cards">
             <div class="card">
-              <div>Total Lembaga</div>
+              <div>Total Lembaga Terfilter</div>
               <h3 id="stat-tot-lbg">0</h3>
             </div>
             <div class="card">
-              <div>Lengkap 100%</div>
-              <h3 id="stat-lengkap" style="color:#10B981;">0</h3>
+              <div>Total Siswa Laki-Laki</div>
+              <h3 id="stat-tot-laki" style="color:#3B82F6;">0</h3>
             </div>
             <div class="card">
-              <div>Belum Lengkap</div>
-              <h3 id="stat-sebagian" style="color:#D69E2E;">0</h3>
+              <div>Total Siswa Perempuan</div>
+              <h3 id="stat-tot-perempuan" style="color:#EC4899;">0</h3>
             </div>
             <div class="card">
-              <div>Belum Mengisi</div>
-              <h3 id="stat-kosong" style="color:#EF4444;">0</h3>
+              <div>Total Seluruh Siswa</div>
+              <h3 id="stat-tot-siswa" style="color:#10B981;">0</h3>
             </div>
           </div>
 
-          <div class="form-group" style="background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
-            <label style="font-weight:700; color:var(--primary); margin-bottom:10px;">Filter Laporan Rekapitulasi</label>
+          <!-- FILTER CONTROL BOX -->
+          <div class="form-group" style="background:var(--bg-body); padding:22px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+            <label style="font-weight:700; color:var(--primary); margin-bottom:12px; font-size:1rem;">⚙️ Kategori Filter Laporan Rekapitulasi</label>
+            
             <div class="grid-cards" style="margin-bottom:0; align-items:end;">
               <div class="form-group" style="margin-bottom:0; grid-column: 1 / span 2;">
-                <select id="rekap-filter-type" onchange="onRekapFilterChange()">
-                  <option value="KESELURUHAN">REKAP KESELURUHAN</option>
-                  <option value="PER_KECAMATAN">REKAP PER KECAMATAN</option>
-                  <option value="PER_JENJANG">REKAP PER JENJANG</option>
-                  <option value="LENGKAP">LEMBAGA YANG SUDAH LENGKAP</option>
-                  <option value="BELUM_LENGKAP">LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
-                  <option value="BELUM_MENGISI">LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
+                <select id="rekap-filter-type" onchange="onRekapFilterChange()" style="font-weight:600;">
+                  <option value="KESELURUHAN">📊 1. REKAP KESELURUHAN</option>
+                  <option value="PER_KECAMATAN">📍 2. REKAP PER KECAMATAN</option>
+                  <option value="PER_JENJANG">🎓 3. REKAP PER JENJANG</option>
+                  <option value="PER_GENDER_ALL">👥 4. REKAP PER JENIS KELAMIN SELURUH JENJANG</option>
+                  <option value="PER_GENDER_KECAMATAN">🗺️ 5. REKAP JENIS KELAMIN PER KECAMATAN</option>
+                  <option value="PER_STATUS">🏛️ 6. REKAP PER STATUS (SWASTA / NEGERI)</option>
+                  <option value="LENGKAP">✅ 7. LEMBAGA YANG SUDAH LENGKAP</option>
+                  <option value="BELUM_LENGKAP">⏳ 8. LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
+                  <option value="BELUM_MENGISI">❌ 9. LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
                 </select>
               </div>
               <div class="form-group" style="margin-bottom:0; display:flex; gap:10px;">
-                <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-body); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
+                <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-container); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
                 <button class="btn" onclick="exportExcel()" style="flex:1; background:#10B981; box-shadow:none;">📥 Export Excel (.xlsx)</button>
               </div>
             </div>
 
+            <!-- SUB FILTER: KECAMATAN -->
             <div id="sub-filter-kecamatan-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0;">
                   <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Kecamatan</label>
                   <select id="sub-kecamatan-select" onchange="renderRekapTable()">
-                    <option value="">-- Pilih Kecamatan --</option>
+                    <option value="">-- Semua Kecamatan --</option>
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
@@ -558,38 +576,87 @@
               </div>
             </div>
 
+            <!-- SUB FILTER: JENJANG -->
             <div id="sub-filter-jenjang-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
-                <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                <div class="form-group" style="margin-bottom:0;">
                   <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Jenjang Pendidikan</label>
                   <select id="sub-jenjang-select" onchange="renderRekapTable()">
-                    <option value="">-- Pilih Jenjang --</option>
+                    <option value="">-- Semua Jenjang --</option>
                     <option value="RA">RA (Raudhatul Athfal)</option>
                     <option value="MI">MI (Madrasah Ibtidaiyah)</option>
                     <option value="MTs">MTs (Madrasah Tsanawiyah)</option>
                     <option value="MA">MA (Madrasah Aliyah)</option>
                   </select>
                 </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Filter Status (Opsional)</label>
+                  <select id="sub-jenjang-status-select" onchange="renderRekapTable()">
+                    <option value="">-- Semua Status --</option>
+                    <option value="NEGERI">NEGERI</option>
+                    <option value="SWASTA">SWASTA</option>
+                  </select>
+                </div>
               </div>
             </div>
+
+            <!-- SUB FILTER: STATUS SWASTA / NEGERI -->
+            <div id="sub-filter-status-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
+              <div class="grid-cards" style="margin-bottom:0;">
+                <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Status Lembaga</label>
+                  <select id="sub-status-select" onchange="renderRekapTable()">
+                    <option value="">-- Semua Status (Negeri & Swasta) --</option>
+                    <option value="NEGERI">NEGERI</option>
+                    <option value="SWASTA">SWASTA</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB FILTER: GENDER PER KECAMATAN -->
+            <div id="sub-filter-gender-kecamatan-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
+              <div class="grid-cards" style="margin-bottom:0;">
+                <div class="form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Kecamatan Spesifik</label>
+                  <select id="sub-gender-kecamatan-select" onchange="renderRekapTable()">
+                    <option value="">-- Tampilkan Rekapitulasi Semua Kecamatan --</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SUMMARY AGGREGATE TABLE (JIKA REKAP GENDER) -->
+          <div id="container-rekap-aggregate" style="display:none; margin-bottom: 25px; overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <table>
+              <thead id="aggregate-table-head"></thead>
+              <tbody id="table-rekap-aggregate"></tbody>
+            </table>
           </div>
 
           <div id="rekap-info-text" style="margin: 15px 0; font-weight:600; color:var(--text-muted); font-size:0.95rem;"></div>
 
+          <!-- MAIN DATA TABLE -->
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
             <table>
               <thead id="rekap-table-head">
                 <tr>
+                  <th style="width:40px; text-align:center;">NO</th>
                   <th>NSM</th>
                   <th>NAMA LEMBAGA</th>
                   <th>JENJANG</th>
                   <th>STATUS</th>
                   <th>KECAMATAN</th>
+                  <th style="text-align:right;">L</th>
+                  <th style="text-align:right;">P</th>
+                  <th style="text-align:right;">TOTAL SISWA</th>
                   <th>KELENGKAPAN</th>
                 </tr>
               </thead>
               <tbody id="table-rekap">
-                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rekapitulasi data...</td></tr>
+                <tr><td colspan="10" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rekapitulasi data...</td></tr>
               </tbody>
             </table>
           </div>
@@ -692,8 +759,8 @@
   </div>
 
   <script>
-    // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG BERAKHIRAN /exec
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiOy1wwQhi0mxB8_BTC3Jc21Pfhjf6Q3ilvc7DK8qyeOoxewl-7MSmZm6SNNfbFq8h/exec";
+    // URL Web App Google Apps Script
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLfq8Pw5-80lwKJj4UnSIm_6I3x3xM9vAaeesGjYGu-ZjiDPLdbQvlnCSuDDwXOXv/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -732,6 +799,9 @@
       
       if (sectionId === 'admin-emis') {
         fetchApprovalList();
+      }
+      if (sectionId === 'rekapitulasi') {
+        renderRekapTable();
       }
     }
 
@@ -794,7 +864,7 @@
           var adminNav = null;
           var items = document.querySelectorAll('.nav-item');
           for (var i = 0; i < items.length; i++) {
-            if (items[i].getAttribute('onclick').indexOf('openPinModal') !== -1) { adminNav = items[i]; break; }
+            if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').indexOf('openPinModal') !== -1) { adminNav = items[i]; break; }
           }
           navigate('admin-emis', adminNav);
           showToast("Akses Admin EMIS Diberikan", "success");
@@ -834,7 +904,9 @@
           if(res.status === 'success') {
             document.getElementById('marquee-text').innerText = res.banner;
             document.getElementById('dash-total').innerText = res.stats.total;
-            document.getElementById('dash-submit').innerText = res.stats.submitted;
+            document.getElementById('dash-submit').innerText = res.statsSummary.lengkap;
+            document.getElementById('dash-sebagian').innerText = res.statsSummary.sebagian;
+            document.getElementById('dash-kosong').innerText = res.statsSummary.kosong;
             
             globalInstitutions = res.institutions || [];
             masterEkstraList = res.masterOptions.ekstrakurikuler || [];
@@ -848,11 +920,6 @@
             renderSarprasDropdowns();
             renderKecamatanSubFilters();
             renderRekapTable();
-            
-            document.getElementById('stat-tot-lbg').innerText = res.statsSummary.total;
-            document.getElementById('stat-lengkap').innerText = res.statsSummary.lengkap;
-            document.getElementById('stat-sebagian').innerText = res.statsSummary.sebagian;
-            document.getElementById('stat-kosong').innerText = res.statsSummary.kosong;
           }
         })
         .catch(function(err) {});
@@ -874,7 +941,7 @@
               '<td>' + res[i].idLembaga + '</td>' +
               '<td>' + res[i].modul + '</td>' +
               '<td>' + res[i].alasan + '</td>' +
-              '<td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:#D69E2E20; color:#D69E2E;">' + res[i].status + '</span></td>' +
+              '<td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:rgba(214,158,46,0.15); color:#D69E2E;">' + res[i].status + '</span></td>' +
               '<td style="display:flex; gap:8px;">' +
                 '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:#10B981;" onclick="processApproval(\'' + res[i].idReq + '\', \'APPROVE\')">Setujui</button>' +
                 '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:#EF4444;" onclick="processApproval(\'' + res[i].idReq + '\', \'REJECT\')">Tolak</button>' +
@@ -903,40 +970,92 @@
 
     function renderKecamatanSubFilters() {
       var selKec = document.getElementById('sub-kecamatan-select');
-      if (!selKec) return;
-      var html = '<option value="">-- Pilih Kecamatan --</option>';
+      var selKecGender = document.getElementById('sub-gender-kecamatan-select');
+      
+      var html = '<option value="">-- Semua Kecamatan --</option>';
       for (var i = 0; i < kecamatanListGlobal.length; i++) {
         html += '<option value="' + kecamatanListGlobal[i] + '">' + kecamatanListGlobal[i] + '</option>';
       }
-      selKec.innerHTML = html;
+      if (selKec) selKec.innerHTML = html;
+      if (selKecGender) selKecGender.innerHTML = html;
     }
 
     function onRekapFilterChange() {
       var filterType = document.getElementById('rekap-filter-type').value;
       var subContainerKec = document.getElementById('sub-filter-kecamatan-container');
       var subContainerJg = document.getElementById('sub-filter-jenjang-container');
-      subContainerKec.style.display = 'none'; subContainerJg.style.display = 'none';
-      if (filterType === 'PER_KECAMATAN') subContainerKec.style.display = 'block';
-      else if (filterType === 'PER_JENJANG') subContainerJg.style.display = 'block';
+      var subContainerStatus = document.getElementById('sub-filter-status-container');
+      var subContainerGenderKec = document.getElementById('sub-filter-gender-kecamatan-container');
+      
+      subContainerKec.style.display = 'none';
+      subContainerJg.style.display = 'none';
+      subContainerStatus.style.display = 'none';
+      subContainerGenderKec.style.display = 'none';
+
+      if (filterType === 'PER_KECAMATAN') {
+        subContainerKec.style.display = 'block';
+      } else if (filterType === 'PER_JENJANG') {
+        subContainerJg.style.display = 'block';
+      } else if (filterType === 'PER_STATUS') {
+        subContainerStatus.style.display = 'block';
+      } else if (filterType === 'PER_GENDER_KECAMATAN') {
+        subContainerGenderKec.style.display = 'block';
+      }
       renderRekapTable();
     }
 
     function renderRekapTable() {
       var filterType = document.getElementById('rekap-filter-type').value;
-      var selectedKecamatan = document.getElementById('sub-kecamatan-select').value;
-      var selectedJenjangKec = document.getElementById('sub-kecamatan-jenjang-select').value;
-      var selectedJenjang = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : "";
       var tbody = document.getElementById('table-rekap');
       var infoText = document.getElementById('rekap-info-text');
+      var aggregateContainer = document.getElementById('container-rekap-aggregate');
+      var aggThead = document.getElementById('aggregate-table-head');
+      var aggTbody = document.getElementById('table-rekap-aggregate');
+
+      var selectedKecamatan = document.getElementById('sub-kecamatan-select') ? document.getElementById('sub-kecamatan-select').value : '';
+      var selectedJenjangKec = document.getElementById('sub-kecamatan-jenjang-select') ? document.getElementById('sub-kecamatan-jenjang-select').value : '';
+      var selectedJenjang = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : '';
+      var selectedStatusJenjang = document.getElementById('sub-jenjang-status-select') ? document.getElementById('sub-jenjang-status-select').value : '';
+      var selectedStatus = document.getElementById('sub-status-select') ? document.getElementById('sub-status-select').value : '';
+      var selectedGenderKec = document.getElementById('sub-gender-kecamatan-select') ? document.getElementById('sub-gender-kecamatan-select').value : '';
 
       var data = [].concat(fullRekapData);
       var filtered = data;
-      if (filterType === 'PER_KECAMATAN') {
+      aggregateContainer.style.display = 'none';
+
+      // Logika Penyaringan Berdasarkan 9 Pilihan
+      if (filterType === 'KESELURUHAN') {
+        filtered = data;
+      } else if (filterType === 'PER_KECAMATAN') {
         filtered = data.filter(function(x) {
-          return (!selectedKecamatan || x.kecamatan === selectedKecamatan) && (!selectedJenjangKec || x.jenjang === selectedJenjangKec);
+          var matchKec = !selectedKecamatan || x.kecamatan === selectedKecamatan;
+          var matchJg = !selectedJenjangKec || x.jenjang === selectedJenjangKec;
+          return matchKec && matchJg;
         });
       } else if (filterType === 'PER_JENJANG') {
-        filtered = data.filter(function(x) { return !selectedJenjang || x.jenjang === selectedJenjang; });
+        filtered = data.filter(function(x) {
+          var matchJg = !selectedJenjang || x.jenjang === selectedJenjang;
+          var matchSt = !selectedStatusJenjang || x.statusLembaga === selectedStatusJenjang;
+          return matchJg && matchSt;
+        });
+      } else if (filterType === 'PER_STATUS') {
+        filtered = data.filter(function(x) {
+          return !selectedStatus || x.statusLembaga === selectedStatus;
+        });
+      } else if (filterType === 'PER_GENDER_ALL') {
+        filtered = data;
+        // Tampilkan Tabel Akumulasi Per Jenjang
+        aggregateContainer.style.display = 'block';
+        renderAggregateGenderPerJenjang(data);
+      } else if (filterType === 'PER_GENDER_KECAMATAN') {
+        if (selectedGenderKec) {
+          filtered = data.filter(function(x) { return x.kecamatan === selectedGenderKec; });
+        } else {
+          filtered = data;
+        }
+        // Tampilkan Tabel Akumulasi Per Kecamatan
+        aggregateContainer.style.display = 'block';
+        renderAggregateGenderPerKecamatan(data, selectedGenderKec);
       } else if (filterType === 'LENGKAP') {
         filtered = data.filter(function(x){ return x.kelengkapan === 'LENGKAP'; });
       } else if (filterType === 'BELUM_LENGKAP') {
@@ -945,17 +1064,134 @@
         filtered = data.filter(function(x){ return x.kelengkapan === 'BELUM MENGISI'; });
       }
 
-      if (infoText) infoText.innerText = "Total Jumlah Lembaga Ditampilkan: " + filtered.length + " Lembaga";
-      var html = '';
+      // Hitung Statistik Card
+      var sumL = 0, sumP = 0, sumTotal = 0;
+      for (var s = 0; s < filtered.length; s++) {
+        sumL += (filtered[s].jmlL || 0);
+        sumP += (filtered[s].jmlP || 0);
+        sumTotal += (filtered[s].jmlTotal || 0);
+      }
+      document.getElementById('stat-tot-lbg').innerText = filtered.length;
+      document.getElementById('stat-tot-laki').innerText = sumL.toLocaleString('id-ID');
+      document.getElementById('stat-tot-perempuan').innerText = sumP.toLocaleString('id-ID');
+      document.getElementById('stat-tot-siswa').innerText = sumTotal.toLocaleString('id-ID');
+
+      if (infoText) {
+        infoText.innerText = "Daftar Rincian: Menampilkan " + filtered.length + " Lembaga | Total Siswa: " + sumTotal.toLocaleString('id-ID');
+      }
+
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data lembaga.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data lembaga yang cocok dengan kriteria filter.</td></tr>';
         return;
       }
+
+      var html = '';
       for (var j = 0; j < filtered.length; j++) {
         var itm = filtered[j];
+        var badgeBg = itm.kelengkapan === 'LENGKAP' ? 'rgba(16, 185, 129, 0.15)' : (itm.kelengkapan === 'BELUM LENGKAP' ? 'rgba(214, 158, 46, 0.15)' : 'rgba(239, 68, 68, 0.15)');
         var badgeColor = itm.kelengkapan === 'LENGKAP' ? '#10B981' : (itm.kelengkapan === 'BELUM LENGKAP' ? '#D69E2E' : '#EF4444');
-        html += '<tr><td>' + itm.nsm + '</td><td>' + itm.nama + '</td><td>' + itm.jenjang + '</td><td>' + itm.statusLembaga + '</td><td>' + itm.kecamatan + '</td><td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:' + badgeColor + '20; color:' + badgeColor + ';">' + itm.kelengkapan + '</span></td></tr>';
+        
+        html += '<tr>' +
+          '<td style="text-align:center; font-weight:600;">' + (j + 1) + '</td>' +
+          '<td>' + (itm.nsm || '-') + '</td>' +
+          '<td style="font-weight:600;">' + (itm.nama || '-') + '</td>' +
+          '<td>' + (itm.jenjang || '-') + '</td>' +
+          '<td>' + (itm.statusLembaga || '-') + '</td>' +
+          '<td>' + (itm.kecamatan || '-') + '</td>' +
+          '<td style="text-align:right; font-weight:500;">' + (itm.jmlL || 0).toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:500;">' + (itm.jmlP || 0).toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:700; color:var(--primary);">' + (itm.jmlTotal || 0).toLocaleString('id-ID') + '</td>' +
+          '<td><span class="summary-badge" style="background:' + badgeBg + '; color:' + badgeColor + ';">' + itm.kelengkapan + '</span></td>' +
+        '</tr>';
       }
+      tbody.innerHTML = html;
+    }
+
+    function renderAggregateGenderPerJenjang(allData) {
+      var jenjangs = ["RA", "MI", "MTs", "MA"];
+      var stats = {};
+      for(var i=0; i<jenjangs.length; i++) {
+        stats[jenjangs[i]] = { totalLbg: 0, l: 0, p: 0, total: 0 };
+      }
+      for(var d=0; d<allData.length; d++) {
+        var row = allData[d];
+        if(stats[row.jenjang]) {
+          stats[row.jenjang].totalLbg++;
+          stats[row.jenjang].l += (row.jmlL || 0);
+          stats[row.jenjang].p += (row.jmlP || 0);
+          stats[row.jenjang].total += (row.jmlTotal || 0);
+        }
+      }
+
+      var thead = document.getElementById('aggregate-table-head');
+      var tbody = document.getElementById('table-rekap-aggregate');
+      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">📊 REKAPITULASI TOTAL SISWA MENURUT JENJANG PENDIDIKAN</th></tr>' +
+        '<tr><th>JENJANG</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
+      
+      var html = '';
+      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
+      for(var j=0; j<jenjangs.length; j++) {
+        var jg = jenjangs[j];
+        var s = stats[jg];
+        grandLbg += s.totalLbg; grandL += s.l; grandP += s.p; grandTot += s.total;
+        html += '<tr>' +
+          '<td style="font-weight:700; color:var(--primary);">' + jg + '</td>' +
+          '<td style="text-align:center;">' + s.totalLbg + ' Lembaga</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.l.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.p.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:700; color:var(--primary);">' + s.total.toLocaleString('id-ID') + '</td>' +
+        '</tr>';
+      }
+      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
+        '<td>TOTAL KESELURUHAN</td>' +
+        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
+        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right; color:var(--primary); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
+      '</tr>';
+      tbody.innerHTML = html;
+    }
+
+    function renderAggregateGenderPerKecamatan(allData, selectedKec) {
+      var kecMap = {};
+      for(var d=0; d<allData.length; d++) {
+        var row = allData[d];
+        var kec = row.kecamatan || "TIDAK DIKETAHUI";
+        if(selectedKec && kec !== selectedKec) continue;
+        if(!kecMap[kec]) { kecMap[kec] = { totalLbg: 0, l: 0, p: 0, total: 0 }; }
+        kecMap[kec].totalLbg++;
+        kecMap[kec].l += (row.jmlL || 0);
+        kecMap[kec].p += (row.jmlP || 0);
+        kecMap[kec].total += (row.jmlTotal || 0);
+      }
+
+      var thead = document.getElementById('aggregate-table-head');
+      var tbody = document.getElementById('table-rekap-aggregate');
+      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary); font-weight:700;">🗺️ REKAPITULASI TOTAL SISWA PER KECAMATAN</th></tr>' +
+        '<tr><th>KECAMATAN</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
+      
+      var html = '';
+      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
+      var sortedKec = Object.keys(kecMap).sort();
+      for(var k=0; k<sortedKec.length; k++) {
+        var kcName = sortedKec[k];
+        var s = kecMap[kcName];
+        grandLbg += s.totalLbg; grandL += s.l; grandP += s.p; grandTot += s.total;
+        html += '<tr>' +
+          '<td style="font-weight:700;">' + kcName + '</td>' +
+          '<td style="text-align:center;">' + s.totalLbg + ' Lembaga</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.l.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:600;">' + s.p.toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:700; color:var(--primary);">' + s.total.toLocaleString('id-ID') + '</td>' +
+        '</tr>';
+      }
+      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
+        '<td>TOTAL ' + (selectedKec ? selectedKec : 'SEMUA KECAMATAN') + '</td>' +
+        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
+        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
+        '<td style="text-align:right; color:var(--primary); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
+      '</tr>';
       tbody.innerHTML = html;
     }
 
@@ -1106,8 +1342,8 @@
       var lTotal = 0, pTotal = 0;
       for (var i = 0; i < activeClassesList.length; i++) {
         var c = activeClassesList[i];
-        var l = parseInt(document.getElementById('s-kelas-' + c + '-l').value) || 0;
-        var p = parseInt(document.getElementById('s-kelas-' + c + '-p').value) || 0;
+        var l = parseInt(document.getElementById('s-kelas-' + c + '-l').value, 10) || 0;
+        var p = parseInt(document.getElementById('s-kelas-' + c + '-p').value, 10) || 0;
         document.getElementById('s-kelas-' + c + '-total').value = l + p;
         lTotal += l; pTotal += p;
       }
@@ -1117,8 +1353,8 @@
     }
 
     function hitungTotalAlumni() {
-      var l = parseInt(document.getElementById('s-alumni-l').value) || 0;
-      var p = parseInt(document.getElementById('s-alumni-p').value) || 0;
+      var l = parseInt(document.getElementById('s-alumni-l').value, 10) || 0;
+      var p = parseInt(document.getElementById('s-alumni-p').value, 10) || 0;
       document.getElementById('s-alumni-total').value = l + p;
     }
 
@@ -1129,8 +1365,8 @@
     }
 
     function hitungTotalTidakLulus() {
-      var l = parseInt(document.getElementById('s-tl-l').value) || 0;
-      var p = parseInt(document.getElementById('s-tl-p').value) || 0;
+      var l = parseInt(document.getElementById('s-tl-l').value, 10) || 0;
+      var p = parseInt(document.getElementById('s-tl-p').value, 10) || 0;
       document.getElementById('s-tl-total').value = l + p;
     }
 
@@ -1144,9 +1380,9 @@
         var c = activeClassesList[i];
         detailKelas.push({
           kelas: c,
-          laki: parseInt(document.getElementById('s-kelas-' + c + '-l').value) || 0,
-          perempuan: parseInt(document.getElementById('s-kelas-' + c + '-p').value) || 0,
-          total: parseInt(document.getElementById('s-kelas-' + c + '-total').value) || 0
+          laki: parseInt(document.getElementById('s-kelas-' + c + '-l').value, 10) || 0,
+          perempuan: parseInt(document.getElementById('s-kelas-' + c + '-p').value, 10) || 0,
+          total: parseInt(document.getElementById('s-kelas-' + c + '-total').value, 10) || 0
         });
       }
 
@@ -1156,16 +1392,16 @@
         jenjang: document.getElementById('s-jenjang').value,
         tahunPelajaran: "2026/2027",
         detailKelas: JSON.stringify(detailKelas),
-        totalL: parseInt(document.getElementById('s-total-semua-l').value) || 0,
-        totalP: parseInt(document.getElementById('s-total-semua-p').value) || 0,
-        totalSiswa: parseInt(document.getElementById('s-total-semua').value) || 0,
-        alumniL: parseInt(document.getElementById('s-alumni-l').value) || 0,
-        alumniP: parseInt(document.getElementById('s-alumni-p').value) || 0,
-        alumniTotal: parseInt(document.getElementById('s-alumni-total').value) || 0,
+        totalL: parseInt(document.getElementById('s-total-semua-l').value, 10) || 0,
+        totalP: parseInt(document.getElementById('s-total-semua-p').value, 10) || 0,
+        totalSiswa: parseInt(document.getElementById('s-total-semua').value, 10) || 0,
+        alumniL: parseInt(document.getElementById('s-alumni-l').value, 10) || 0,
+        alumniP: parseInt(document.getElementById('s-alumni-p').value, 10) || 0,
+        alumniTotal: parseInt(document.getElementById('s-alumni-total').value, 10) || 0,
         tidakLulus: document.getElementById('s-tidak-lulus').value,
-        tidakLulusL: parseInt(document.getElementById('s-tl-l').value) || 0,
-        tidakLulusP: parseInt(document.getElementById('s-tl-p').value) || 0,
-        tidakLulusTotal: parseInt(document.getElementById('s-tl-total').value) || 0
+        tidakLulusL: parseInt(document.getElementById('s-tl-l').value, 10) || 0,
+        tidakLulusP: parseInt(document.getElementById('s-tl-p').value, 10) || 0,
+        tidakLulusTotal: parseInt(document.getElementById('s-tl-total').value, 10) || 0
       };
 
       fetch(APPS_SCRIPT_URL, {
@@ -1198,13 +1434,13 @@
       var formData = {
         action: "saveSarpras",
         idLembaga: idLembaga,
-        jumlahGedung: parseInt(document.getElementById('spr-gedung').value) || 0,
-        ruangKepala: parseInt(document.getElementById('spr-kepala').value) || 0,
-        ruangWakapu: parseInt(document.getElementById('spr-wakapu').value) || 0,
-        ruangGuru: parseInt(document.getElementById('spr-guru').value) || 0,
-        ruangKelas: parseInt(document.getElementById('spr-kelas').value) || 0,
-        toiletGuru: parseInt(document.getElementById('spr-toilet-guru').value) || 0,
-        toiletSiswa: parseInt(document.getElementById('spr-toilet-siswa').value) || 0,
+        jumlahGedung: parseInt(document.getElementById('spr-gedung').value, 10) || 0,
+        ruangKepala: parseInt(document.getElementById('spr-kepala').value, 10) || 0,
+        ruangWakapu: parseInt(document.getElementById('spr-wakapu').value, 10) || 0,
+        ruangGuru: parseInt(document.getElementById('spr-guru').value, 10) || 0,
+        ruangKelas: parseInt(document.getElementById('spr-kelas').value, 10) || 0,
+        toiletGuru: parseInt(document.getElementById('spr-toilet-guru').value, 10) || 0,
+        toiletSiswa: parseInt(document.getElementById('spr-toilet-siswa').value, 10) || 0,
         listEkstrakurikuler: document.getElementById('spr-ekstra').value,
         listLaboratorium: document.getElementById('spr-lab').value
       };
@@ -1221,7 +1457,7 @@
         if (res.status === 'success') { document.getElementById('form-sarpras').reset(); fetchInitialData(); }
         else if (res.status === 'duplicate') {
           currentDuplicateIdLembagaSarpras = res.idLembaga;
-          document.getElementById('update-sarpras-alasan').value ='.';
+          document.getElementById('update-sarpras-alasan').value = '';
           document.getElementById('update-sarpras-modal').classList.add('active');
         }
       })
