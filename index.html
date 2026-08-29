@@ -104,11 +104,24 @@
     .card div { color: var(--text-main); font-size: 0.95rem; font-weight: 500; }
     .card h3 { font-size: 2.5rem; color: var(--primary); margin: 10px 0 0 0; font-weight: 700; }
     
+    .alert-box { background-color: #FFF5F5; color: #C53030; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+    [data-theme="dark"] .alert-box { background-color: rgba(229, 62, 62, 0.1); color: #FC8181; }
+
     #toast-container { position: fixed; top: 25px; right: 25px; z-index: 9999; }
     .toast { min-width: 280px; padding: 16px 24px; border-radius: var(--radius-sm); margin-bottom: 12px; color: white; font-weight: 500; font-size: 0.95rem; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .toast.show { transform: translateX(0); }
     .toast.success { background-color: #10B981; }
     .toast.error { background-color: #EF4444; }
+    
+    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 600px; }
+    th { background: var(--bg-body); color: var(--text-main); font-weight: 600; padding: 15px; text-align: left; border-bottom: 2px solid var(--border-color); }
+    td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.95rem; }
+    tr:last-child td { border-bottom: none; }
+    
+    .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content { background: var(--bg-container); padding: 40px; border-radius: var(--radius-lg); width: 90%; max-width: 420px; box-shadow: var(--shadow-md); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
     
     .form-divider { font-size: 1rem; color: var(--primary); font-weight: 600; margin: 25px 0 15px 0; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
 
@@ -129,7 +142,7 @@
   <div class="app-wrapper">
     <!-- Marquee Banner -->
     <div class="banner">
-      <marquee id="marquee-text">Menghubungkan ke server Google Sheet Kemenag Musi Rawas...</marquee>
+      <marquee id="marquee-text">Memuat informasi server...</marquee>
     </div>
 
     <!-- Header -->
@@ -149,6 +162,11 @@
         <div class="sidebar-menu">
           <div class="nav-item active" onclick="navigate('dashboard', this)">📊 Dashboard</div>
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)">🏫 Input Kelembagaan</div>
+          <div class="nav-item" onclick="navigate('input-siswa', this)">👨‍🎓 Input Siswa</div>
+          <div class="nav-item" onclick="navigate('input-sarpras', this)">🏢 Input Sarpras</div>
+          <div class="nav-item" onclick="navigate('rekapitulasi', this)">🖨️ Rekapitulasi</div>
+          <div class="nav-item" onclick="openPinModal('admin-emis')">⚙️ Admin EMIS</div>
+          <div class="nav-item" onclick="navigate('log-audit', this)">📝 Log Audit</div>
         </div>
         <div class="watermark-donie">@doniepenmadmura</div>
       </nav>
@@ -159,6 +177,7 @@
         <!-- SECTION: DASHBOARD -->
         <section id="dashboard" class="page-section active">
           <h2>Dashboard Statistik</h2>
+
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga</div>
@@ -169,6 +188,8 @@
               <h3 id="dash-submit">-</h3>
             </div>
           </div>
+          
+          <div id="dashboard-ews-container" style="margin-top: 25px;"></div>
         </section>
 
         <!-- SECTION: INPUT KELEMBAGAAN -->
@@ -205,7 +226,8 @@
               </div>
               <div class="form-group">
                 <label>NSM</label>
-                <input type="number" id="k-nsm" required placeholder="Masukkan NSM">
+                <input type="number" id="k-nsm" required placeholder="Masukkan NSM" oninput="checkRealtimeNsm(this)">
+                <small id="nsm-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ NSM ini sudah terdaftar! Submit ulang akan memicu pengajuan update ke Admin.</small>
               </div>
               <div class="form-group">
                 <label>NPSN</label>
@@ -213,7 +235,7 @@
               </div>
             </div>
 
-            <div class="form-divider">2. Alamat & Kontak</div>
+            <div class="form-divider">2. Alamat Lembaga</div>
             <div class="grid-cards">
               <div class="form-group">
                 <label>Desa / Kelurahan</label>
@@ -223,14 +245,357 @@
                 <label>Kecamatan</label>
                 <input type="text" id="k-kecamatan" class="uppercase-input" required>
               </div>
+            </div>
+
+            <div class="form-divider">3. Izin Operasional</div>
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Nomor SK Izin Operasional</label>
+                <input type="text" id="k-no-izin" class="uppercase-input" required placeholder="CONTOH: 100 TAHUN 2017">
+              </div>
+              <div class="form-group">
+                <label>Tanggal SK Izin Operasional</label>
+                <input type="date" id="k-tgl-izin" required>
+              </div>
+              <div class="form-group">
+                <label>Akhir Masa Berlaku Izin Operasional</label>
+                <input type="date" id="k-akhir-izin" required>
+              </div>
+            </div>
+
+            <div class="form-divider">4. Akreditasi</div>
+            <div class="grid-cards">
+              <div class="form-group">
+                <label>Status Akreditasi</label>
+                <select id="k-akreditasi" required>
+                  <option value="">Pilih Status</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="Belum Terakreditasi">Belum Terakreditasi</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid-cards">
+              <div class="form-group">
+                <label>Tanggal SK Akreditasi</label>
+                <input type="date" id="k-tgl-akred">
+              </div>
+              <div class="form-group">
+                <label>Akhir Masa Berlaku Akreditasi</label>
+                <input type="date" id="k-akhir-akred">
+              </div>
+            </div>
+
+            <div class="form-divider">5. Kontak & Pengurus</div>
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>NPWP Lembaga</label>
+                <input type="text" id="k-npwp" class="uppercase-input" required placeholder="01.234.567.8-901.000">
+              </div>
+              <div class="form-group">
+                <label>Nama Kepala Lembaga</label>
+                <input type="text" id="k-kepala" class="uppercase-input" required placeholder="NAMA KEPALA">
+              </div>
               <div class="form-group">
                 <label>Nomor WhatsApp Kepala</label>
                 <input type="text" id="k-wa-kepala" required placeholder="081234567890" maxlength="13">
               </div>
+              <div class="form-group">
+                <label>Nama Operator Lembaga</label>
+                <input type="text" id="k-operator" class="uppercase-input" required placeholder="NAMA OPERATOR">
+              </div>
+              <div class="form-group">
+                <label>Nomor WhatsApp Operator</label>
+                <input type="text" id="k-wa-operator" required placeholder="081234567890" maxlength="13">
+              </div>
             </div>
 
-            <button type="submit" class="btn" id="btn-submit-lbg" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px;">Simpan Data Kelembagaan</button>
+            <div class="form-divider">6. Titik Geografis Lokasi</div>
+            <div class="grid-cards" style="margin-bottom: 10px;">
+              <div class="form-group">
+                <label>Latitude (Garis Lintang)</label>
+                <input type="text" id="k-lat" required>
+              </div>
+              <div class="form-group">
+                <label>Longitude (Garis Bujur)</label>
+                <input type="text" id="k-lng" required>
+              </div>
+            </div>
+            <div class="form-group" style="text-align: right; margin-bottom: 30px;">
+              <button type="button" class="btn" style="background:#10B981; margin-bottom: 10px;" onclick="getKoordinatOtomatis()">📍 Ambil Koordinat Otomatis</button>
+              <br>
+              <a href="https://maps.google.com" target="_blank" style="font-size:0.85rem; color:var(--primary); font-weight: 500; text-decoration: none;">Atau cari manual via Google Maps ↗</a>
+            </div>
+
+            <button type="submit" class="btn" id="btn-submit-lbg" style="width: 100%; font-size: 1.1rem; padding: 15px;">Simpan Data Kelembagaan</button>
           </form>
+        </section>
+
+        <!-- SECTION: INPUT SISWA -->
+        <section id="input-siswa" class="page-section">
+          <h2>Data Siswa</h2>
+          
+          <form id="form-siswa" onsubmit="event.preventDefault(); submitSiswa();">
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Pilih Lembaga</label>
+                <select id="s-lembaga" required onchange="onLembagaChange()">
+                  <option value="">-- Memuat Data Lembaga... --</option>
+                </select>
+                <small id="siswa-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah memiliki Data Siswa. Submit ulang akan memicu pengajuan update ke Admin.</small>
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Jenjang (Otomatis)</label>
+                <input type="text" id="s-jenjang-display" readonly style="background:var(--bg-body); font-weight:bold; color:var(--primary);" placeholder="Pilih lembaga di atas terlebih dahulu">
+                <input type="hidden" id="s-jenjang">
+              </div>
+            </div>
+            
+            <div class="form-divider" style="margin-top:0;">Data Kelas (Tahun Pelajaran 2026/2027)</div>
+            <div id="kelas-container">
+              <div class="alert-box">⚠️ Silakan pilih lembaga terlebih dahulu untuk mengisi detail data siswa per kelas.</div>
+            </div>
+            
+            <div id="total-siswa-aktif-container" style="display:none; background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:25px;">
+              <h4 style="color:var(--primary); margin:0 0 15px 0; border-bottom: 1px dashed var(--border-color); padding-bottom:10px;">Total Seluruh Siswa Aktif (Semua Kelas)</h4>
+              <div class="grid-cards" style="margin-bottom:0;">
+                <div class="form-group">
+                  <label>Total Laki-Laki</label>
+                  <input type="number" id="s-total-semua-l" readonly style="font-weight:bold; color:var(--text-main); background:transparent; border-color:transparent; padding:0; font-size:1.5rem;" value="0">
+                </div>
+                <div class="form-group">
+                  <label>Total Perempuan</label>
+                  <input type="number" id="s-total-semua-p" readonly style="font-weight:bold; color:var(--text-main); background:transparent; border-color:transparent; padding:0; font-size:1.5rem;" value="0">
+                </div>
+                <div class="form-group">
+                  <label>Total Keseluruhan</label>
+                  <input type="number" id="s-total-semua" readonly style="font-weight:bold; color:var(--primary); background:transparent; border-color:transparent; padding:0; font-size:1.5rem;" value="0">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-divider">Data Alumni (Tahun Pelajaran 2025/2026)</div>
+            <div class="grid-cards">
+              <div class="form-group">
+                <label>Alumni Laki-Laki</label>
+                <input type="number" id="s-alumni-l" min="0" placeholder="Ketik 0 jika kosong" oninput="hitungTotalAlumni()">
+              </div>
+              <div class="form-group">
+                <label>Alumni Perempuan</label>
+                <input type="number" id="s-alumni-p" min="0" placeholder="Ketik 0 jika kosong" oninput="hitungTotalAlumni()">
+              </div>
+              <div class="form-group">
+                <label>Total Alumni</label>
+                <input type="number" id="s-alumni-total" readonly style="background:var(--bg-body); font-weight:bold; color:var(--primary);" value="0">
+              </div>
+            </div>
+
+            <div class="form-divider">Status Siswa Tidak Lulus (Tahun Pelajaran 2025/2026)</div>
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Pilih Keterangan</label>
+                <select id="s-tidak-lulus" required onchange="toggleTidakLulusInputs()">
+                  <option value="Semua Lulus">Semua Lulus</option>
+                  <option value="MENGULANG">Ada yang MENGULANG</option>
+                  <option value="BERHENTI">Ada yang BERHENTI</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="container-detail-tidak-lulus" style="display:none; background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:25px;">
+              <h4 id="label-tidak-lulus-title" style="color:var(--primary); margin:0 0 15px 0; border-bottom: 1px dashed var(--border-color); padding-bottom:10px;">Detail Siswa Tidak Lulus</h4>
+              <div class="grid-cards" style="margin-bottom:0;">
+                <div class="form-group">
+                  <label>Laki-Laki</label>
+                  <input type="number" id="s-tl-l" min="0" placeholder="Ketik 0 jika kosong" oninput="hitungTotalTidakLulus()">
+                </div>
+                <div class="form-group">
+                  <label>Perempuan</label>
+                  <input type="number" id="s-tl-p" min="0" placeholder="Ketik 0 jika kosong" oninput="hitungTotalTidakLulus()">
+                </div>
+                <div class="form-group">
+                  <label>Total</label>
+                  <input type="number" id="s-tl-total" readonly style="background:var(--bg-container); font-weight:bold; color:var(--primary);" value="0">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn" id="btn-submit-siswa" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top:20px;">Simpan Data Siswa</button>
+          </form>
+        </section>
+        
+        <!-- SECTION: INPUT SARPRAS -->
+        <section id="input-sarpras" class="page-section">
+          <h2>Sarana & Prasarana</h2>
+          <form id="form-sarpras" onsubmit="event.preventDefault(); submitSarpras();">
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Pilih Lembaga</label>
+                <select id="spr-lembaga" required onchange="onSarprasLembagaChange()">
+                  <option value="">-- Memuat Data Lembaga... --</option>
+                </select>
+                <small id="sarpras-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah memiliki Data Sarpras. Submit ulang akan memicu pengajuan update ke Admin.</small>
+              </div>
+            </div>
+
+            <div class="form-divider">1. Bangunan Fisik Utama</div>
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Jumlah Gedung</label>
+                <input type="number" id="spr-gedung" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+            </div>
+
+            <div class="form-divider">2. Ketersediaan Ruangan</div>
+            <div class="grid-cards">
+              <div class="form-group">
+                <label>Ruang Kepala Lembaga</label>
+                <input type="number" id="spr-kepala" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+              <div class="form-group">
+                <label>Ruang Wakil Kepala Lembaga</label>
+                <input type="number" id="spr-wakapu" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+              <div class="form-group">
+                <label>Ruang Guru</label>
+                <input type="number" id="spr-guru" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+              <div class="form-group">
+                <label>Ruang Kelas</label>
+                <input type="number" id="spr-kelas" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+              <div class="form-group">
+                <label>Toilet Guru</label>
+                <input type="number" id="spr-toilet-guru" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+              <div class="form-group">
+                <label>Toilet Siswa</label>
+                <input type="number" id="spr-toilet-siswa" min="0" required placeholder="Ketik 0 jika kosong">
+              </div>
+            </div>
+
+            <div class="form-divider">3. Ekstrakurikuler & Laboratorium</div>
+            <div class="grid-cards">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Daftar Ekstrakurikuler di Sekolah</label>
+                <select id="spr-ekstra" class="uppercase-input" required>
+                  <option value="TIDAK ADA">Tidak Ada</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Daftar Laboratorium di Sekolah</label>
+                <select id="spr-lab" class="uppercase-input" required>
+                  <option value="TIDAK ADA">Tidak Ada</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn" id="btn-submit-spr" style="width: 100%; font-size: 1.1rem; padding: 15px; margin-top:20px;">Simpan Data Sarpras</button>
+          </form>
+        </section>
+
+        <!-- SECTION: REKAPITULASI -->
+        <section id="rekapitulasi" class="page-section">
+          <h2>Rekapitulasi & Statistik Data</h2>
+          
+          <div class="grid-cards" style="margin-bottom: 25px;" id="stats-summary-cards">
+            <div class="card">
+              <div>Total Lembaga</div>
+              <h3 id="stat-tot-lbg">0</h3>
+            </div>
+            <div class="card">
+              <div>Lengkap 100%</div>
+              <h3 id="stat-lengkap" style="color:#10B981;">0</h3>
+            </div>
+            <div class="card">
+              <div>Belum Lengkap</div>
+              <h3 id="stat-sebagian" style="color:#D69E2E;">0</h3>
+            </div>
+            <div class="card">
+              <div>Belum Mengisi</div>
+              <h3 id="stat-kosong" style="color:#EF4444;">0</h3>
+            </div>
+          </div>
+
+          <div class="form-group" style="background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+            <label style="font-weight:700; color:var(--primary); margin-bottom:10px;">Filter Laporan Rekapitulasi</label>
+            <div class="grid-cards" style="margin-bottom:0; align-items:end;">
+              <div class="form-group" style="margin-bottom:0; grid-column: 1 / span 2;">
+                <select id="rekap-filter-type" onchange="onRekapFilterChange()">
+                  <option value="KESELURUHAN">REKAP KESELURUHAN</option>
+                  <option value="PER_KECAMATAN">REKAP PER KECAMATAN</option>
+                  <option value="PER_JENJANG">REKAP PER JENJANG</option>
+                  <option value="LENGKAP">LEMBAGA YANG SUDAH LENGKAP</option>
+                  <option value="BELUM_LENGKAP">LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
+                  <option value="BELUM_MENGISI">LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0; display:flex; gap:10px;">
+                <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-body); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
+                <button class="btn" onclick="exportExcel()" style="flex:1; background:#10B981; box-shadow:none;">📥 Export Excel (.xlsx)</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="rekap-info-text" style="margin: 15px 0; font-weight:600; color:var(--text-muted); font-size:0.95rem;"></div>
+
+          <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <table>
+              <thead id="rekap-table-head">
+                <tr>
+                  <th>NSM</th>
+                  <th>NAMA LEMBAGA</th>
+                  <th>JENJANG</th>
+                  <th>STATUS</th>
+                  <th>KECAMATAN</th>
+                  <th>KELENGKAPAN</th>
+                </tr>
+              </thead>
+              <tbody id="table-rekap">
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rekapitulasi data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SECTION: ADMIN EMIS -->
+        <section id="admin-emis" class="page-section">
+          <h2>Admin EMIS & Approval Pengajuan Update</h2>
+          
+          <div class="form-divider" style="margin-top:0;">1. Daftar Pengajuan Update Data Lembaga</div>
+          <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 35px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>WAKTU</th>
+                  <th>ID / NSM LEMBAGA</th>
+                  <th>MODUL</th>
+                  <th>ALASAN PENGAJUAN</th>
+                  <th>STATUS</th>
+                  <th>AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="table-approval-list">
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat daftar pengajuan...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="form-divider">2. Ubah PIN Akses Menu Admin EMIS</div>
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px;">
+            <div class="form-group">
+              <label>PIN Admin Baru (4-6 digit angka)</label>
+              <input type="password" id="admin-new-pin" placeholder="••••" maxlength="6" style="background:var(--bg-container); font-size:1.2rem; font-weight:bold; letter-spacing:4px;">
+            </div>
+            <button class="btn" onclick="updateAdminPin()" style="background:#10B981;">Simpan PIN Admin Baru</button>
+          </div>
+        </section>
+
+        <!-- SECTION: LOG AUDIT -->
+        <section id="log-audit" class="page-section">
+          <h2>Log Aktivitas</h2>
+          <p style="color:var(--text-muted);">Fitur pencatatan log sinkronisasi latar belakang aktif.</p>
         </section>
 
       </main>
@@ -240,9 +605,72 @@
   <!-- Toast Container -->
   <div id="toast-container"></div>
 
+  <!-- PIN Modal -->
+  <div class="modal-overlay" id="pin-modal">
+    <div class="modal-content">
+      <h3 style="margin-bottom:10px; color:var(--text-main); font-weight:700;">Otorisasi Admin EMIS</h3>
+      <p style="margin-bottom:25px; font-size:0.95rem; color:var(--text-muted);">Masukkan PIN Admin untuk masuk ke menu pengaturan.</p>
+      <input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing: 12px; font-weight:700; font-size:1.5rem; background: var(--bg-body);" onkeydown="handlePinKeydown(event)">
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button>
+        <button class="btn" style="flex:1;" onclick="verifyPinSubmit()">Masuk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Request Update Kelembagaan -->
+  <div class="modal-overlay" id="update-lbg-modal">
+    <div class="modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom:10px; color:var(--primary); font-weight:700;">Pengajuan Update Kelembagaan</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">NSM ini sudah terdaftar. Tuliskan alasan mengapa data kelembagaan perlu diperbarui:</p>
+      <textarea id="update-lbg-alasan" rows="3" placeholder="Contoh: Perubahan SK Izin Operasional..." style="margin-bottom:20px; resize:none;"></textarea>
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateLbgModal()">Batal</button>
+        <button class="btn" style="flex:1; background:#10B981;" onclick="submitRequestUpdateKelembagaan()">Kirim Pengajuan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Request Update Siswa -->
+  <div class="modal-overlay" id="update-siswa-modal">
+    <div class="modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom:10px; color:var(--primary); font-weight:700;">Pengajuan Update Data Siswa</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Siswa. Tuliskan alasan pengajuan update:</p>
+      <textarea id="update-siswa-alasan" rows="3" placeholder="Contoh: Perbaikan data kelas karena mutasi..." style="margin-bottom:20px; resize:none;"></textarea>
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSiswaModal()">Batal</button>
+        <button class="btn" style="flex:1; background:#10B981;" onclick="submitRequestUpdateSiswa()">Kirim Pengajuan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Request Update Sarpras -->
+  <div class="modal-overlay" id="update-sarpras-modal">
+    <div class="modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom:10px; color:var(--primary); font-weight:700;">Pengajuan Update Data Sarpras</h3>
+      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Sarpras. Tuliskan alasan pengajuan update:</p>
+      <textarea id="update-sarpras-alasan" rows="3" placeholder="Contoh: Penambahan fasilitas gedung baru..." style="margin-bottom:20px; resize:none;"></textarea>
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSarprasModal()">Batal</button>
+        <button class="btn" style="flex:1; background:#10B981;" onclick="submitRequestUpdateSarpras()">Kirim Pengajuan</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG BERAKHIRAN /exec
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrl_HG0Q3Fr4bmZVLH6BHweR9OHhXjSOcsAjzWJLXi1cOooRxD5FQSIHGkhjPCNKv7/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_1p_TxJWVATSF10kZbQ_kjqBd8gi6ldKu6DedlX9g76c2OPvvCyzUMIxoMLXauZTP/exec";
+
+    var globalInstitutions = [];
+    var masterEkstraList = [];
+    var masterLabList = [];
+    var fullRekapData = [];
+    var kecamatanListGlobal = [];
+    var currentDuplicateNsm = "";
+    var currentDuplicateIdLembagaSiswa = "";
+    var currentDuplicateIdLembagaSarpras = "";
+    var existingSiswaMap = {};
+    var existingSarprasMap = {};
 
     window.onload = function() {
       fetchInitialData();
@@ -267,6 +695,10 @@
       for(var j=0; j<sections.length; j++) { sections[j].classList.remove('active'); }
       if(navElement) navElement.classList.add('active');
       document.getElementById(sectionId).classList.add('active');
+      
+      if (sectionId === 'admin-emis') {
+        fetchApprovalList();
+      }
     }
 
     function showToast(message, type) {
@@ -282,6 +714,77 @@
       }, 4000);
     }
 
+    function checkRealtimeNsm(el) {
+      var val = el.value.trim();
+      var warningEl = document.getElementById('nsm-warning');
+      if (!val) { warningEl.style.display = 'none'; return; }
+      var found = false;
+      for (var i = 0; i < globalInstitutions.length; i++) {
+        if (globalInstitutions[i].nsm === val) { found = true; break; }
+      }
+      if (found) { warningEl.style.display = 'block'; } else { warningEl.style.display = 'none'; }
+    }
+
+    function openPinModal() {
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-modal').classList.add('active');
+      setTimeout(function() { document.getElementById('pin-input').focus(); }, 100);
+    }
+
+    function closePinModal() { document.getElementById('pin-modal').classList.remove('active'); }
+    function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
+
+    function verifyPinSubmit() {
+      var pin = document.getElementById('pin-input').value;
+      if(pin === "") { showToast("PIN tidak boleh kosong", "error"); return; }
+      
+      var btn = document.querySelector('#pin-modal .btn:nth-child(2)');
+      btn.innerText = "Memeriksa...";
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "verifyAdminPin", pin: pin })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(response) {
+        btn.innerText = "Masuk";
+        if(response.status === 'success') {
+          closePinModal();
+          var adminNav = null;
+          var items = document.querySelectorAll('.nav-item');
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].getAttribute('onclick').indexOf('openPinModal') !== -1) { adminNav = items[i]; break; }
+          }
+          navigate('admin-emis', adminNav);
+          showToast("Akses Admin EMIS Diberikan", "success");
+        } else {
+          showToast(response.message, "error");
+        }
+      })
+      .catch(function(err) {
+        btn.innerText = "Masuk";
+        showToast("Gagal memverifikasi PIN", "error");
+      });
+    }
+
+    function updateAdminPin() {
+      var newPin = document.getElementById('admin-new-pin').value;
+      if (!newPin || newPin.length < 4) { showToast("PIN baru minimal harus 4 digit!", "error"); return; }
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "setAdminPin", newPin: newPin })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        if (res.status === 'success') {
+          showToast(res.message, "success");
+          document.getElementById('admin-new-pin').value = '';
+        } else { showToast(res.message, "error"); }
+      });
+    }
+
     function fetchInitialData() {
       fetch(APPS_SCRIPT_URL + "?action=getInitialData")
         .then(function(res) { return res.json(); })
@@ -290,48 +793,423 @@
             document.getElementById('marquee-text').innerText = res.banner;
             document.getElementById('dash-total').innerText = res.stats.total;
             document.getElementById('dash-submit').innerText = res.stats.submitted;
+            
+            globalInstitutions = res.institutions || [];
+            masterEkstraList = res.masterOptions.ekstrakurikuler || [];
+            masterLabList = res.masterOptions.laboratorium || [];
+            fullRekapData = res.rekapList || [];
+            kecamatanListGlobal = res.kecamatanList || [];
+            existingSiswaMap = res.existingSiswaMap || {};
+            existingSarprasMap = res.existingSarprasMap || {};
+            
+            renderLembagaDropdowns();
+            renderSarprasDropdowns();
+            renderRekapTable();
+            
+            document.getElementById('stat-tot-lbg').innerText = res.statsSummary.total;
+            document.getElementById('stat-lengkap').innerText = res.statsSummary.lengkap;
+            document.getElementById('stat-sebagian').innerText = res.statsSummary.sebagian;
+            document.getElementById('stat-kosong').innerText = res.statsSummary.kosong;
+
+            var ewsContainer = document.getElementById('dashboard-ews-container');
+            if (res.alerts && res.alerts.length > 0) {
+              var alertHtml = '<div style="background:#FFF5F5; border:1px solid #FEB2B2; padding:20px; border-radius:var(--radius-md);">';
+              alertHtml += '<h4 style="color:#C53030; margin-bottom:10px; font-weight:700;">⚠️ Early Warning System (Pemberitahuan Izin & Akreditasi)</h4>';
+              for (var a = 0; a < res.alerts.length; a++) {
+                alertHtml += '<div style="color:#9B2C2C; font-size:0.95rem; margin-bottom:6px; font-weight:500;">• ' + res.alerts[a] + '</div>';
+              }
+              alertHtml += '</div>';
+              ewsContainer.innerHTML = alertHtml;
+            } else {
+              ewsContainer.innerHTML = '<div style="background:#F0FFF4; border:1px solid #C6F6D5; padding:20px; border-radius:var(--radius-md); color:#22543D; font-weight:600;">✅ Seluruh izin operasional dan masa berlaku akreditasi madrasah dalam kondisi aman.</div>';
+            }
           }
         })
         .catch(function(err) {
-          showToast("Gagal memuat data dari Google Sheet", "error");
+          showToast("Gagal memuat data dari server", "error");
         });
     }
 
-    function submitKelembagaan() {
-      var btn = document.getElementById('btn-submit-lbg');
-      btn.innerText = "Menyimpan ke Google Sheet...";
-      btn.disabled = true;
+    function fetchApprovalList() {
+      fetch(APPS_SCRIPT_URL + "?action=getApprovalRequests")
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          var tbody = document.getElementById('table-approval-list');
+          if (!res || res.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update yang tertunda.</td></tr>';
+            return;
+          }
+          var html = '';
+          for (var i = 0; i < res.length; i++) {
+            html += '<tr>' +
+              '<td>' + res[i].timestamp + '</td>' +
+              '<td>' + res[i].idLembaga + '</td>' +
+              '<td>' + res[i].modul + '</td>' +
+              '<td>' + res[i].alasan + '</td>' +
+              '<td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:#D69E2E20; color:#D69E2E;">' + res[i].status + '</span></td>' +
+              '<td style="display:flex; gap:8px;">' +
+                '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:#10B981;" onclick="processApproval(\'' + res[i].idReq + '\', \'APPROVE\')">Setujui</button>' +
+                '<button class="btn" style="padding:6px 12px; font-size:0.85rem; background:#EF4444;" onclick="processApproval(\'' + res[i].idReq + '\', \'REJECT\')">Tolak</button>' +
+              '</td>' +
+            '</tr>';
+          }
+          tbody.innerHTML = html;
+        });
+    }
 
-      var formData = {
-        action: "saveKelembagaan",
-        jenjang: document.getElementById('k-jenjang').value,
-        statusLembaga: document.getElementById('k-status').value,
-        nama: document.getElementById('k-nama').value,
-        nsm: document.getElementById('k-nsm').value,
-        npsn: document.getElementById('k-npsn').value,
-        desa: document.getElementById('k-desa').value,
-        kecamatan: document.getElementById('k-kecamatan').value,
-        waKepala: document.getElementById('k-wa-kepala').value
-      };
-
+    function processApproval(idReq, action) {
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "handleApprovalAction", idReq: idReq, approvalAction: action })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        showToast(res.message, res.status === 'success' ? 'success' : 'error');
+        fetchApprovalList();
+        fetchInitialData();
+      });
+    }
+
+    function onRekapFilterChange() {
+      renderRekapTable();
+    }
+
+    function renderRekapTable() {
+      var filterType = document.getElementById('rekap-filter-type').value;
+      var thead = document.getElementById('rekap-table-head');
+      var tbody = document.getElementById('table-rekap');
+      var infoText = document.getElementById('rekap-info-text');
+
+      var data = [].concat(fullRekapData);
+      var filtered = data;
+      if (filterType === 'LENGKAP') {
+        filtered = data.filter(function(x){ return x.kelengkapan === 'LENGKAP'; });
+      } else if (filterType === 'BELUM_LENGKAP') {
+        filtered = data.filter(function(x){ return x.kelengkapan === 'BELUM LENGKAP'; });
+      } else if (filterType === 'BELUM_MENGISI') {
+        filtered = data.filter(function(x){ return x.kelengkapan === 'BELUM MENGISI'; });
+      }
+
+      infoText.innerText = "Total Jumlah Lembaga Ditampilkan: " + filtered.length + " Lembaga";
+      thead.innerHTML = '<tr><th>NSM</th><th>NAMA LEMBAGA</th><th>JENJANG</th><th>STATUS</th><th>KECAMATAN</th><th>KELENGKAPAN</th></tr>';
+      var html = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data lembaga.</td></tr>';
+        return;
+      }
+      for (var j = 0; j < filtered.length; j++) {
+        var itm = filtered[j];
+        var badgeColor = itm.kelengkapan === 'LENGKAP' ? '#10B981' : (itm.kelengkapan === 'BELUM LENGKAP' ? '#D69E2E' : '#EF4444');
+        html += '<tr><td>' + itm.nsm + '</td><td>' + itm.nama + '</td><td>' + itm.jenjang + '</td><td>' + itm.statusLembaga + '</td><td>' + itm.kecamatan + '</td><td><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; background:' + badgeColor + '20; color:' + badgeColor + ';">' + itm.kelengkapan + '</span></td></tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    function renderLembagaDropdowns(defaultSelectedId) {
+      var selectSiswa = document.getElementById('s-lembaga');
+      if (!selectSiswa) return;
+      if (globalInstitutions.length === 0) {
+        selectSiswa.innerHTML = '<option value="">-- Belum ada lembaga terdaftar --</option>';
+        return;
+      }
+      var html = '<option value="">-- Pilih Lembaga --</option>';
+      for (var i = 0; i < globalInstitutions.length; i++) {
+        var inst = globalInstitutions[i];
+        html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-name="' + inst.name + '">' + inst.name + ' (' + inst.jenjang + ' - NSM: ' + inst.nsm + ')</option>';
+      }
+      selectSiswa.innerHTML = html;
+      selectSiswa.value = defaultSelectedId || globalInstitutions[0].id;
+      onLembagaChange();
+    }
+
+    function renderSarprasDropdowns() {
+      var selectSarpras = document.getElementById('spr-lembaga');
+      var selectEkstra = document.getElementById('spr-ekstra');
+      var selectLab = document.getElementById('spr-lab');
+      if (selectSarpras) {
+        if (globalInstitutions.length === 0) {
+          selectSarpras.innerHTML = '<option value="">-- Belum ada lembaga terdaftar --</option>';
+        } else {
+          var html = '<option value="">-- Pilih Lembaga --</option>';
+          for (var i = 0; i < globalInstitutions.length; i++) {
+            var inst = globalInstitutions[i];
+            html += '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
+          }
+          selectSarpras.innerHTML = html;
+          selectSarpras.value = globalInstitutions[0].id;
+        }
+      }
+      if (selectEkstra) {
+        var ekstraHtml = '<option value="TIDAK ADA">Tidak Ada</option>';
+        for (var e = 0; e < masterEkstraList.length; e++) { ekstraHtml += '<option value="' + masterEkstraList[e] + '">' + masterEkstraList[e] + '</option>'; }
+        selectEkstra.innerHTML = ekstraHtml;
+      }
+      if (selectLab) {
+        var labHtml = '<option value="TIDAK ADA">Tidak Ada</option>';
+        for (var l = 0; l < masterLabList.length; l++) { labHtml += '<option value="' + masterLabList[l] + '">' + masterLabList[l] + '</option>'; }
+        selectLab.innerHTML = labHtml;
+      }
+    }
+
+    function onLembagaChange() {
+      var select = document.getElementById('s-lembaga');
+      var selectedOption = select.options[select.selectedIndex];
+      var jenjangInput = document.getElementById('s-jenjang');
+      var jenjangDisplay = document.getElementById('s-jenjang-display');
+      var warningEl = document.getElementById('siswa-warning');
+      
+      if (select.value && selectedOption) {
+        var idLbg = select.value;
+        jenjangInput.value = selectedOption.getAttribute('data-jenjang');
+        jenjangDisplay.value = selectedOption.getAttribute('data-jenjang');
+        renderKelasInputs();
+        if (existingSiswaMap[idLbg]) { warningEl.style.display = 'block'; }
+        else { warningEl.style.display = 'none'; }
+      } else {
+        jenjangInput.value = ""; jenjangDisplay.value = "";
+        warningEl.style.display = 'none';
+        renderKelasInputs();
+      }
+    }
+
+    function onSarprasLembagaChange() {
+      var select = document.getElementById('spr-lembaga');
+      var warningEl = document.getElementById('sarpras-warning');
+      if (select.value && existingSarprasMap[select.value]) {
+        warningEl.style.display = 'block';
+      } else {
+        warningEl.style.display = 'none';
+      }
+    }
+
+    function getKoordinatOtomatis() {
+      if (navigator.geolocation) {
+        showToast("Mencari titik lokasi...", "success");
+        navigator.geolocation.getCurrentPosition(function(position) {
+          document.getElementById('k-lat').value = position.coords.latitude;
+          document.getElementById('k-lng').value = position.coords.longitude;
+          showToast("Berhasil mendapatkan koordinat", "success");
+        }, function(error) { showToast("Gagal mendapat izin lokasi dari Browser/HP", "error"); });
+      } else { showToast("Browser Anda tidak mendukung fitur lokasi", "error"); }
+    }
+
+    function submitKelembagaan() {
+      var btn = document.getElementById('btn-submit-lbg'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var formData = {
+        action: "saveKelembagaan",
+        jenjang: document.getElementById('k-jenjang').value, statusLembaga: document.getElementById('k-status').value, nama: document.getElementById('k-nama').value,
+        nsm: document.getElementById('k-nsm').value, npsn: document.getElementById('k-npsn').value, desa: document.getElementById('k-desa').value, kecamatan: document.getElementById('k-kecamatan').value,
+        noIzin: document.getElementById('k-no-izin').value, tglIzin: document.getElementById('k-tgl-izin').value, akhirIzin: document.getElementById('k-akhir-izin').value,
+        akreditasi: document.getElementById('k-akreditasi').value, tglAkred: document.getElementById('k-tgl-akred').value, akhirAkred: document.getElementById('k-akhir-akred').value,
+        npwp: document.getElementById('k-npwp').value, namaKepala: document.getElementById('k-kepala').value, waKepala: document.getElementById('k-wa-kepala').value,
+        namaOp: document.getElementById('k-operator').value, waOp: document.getElementById('k-wa-operator').value, lat: document.getElementById('k-lat').value, lng: document.getElementById('k-lng').value
+      };
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(formData)
       })
-      .then(function() {
-        btn.innerText = "Simpan Data Kelembagaan";
-        btn.disabled = false;
-        showToast("Data berhasil disimpan ke Google Sheet!", "success");
-        document.getElementById('form-kelembagaan').reset();
-        setTimeout(fetchInitialData, 1500);
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
+        if(res.status === 'success') {
+          showToast(res.message, "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
+        } else if (res.status === 'duplicate') {
+          currentDuplicateNsm = res.nsm;
+          document.getElementById('update-lbg-alasan').value = '';
+          document.getElementById('update-lbg-modal').classList.add('active');
+        } else { showToast(res.message, "error"); }
       })
       .catch(function(err) {
-        btn.innerText = "Simpan Data Kelembagaan";
-        btn.disabled = false;
+        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
         showToast("Gagal menyimpan data", "error");
       });
+    }
+
+    var activeClassesList = [];
+    function renderKelasInputs() {
+      var jenjang = document.getElementById('s-jenjang').value;
+      var container = document.getElementById('kelas-container');
+      var totalContainer = document.getElementById('total-siswa-aktif-container');
+      activeClassesList = [];
+      document.getElementById('s-total-semua-l').value = 0; document.getElementById('s-total-semua-p').value = 0; document.getElementById('s-total-semua').value = 0;
+      if (!jenjang) {
+        container.innerHTML = '<div class="alert-box">⚠️ Silakan pilih lembaga terlebih dahulu untuk mengisi detail data siswa per kelas.</div>'; totalContainer.style.display = 'none'; return;
+      }
+      if (jenjang === 'RA') activeClassesList = ['A', 'B']; else if (jenjang === 'MI') activeClassesList = ['1', '2', '3', '4', '5', '6']; else if (jenjang === 'MTs') activeClassesList = ['7', '8', '9']; else if (jenjang === 'MA') activeClassesList = ['10', '11', '12'];
+      var htmlString = "";
+      for (var i = 0; i < activeClassesList.length; i++) {
+        var c = activeClassesList[i];
+        htmlString += '<div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:15px; align-items:end;"><div style="font-weight:700; color:var(--primary); font-size:1.1rem; padding-bottom:10px;">Kelas ' + c + '</div>';
+        htmlString += '<div class="form-group" style="margin-bottom:0;">' + (i === 0 ? '<label>Laki-Laki</label>' : '') + '<input type="number" id="s-kelas-' + c + '-l" min="0" placeholder="0" oninput="hitungTotalSemuaSiswa()"></div>';
+        htmlString += '<div class="form-group" style="margin-bottom:0;">' + (i === 0 ? '<label>Perempuan</label>' : '') + '<input type="number" id="s-kelas-' + c + '-p" min="0" placeholder="0" oninput="hitungTotalSemuaSiswa()"></div>';
+        htmlString += '<div class="form-group" style="margin-bottom:0;">' + (i === 0 ? '<label>Total</label>' : '') + '<input type="number" id="s-kelas-' + c + '-total" value="0" readonly style="background:var(--bg-body); font-weight:bold; color:var(--primary);"></div></div></div>';
+      }
+      container.innerHTML = htmlString; totalContainer.style.display = 'block';
+    }
+
+    function hitungTotalSemuaSiswa() {
+      var grandTotalL = 0; var grandTotalP = 0;
+      for (var i = 0; i < activeClassesList.length; i++) {
+        var c = activeClassesList[i];
+        var l = document.getElementById('s-kelas-' + c + '-l').value === "" ? 0 : (parseInt(document.getElementById('s-kelas-' + c + '-l').value) || 0);
+        var p = document.getElementById('s-kelas-' + c + '-p').value === "" ? 0 : (parseInt(document.getElementById('s-kelas-' + c + '-p').value) || 0);
+        document.getElementById('s-kelas-' + c + '-total').value = l + p; grandTotalL += l; grandTotalP += p;
+      }
+      document.getElementById('s-total-semua-l').value = grandTotalL; document.getElementById('s-total-semua-p').value = grandTotalP; document.getElementById('s-total-semua').value = (grandTotalL + grandTotalP);
+    }
+    function hitungTotalAlumni() {
+      var l = document.getElementById('s-alumni-l').value === "" ? 0 : (parseInt(document.getElementById('s-alumni-l').value) || 0);
+      var p = document.getElementById('s-alumni-p').value === "" ? 0 : (parseInt(document.getElementById('s-alumni-p').value) || 0);
+      document.getElementById('s-alumni-total').value = l + p;
+    }
+    function toggleTidakLulusInputs() {
+      var val = document.getElementById('s-tidak-lulus').value;
+      var container = document.getElementById('container-detail-tidak-lulus');
+      if (val === "Semua Lulus") { container.style.display = 'none'; document.getElementById('s-tl-l').value = ""; document.getElementById('s-tl-p').value = ""; document.getElementById('s-tl-total').value = 0; } 
+      else { container.style.display = 'block'; document.getElementById('label-tidak-lulus-title').innerText = "Detail Siswa " + val; }
+    }
+    function hitungTotalTidakLulus() {
+      var l = document.getElementById('s-tl-l').value === "" ? 0 : (parseInt(document.getElementById('s-tl-l').value) || 0);
+      var p = document.getElementById('s-tl-p').value === "" ? 0 : (parseInt(document.getElementById('s-tl-p').value) || 0);
+      document.getElementById('s-tl-total').value = l + p;
+    }
+
+    function submitSiswa() {
+      var idLembaga = document.getElementById('s-lembaga').value;
+      if (!idLembaga) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
+      var btn = document.getElementById('btn-submit-siswa'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var detailKelas = [];
+      for (var j = 0; j < activeClassesList.length; j++) {
+        var cls = activeClassesList[j];
+        var lVal = parseInt(document.getElementById('s-kelas-' + cls + '-l').value) || 0;
+        var pVal = parseInt(document.getElementById('s-kelas-' + cls + '-p').value) || 0;
+        detailKelas.push({ kelas: cls, laki: lVal, perempuan: pVal, total: lVal + pVal });
+      }
+      var statusTidakLulus = document.getElementById('s-tidak-lulus').value;
+      var formData = {
+        action: "saveSiswa",
+        idLembaga: idLembaga, lembagaNama: document.getElementById('s-lembaga').options[document.getElementById('s-lembaga').selectedIndex].getAttribute('data-name'),
+        jenjang: document.getElementById('s-jenjang').value, tahunPelajaran: "2026/2027", detailKelas: JSON.stringify(detailKelas),
+        totalL: parseInt(document.getElementById('s-total-semua-l').value) || 0, totalP: parseInt(document.getElementById('s-total-semua-p').value) || 0, totalSiswa: parseInt(document.getElementById('s-total-semua').value) || 0,
+        alumniL: parseInt(document.getElementById('s-alumni-l').value) || 0, alumniP: parseInt(document.getElementById('s-alumni-p').value) || 0, alumniTotal: parseInt(document.getElementById('s-alumni-total').value) || 0,
+        tidakLulus: statusTidakLulus, tidakLulusL: statusTidakLulus === "Semua Lulus" ? 0 : (parseInt(document.getElementById('s-tl-l').value) || 0), tidakLulusP: statusTidakLulus === "Semua Lulus" ? 0 : (parseInt(document.getElementById('s-tl-p').value) || 0), tidakLulusTotal: statusTidakLulus === "Semua Lulus" ? 0 : (parseInt(document.getElementById('s-tl-total').value) || 0)
+      };
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(formData)
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
+        if (res.status === 'success') {
+          showToast(res.message, "success"); document.getElementById('form-siswa').reset(); toggleTidakLulusInputs(); renderKelasInputs(); fetchInitialData();
+        } else if (res.status === 'duplicate') {
+          currentDuplicateIdLembagaSiswa = res.idLembaga;
+          document.getElementById('update-siswa-alasan').value = '';
+          document.getElementById('update-siswa-modal').classList.add('active');
+        } else { showToast(res.message, "error"); }
+      });
+    }
+
+    function submitSarpras() {
+      var idLembaga = document.getElementById('spr-lembaga').value;
+      if (!idLembaga) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
+      var btn = document.getElementById('btn-submit-spr'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var formData = {
+        action: "saveSarpras",
+        idLembaga: idLembaga, jumlahGedung: parseInt(document.getElementById('spr-gedung').value) || 0, ruangKepala: parseInt(document.getElementById('spr-kepala').value) || 0,
+        ruangWakapu: parseInt(document.getElementById('spr-wakapu').value) || 0, ruangGuru: parseInt(document.getElementById('spr-guru').value) || 0, ruangKelas: parseInt(document.getElementById('spr-kelas').value) || 0,
+        toiletGuru: parseInt(document.getElementById('spr-toilet-guru').value) || 0, toiletSiswa: parseInt(document.getElementById('spr-toilet-siswa').value) || 0,
+        listEkstrakurikuler: document.getElementById('spr-ekstra').value, listLaboratorium: document.getElementById('spr-lab').value
+      };
+      
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(formData)
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
+        if (res.status === 'success') { showToast(res.message, "success"); document.getElementById('form-sarpras').reset(); fetchInitialData();
+        } else if (res.status === 'duplicate') {
+          currentDuplicateIdLembagaSarpras = res.idLembaga;
+          document.getElementById('update-sarpras-alasan').value = '';
+          document.getElementById('update-sarpras-modal').classList.add('active');
+        } else { showToast(res.message, "error"); }
+      });
+    }
+
+    function closeUpdateLbgModal() { document.getElementById('update-lbg-modal').classList.remove('active'); }
+    function submitRequestUpdateKelembagaan() {
+      var alasan = document.getElementById('update-lbg-alasan').value;
+      if (!alasan) { showToast("Harap tuliskan alasan pengajuan update!", "error"); return; }
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "requestUpdateKelembagaan", nsm: currentDuplicateNsm, alasan: alasan })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        closeUpdateLbgModal(); showToast(res.message, "success");
+      });
+    }
+
+    function closeUpdateSiswaModal() { document.getElementById('update-siswa-modal').classList.remove('active'); }
+    function submitRequestUpdateSiswa() {
+      var alasan = document.getElementById('update-siswa-alasan').value;
+      if (!alasan) { showToast("Harap tuliskan alasan pengajuan update!", "error"); return; }
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "requestUpdateSiswa", idLembaga: currentDuplicateIdLembagaSiswa, alasan: alasan })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        closeUpdateSiswaModal(); showToast(res.message, "success");
+      });
+    }
+
+    function closeUpdateSarprasModal() { document.getElementById('update-sarpras-modal').classList.remove('active'); }
+    function submitRequestUpdateSarpras() {
+      var alasan = document.getElementById('update-sarpras-alasan').value;
+      if (!alasan) { showToast("Harap tuliskan alasan pengajuan update!", "error"); return; }
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "requestUpdateSarpras", idLembaga: currentDuplicateIdLembagaSarpras, alasan: alasan })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        closeUpdateSarprasModal(); showToast(res.message, "success");
+      });
+    }
+
+    function exportExcel() {
+      showToast("Memproses data untuk Excel, mohon tunggu...", "success");
+      fetch(APPS_SCRIPT_URL + "?action=getCompleteDataForExport")
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          if(!res || res.length === 0) { showToast("Tidak ada data untuk diexport", "error"); return; }
+          var dataByJenjang = { "RA": [], "MI": [], "MTs": [], "MA": [] };
+          var headers = ["NSM", "NPSN", "NAMA LEMBAGA", "STATUS", "KECAMATAN", "DESA", "SK IZIN", "TGL IZIN", "AKHIR IZIN", "AKREDITASI", "NPWP", "KEPALA", "WA KEPALA", "OPERATOR", "WA OPERATOR", "LAT", "LNG", "S. LAKI", "S. PEREMPUAN", "TOT. SISWA", "TOT. ALUMNI", "STATUS TDK LULUS", "GEDUNG", "R. KEPALA", "R. GURU", "R. KELAS", "T. GURU", "T. SISWA", "EKSTRA", "LAB"];
+          for (var k in dataByJenjang) { dataByJenjang[k].push(headers); }
+          for(var i=0; i<res.length; i++) {
+            if (dataByJersey[res[i].jenjang]) dataByJenjang[res[i].jenjang].push(res[i].data);
+          }
+          var wb = XLSX.utils.book_new();
+          for (var jg in dataByJenjang) {
+            var ws = XLSX.utils.aoa_to_sheet(dataByJenjang[jg].length > 1 ? dataByJenjang[jg] : [headers, ["Tidak ada data"]]);
+            XLSX.utils.book_append_sheet(wb, ws, jg);
+          }
+          XLSX.writeFile(wb, "Data_Madrasah_Musi_Rawas.xlsx");
+          showToast("Export Excel berhasil diunduh!", "success");
+        });
     }
   </script>
 </body>
