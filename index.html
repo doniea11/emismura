@@ -551,19 +551,19 @@
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
-              <h3 id="dash-total">-</h3>
+              <h3 id="dash-total">0</h3>
             </div>
             <div class="card">
               <div>Data Lengkap 100%</div>
-              <h3 id="dash-submit">-</h3>
+              <h3 id="dash-submit">0</h3>
             </div>
             <div class="card">
               <div>Belum Lengkap</div>
-              <h3 id="dash-sebagian">-</h3>
+              <h3 id="dash-sebagian">0</h3>
             </div>
             <div class="card">
               <div>Belum Mengisi</div>
-              <h3 id="dash-kosong">-</h3>
+              <h3 id="dash-kosong">0</h3>
             </div>
           </div>
 
@@ -1281,7 +1281,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKg_eZgkJF5j87nkR2bZcKT_7ysQ6v0auGBvxYQyHCteo4PTqJ6ncf1wJRZ0BCNcoA/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGvtb6Mg_z1RCls1q5A4DLYja6ttL_kK2DvFAp1rh_iVCoO6sfdjy3t8C1G5hf8mby/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1460,61 +1460,88 @@
     }
 
     function fetchInitialData() {
+      // Safe preview mode: jika di dalam Apps Script Web App
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            handleInitialDataResponse(res);
+          })
+          .withFailureHandler(function(err) {
+            showToast("Gagal memuat data dari server Apps Script", "error");
+          })
+          .getInitialDataObj();
+        return;
+      }
+
+      // Mode Web / Vercel API fetch
       fetch(APPS_SCRIPT_URL + "?action=getInitialData")
         .then(function(res) { return res.json(); })
         .then(function(res) {
-          if(res.status === 'success') {
-            var marqueeContainer = document.getElementById('marquee-text');
-            var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
-            var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
-
-            if (marqueeContainer) {
-              marqueeContainer.innerHTML = '<span class="aksara-jawa-badge">' +
-                '<span class="aksara-ornament">꧁</span>' +
-                '<span class="aksara-jawa-style-text" id="marquee-text-content">' + cleanBannerText + '</span>' +
-                '<span class="aksara-ornament">꧂</span>' +
-              '</span>';
-            }
-            
-            document.getElementById('dash-total').innerText = res.stats.total;
-            document.getElementById('dash-submit').innerText = res.statsSummary.lengkap;
-            document.getElementById('dash-sebagian').innerText = res.statsSummary.sebagian;
-            document.getElementById('dash-kosong').innerText = res.statsSummary.kosong;
-            
-            globalInstitutions = res.institutions || [];
-            masterEkstraList = res.masterOptions.ekstrakurikuler || [];
-            masterLabList = res.masterOptions.laboratorium || [];
-            fullRekapData = res.rekapList || [];
-            kecamatanListGlobal = res.kecamatanList || [];
-            existingSiswaMap = res.existingSiswaMap || {};
-            existingSarprasMap = res.existingSarprasMap || {};
-            
-            currentStatusPeriode = res.statusPeriode || "DIBUKA";
-            currentTahunPelajaran = res.tahunPelajaran || "2026/2027";
-            isAllInstitutionsCompleted = res.isAllCompleted || false;
-            
-            document.getElementById('badge-tp-display').innerText = "TP: " + currentTahunPelajaran;
-            document.getElementById('label-tp-siswa').innerText = currentTahunPelajaran;
-            document.getElementById('admin-cur-tp-input').value = currentTahunPelajaran;
-
-            if (res.pinRekapStatus) {
-              pinRekapStatus = res.pinRekapStatus;
-              var pinSelect = document.getElementById('admin-pin-rekap-select');
-              if (pinSelect) pinSelect.value = pinRekapStatus;
-            }
-            
-            applyPeriodeStatusUI();
-            renderDashboardCompletedList();
-            renderMasterLembagaDropdown();
-            renderAdminEditLembagaDropdown();
-            renderLembagaDropdowns();
-            renderSarprasDropdowns();
-            renderKecamatanSubFilters();
-            renderRekapTable();
-            checkAndRenderEwsAlerts();
-          }
+          handleInitialDataResponse(res);
         })
-        .catch(function(err) {});
+        .catch(function(err) {
+          console.error("Fetch Error:", err);
+          showToast("Gagal menyambung ke server Google Sheets", "error");
+        });
+    }
+
+    function handleInitialDataResponse(res) {
+      if(!res || res.status !== 'success') {
+        if(res && res.message) showToast(res.message, "error");
+        return;
+      }
+
+      var marqueeContainer = document.getElementById('marquee-text');
+      var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
+      var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
+
+      if (marqueeContainer) {
+        marqueeContainer.innerHTML = '<span class="aksara-jawa-badge">' +
+          '<span class="aksara-ornament">꧁</span>' +
+          '<span class="aksara-jawa-style-text" id="marquee-text-content">' + cleanBannerText + '</span>' +
+          '<span class="aksara-ornament">꧂</span>' +
+        '</span>';
+      }
+      
+      var stats = res.stats || {};
+      var statsSummary = res.statsSummary || {};
+      
+      document.getElementById('dash-total').innerText = stats.total !== undefined ? stats.total : (statsSummary.total || 0);
+      document.getElementById('dash-submit').innerText = statsSummary.lengkap !== undefined ? statsSummary.lengkap : (stats.submitted || 0);
+      document.getElementById('dash-sebagian').innerText = statsSummary.sebagian !== undefined ? statsSummary.sebagian : 0;
+      document.getElementById('dash-kosong').innerText = statsSummary.kosong !== undefined ? statsSummary.kosong : 0;
+      
+      globalInstitutions = res.institutions || [];
+      masterEkstraList = (res.masterOptions && res.masterOptions.ekstrakurikuler) ? res.masterOptions.ekstrakurikuler : [];
+      masterLabList = (res.masterOptions && res.masterOptions.laboratorium) ? res.masterOptions.laboratorium : [];
+      fullRekapData = res.rekapList || [];
+      kecamatanListGlobal = res.kecamatanList || [];
+      existingSiswaMap = res.existingSiswaMap || {};
+      existingSarprasMap = res.existingSarprasMap || {};
+      
+      currentStatusPeriode = res.statusPeriode || "DIBUKA";
+      currentTahunPelajaran = res.tahunPelajaran || "2026/2027";
+      isAllInstitutionsCompleted = res.isAllCompleted || false;
+      
+      document.getElementById('badge-tp-display').innerText = "TP: " + currentTahunPelajaran;
+      document.getElementById('label-tp-siswa').innerText = currentTahunPelajaran;
+      document.getElementById('admin-cur-tp-input').value = currentTahunPelajaran;
+
+      if (res.pinRekapStatus) {
+        pinRekapStatus = res.pinRekapStatus;
+        var pinSelect = document.getElementById('admin-pin-rekap-select');
+        if (pinSelect) pinSelect.value = pinRekapStatus;
+      }
+      
+      applyPeriodeStatusUI();
+      renderDashboardCompletedList();
+      renderMasterLembagaDropdown();
+      renderAdminEditLembagaDropdown();
+      renderLembagaDropdowns();
+      renderSarprasDropdowns();
+      renderKecamatanSubFilters();
+      renderRekapTable();
+      checkAndRenderEwsAlerts();
     }
 
     function renderDashboardCompletedList() {
