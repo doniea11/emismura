@@ -472,6 +472,123 @@
       .topbar { padding: 15px 20px; flex-direction: column; gap: 12px; }
       .topbar-right { width: 100%; justify-content: space-between; }
     }
+
+    /* ==========================================
+       PRINT STYLESHEET KHUSUS CETAK DOKUMEN PROFIL
+       Hanya mencetak lembar data lembaga, tanpa layar laptop/web
+       ========================================== */
+    #print-document-container {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #print-document-container, #print-document-container * {
+        visibility: visible !important;
+      }
+      #print-document-container {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12mm 15mm !important;
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: 11pt !important;
+        line-height: 1.35 !important;
+        box-sizing: border-box !important;
+      }
+      .no-print, .app-wrapper, .modal-overlay, #toast-container {
+        display: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm;
+      }
+      .print-kop-header {
+        text-align: center;
+        border-bottom: 3px double #000;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
+      }
+      .print-kop-header h4 {
+        font-size: 11pt;
+        font-weight: bold;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .print-kop-header h3 {
+        font-size: 13pt;
+        font-weight: bold;
+        margin: 2px 0;
+        text-transform: uppercase;
+      }
+      .print-kop-header p {
+        font-size: 9.5pt;
+        margin: 2px 0 0 0;
+        font-style: italic;
+      }
+      .print-title {
+        text-align: center;
+        font-size: 12pt;
+        font-weight: bold;
+        text-decoration: underline;
+        margin: 12px 0 4px 0;
+        text-transform: uppercase;
+      }
+      .print-subtitle {
+        text-align: center;
+        font-size: 10pt;
+        margin-bottom: 14px;
+      }
+      .print-section-title {
+        font-size: 10.5pt;
+        font-weight: bold;
+        background-color: #E5E7EB !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 4px 8px;
+        border: 1px solid #000;
+        margin-top: 10px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+      }
+      .print-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 10px !important;
+        font-size: 10pt !important;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #000 !important;
+        padding: 4.5px 7px !important;
+        vertical-align: middle !important;
+        color: #000 !important;
+      }
+      .print-table th {
+        background-color: #F3F4F6 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        text-align: left;
+      }
+      .print-signature-box {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        page-break-inside: avoid;
+      }
+      .print-sign-col {
+        width: 45%;
+        text-align: center;
+        font-size: 10pt;
+      }
+    }
   </style>
 </head>
 <body data-theme="light">
@@ -964,11 +1081,26 @@
                   <option value="LENGKAP">✅ 6. LEMBAGA YANG SUDAH LENGKAP</option>
                   <option value="BELUM_LENGKAP">⏳ 7. LEMBAGA YANG BELUM SEMUANYA LENGKAP</option>
                   <option value="BELUM_MENGISI">❌ 8. LEMBAGA YANG SAMA SEKALI BELUM MENGISI</option>
+                  <option value="PER_LEMBAGA">📄 9. REKAP & CETAK PER LEMBAGA</option>
                 </select>
               </div>
               <div class="form-group" style="margin-bottom:0; display:flex; gap:10px;">
                 <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-container); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
                 <button class="btn" onclick="exportExcel()" style="flex:1; background:var(--primary-solid); box-shadow:none;">📥 Export Excel (.xlsx)</button>
+              </div>
+            </div>
+
+            <div id="sub-filter-per-lembaga-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
+              <div class="grid-cards" style="margin-bottom:0; align-items:end;">
+                <div class="form-group" style="margin-bottom:0; grid-column: 1 / span 2;">
+                  <label style="font-weight:600; color:var(--primary-solid); margin-bottom:5px;">Pilih Madrasah / RA yang Ingin Dilihat & Dicetak Lengkap</label>
+                  <select id="sub-per-lembaga-select" onchange="onSelectPerLembagaRekap()" style="font-weight:600;">
+                    <option value="">-- Pilih Lembaga --</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <button class="btn" onclick="cetakProfilLembagaTerpilih()" style="width:100%; background:var(--primary-solid); font-weight:700;">🖨️ Cetak Lembar Profil Lembaga</button>
+                </div>
               </div>
             </div>
 
@@ -1071,10 +1203,11 @@
                   <th style="text-align:right;">P</th>
                   <th style="text-align:right;">TOTAL SISWA</th>
                   <th>KELENGKAPAN</th>
+                  <th style="text-align:center; width:90px;">AKSI</th>
                 </tr>
               </thead>
               <tbody id="table-rekap">
-                <tr><td colspan="11" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rekapitulasi data...</td></tr>
+                <tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rekapitulasi data...</td></tr>
               </tbody>
             </table>
           </div>
@@ -1280,8 +1413,33 @@
     </div>
   </div>
 
+  <!-- Modal Preview Profil Lembaga Lengkap -->
+  <div class="modal-overlay" id="modal-preview-profil" style="align-items: flex-start; padding: 25px 15px; overflow-y: auto;">
+    <div class="modal-content" style="max-width: 860px; text-align: left; width: 100%; margin: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:20px;">
+        <div>
+          <h3 style="color:var(--primary-solid); font-size:1.3rem; margin-bottom:2px;">📄 Lembar Rekapitulasi Profil Lembaga</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">Isian Lengkap Data Kelembagaan, Data Siswa, dan Sarana Prasarana</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn" onclick="executePrintLembaran()" style="background:var(--primary-solid); font-size:0.9rem; padding:8px 16px;">🖨️ Cetak Lembaran</button>
+          <button class="btn" onclick="closePreviewProfilModal()" style="background:transparent; color:var(--text-muted); border:1px solid var(--border-color); font-size:0.9rem; padding:8px 14px; box-shadow:none;">✕ Tutup</button>
+        </div>
+      </div>
+      
+      <div id="profil-preview-content" style="background:var(--bg-body); padding:20px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-height:65vh; overflow-y:auto;">
+        Memuat detail isian lembaga...
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER KHUSUS UNTUK PRINT BERSIH (Hanya dicetak saat window.print) -->
+  <div id="print-document-container">
+    <div id="print-document-body"></div>
+  </div>
+
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzB1x5EtHuD652VD2gUKWqIlCMePKHFn2sdebB0aXwB0stPflTEp-1xfWcd8neTvbTF/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ8Vh9NQF61FinDnWem251SS_6D293FTbdoaY4unQhaQW82v-r_Mm9509N8wecQ7zl/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1298,6 +1456,7 @@
     var currentTahunPelajaran = "2026/2027";
     var isAllInstitutionsCompleted = false;
     var pinModalTarget = "admin-emis";
+    var currentLoadedProfilData = null;
 
     window.onload = function() {
       fetchInitialData();
@@ -1517,6 +1676,7 @@
       renderLembagaDropdowns();
       renderSarprasDropdowns();
       renderKecamatanSubFilters();
+      renderPerLembagaDropdown();
       renderRekapTable();
       checkAndRenderEwsAlerts();
     }
@@ -2399,17 +2559,46 @@
       selKec.innerHTML = html;
     }
 
+    function renderPerLembagaDropdown() {
+      var selLbg = document.getElementById('sub-per-lembaga-select');
+      if (!selLbg) return;
+      var html = '<option value="">-- Pilih Lembaga untuk Melihat & Mencetak Profil Lengkap --</option>';
+      for (var i = 0; i < globalInstitutions.length; i++) {
+        var inst = globalInstitutions[i];
+        html += '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ' - NSM: ' + inst.nsm + ')</option>';
+      }
+      selLbg.innerHTML = html;
+    }
+
+    function onSelectPerLembagaRekap() {
+      var idLbg = document.getElementById('sub-per-lembaga-select').value;
+      if (idLbg) {
+        openProfilLembagaModal(idLbg);
+      }
+    }
+
+    function cetakProfilLembagaTerpilih() {
+      var idLbg = document.getElementById('sub-per-lembaga-select').value;
+      if (!idLbg) {
+        showToast("Pilih lembaga terlebih dahulu!", "error");
+        return;
+      }
+      openProfilLembagaModal(idLbg, true);
+    }
+
     function onRekapFilterChange() {
       var filterType = document.getElementById('rekap-filter-type').value;
       var subContainerStatus = document.getElementById('sub-filter-status-container');
       var subContainerJg = document.getElementById('sub-filter-jenjang-container');
       var subContainerKec = document.getElementById('sub-filter-kecamatan-container');
       var subContainerJk = document.getElementById('sub-filter-jk-container');
+      var subContainerPerLbg = document.getElementById('sub-filter-per-lembaga-container');
       
       subContainerStatus.style.display = 'none';
       subContainerJg.style.display = 'none';
       subContainerKec.style.display = 'none';
       subContainerJk.style.display = 'none';
+      if (subContainerPerLbg) subContainerPerLbg.style.display = 'none';
 
       if (filterType === 'PER_STATUS') {
         subContainerStatus.style.display = 'block';
@@ -2419,6 +2608,8 @@
         subContainerKec.style.display = 'block';
       } else if (filterType === 'REKAP_JK') {
         subContainerJk.style.display = 'block';
+      } else if (filterType === 'PER_LEMBAGA') {
+        if (subContainerPerLbg) subContainerPerLbg.style.display = 'block';
       }
       renderRekapTable();
     }
@@ -2440,7 +2631,7 @@
       var filtered = data;
       aggregateContainer.style.display = 'none';
 
-      if (filterType === 'KESELURUHAN') {
+      if (filterType === 'KESELURUHAN' || filterType === 'PER_LEMBAGA') {
         filtered = data;
       } else if (filterType === 'PER_STATUS') {
         filtered = data.filter(function(x) {
@@ -2494,7 +2685,7 @@
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data lembaga yang cocok dengan kriteria filter.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data lembaga yang cocok dengan kriteria filter.</td></tr>';
         return;
       }
 
@@ -2516,229 +2707,229 @@
           '<td style="text-align:right; font-weight:500;">' + (itm.jmlP || 0).toLocaleString('id-ID') + '</td>' +
           '<td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + (itm.jmlTotal || 0).toLocaleString('id-ID') + '</td>' +
           '<td><span class="summary-badge" style="background:' + badgeBg + '; color:' + badgeColor + ';">' + itm.kelengkapan + '</span></td>' +
+          '<td style="text-align:center;"><button class="btn" style="padding:5px 10px; font-size:0.8rem; background:var(--primary-solid);" onclick="openProfilLembagaModal(\'' + itm.id + '\')">🖨️ Cetak</button></td>' +
         '</tr>';
       }
       tbody.innerHTML = html;
     }
 
-    function renderAggregateGenderPerJenjang(allData) {
-      var jenjangs = ["RA", "MI", "MTs", "MA"];
-      var stats = {};
-      for(var i=0; i<jenjangs.length; i++) {
-        stats[jenjangs[i]] = { totalLbg: 0, l: 0, p: 0, total: 0 };
-      }
-      for(var d=0; d<allData.length; d++) {
-        var row = allData[d];
-        if(stats[row.jenjang]) {
-          stats[row.jenjang].totalLbg++;
-          stats[row.jenjang].l += (row.jmlL || 0);
-          stats[row.jenjang].p += (row.jmlP || 0);
-          stats[row.jenjang].total += (row.jmlTotal || 0);
-        }
+    /* ==========================================
+       MODUL DETAIL & CETAK LEMBAR PROFIL PER LEMBAGA
+       ========================================== */
+    function openProfilLembagaModal(idLembaga, autoPrint) {
+      var modal = document.getElementById('modal-preview-profil');
+      var container = document.getElementById('profil-preview-content');
+      container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">Memuat rincian data kelembagaan, siswa, dan sarpras...</div>';
+      modal.classList.add('active');
+
+      // Cek apakah di Google Apps Script Server
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            handleDetailLembagaResponse(res, autoPrint);
+          })
+          .withFailureHandler(function(err) {
+            handleFallbackDetailLembaga(idLembaga, autoPrint);
+          })
+          .getDetailLembagaObj(idLembaga);
+        return;
       }
 
-      var thead = document.getElementById('aggregate-table-head');
-      var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary-solid); font-weight:700;">🎓 1. REKAPITULASI JENIS KELAMIN PER JENJANG PENDIDIKAN</th></tr>' +
-        '<tr><th>JENJANG</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
-      
-      var html = '';
-      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
-      for(var j=0; j<jenjangs.length; j++) {
-        var jg = jenjangs[j];
-        var s = stats[jg];
-        grandLbg += s.totalLbg; grandL += s.l; grandP += s.p; grandTot += s.total;
-        html += '<tr>' +
-          '<td style="font-weight:700; color:var(--primary-solid);">' + jg + '</td>' +
-          '<td style="text-align:center;">' + s.totalLbg + ' Lembaga</td>' +
-          '<td style="text-align:right; font-weight:600;">' + s.l.toLocaleString('id-ID') + '</td>' +
-          '<td style="text-align:right; font-weight:600;">' + s.p.toLocaleString('id-ID') + '</td>' +
-          '<td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + s.total.toLocaleString('id-ID') + '</td>' +
-        '</tr>';
-      }
-      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
-        '<td>TOTAL KESELURUHAN</td>' +
-        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
-        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right; color:var(--primary-solid); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
-      '</tr>';
-      tbody.innerHTML = html;
+      // Fetch Web API
+      fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + encodeURIComponent(idLembaga))
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          if (res && res.status === 'success') {
+            handleDetailLembagaResponse(res, autoPrint);
+          } else {
+            handleFallbackDetailLembaga(idLembaga, autoPrint);
+          }
+        })
+        .catch(function(err) {
+          handleFallbackDetailLembaga(idLembaga, autoPrint);
+        });
     }
 
-    function renderAggregateGenderPerStatus(allData) {
-      var statuses = ["NEGERI", "SWASTA"];
-      var stats = {};
-      for (var i = 0; i < statuses.length; i++) {
-        stats[statuses[i]] = { totalLbg: 0, l: 0, p: 0, total: 0 };
-      }
-      for (var d = 0; d < allData.length; d++) {
-        var row = allData[d];
-        var st = (row.statusLembaga || "").toUpperCase();
-        if (stats[st]) {
-          stats[st].totalLbg++;
-          stats[st].l += (row.jmlL || 0);
-          stats[st].p += (row.jmlP || 0);
-          stats[st].total += (row.jmlTotal || 0);
-        }
-      }
-
-      var thead = document.getElementById('aggregate-table-head');
-      var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="5" style="color:var(--primary-solid); font-weight:700;">🏛️ 2. REKAPITULASI JENIS KELAMIN PER STATUS (NEGERI & SWASTA)</th></tr>' +
-        '<tr><th>STATUS LEMBAGA</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
+    function handleFallbackDetailLembaga(idLembaga, autoPrint) {
+      var match = fullRekapData.find(function(x){ return x.id === idLembaga || x.nsm === idLembaga; });
+      var inst = globalInstitutions.find(function(x){ return x.id === idLembaga || x.nsm === idLembaga; }) || match || {};
       
-      var html = '';
-      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
-      for (var j = 0; j < statuses.length; j++) {
-        var st = statuses[j];
-        var s = stats[st];
-        grandLbg += s.totalLbg; grandL += s.l; grandP += s.p; grandTot += s.total;
-        var statusBadge = st === 'NEGERI' 
-          ? '<span style="padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:700; background:rgba(0,192,90,0.15); color:var(--primary-solid);">NEGERI</span>' 
-          : '<span style="padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:700; background:rgba(59,130,246,0.15); color:#3B82F6;">SWASTA</span>';
-        
-        html += '<tr>' +
-          '<td style="font-weight:700;">' + statusBadge + ' ' + st + '</td>' +
-          '<td style="text-align:center;">' + s.totalLbg + ' Lembaga</td>' +
-          '<td style="text-align:right; font-weight:600;">' + s.l.toLocaleString('id-ID') + '</td>' +
-          '<td style="text-align:right; font-weight:600;">' + s.p.toLocaleString('id-ID') + '</td>' +
-          '<td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + s.total.toLocaleString('id-ID') + '</td>' +
-        '</tr>';
-      }
-      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
-        '<td>TOTAL KESELURUHAN</td>' +
-        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
-        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right; color:var(--primary-solid); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
-      '</tr>';
-      tbody.innerHTML = html;
+      var dummyDetail = {
+        status: "success",
+        tahunPelajaran: currentTahunPelajaran,
+        kelembagaan: {
+          id: inst.id || idLembaga,
+          nama: inst.name || inst.nama || "MADRASAH CONTOH",
+          nsm: inst.nsm || "111216050001",
+          npsn: inst.npsn || "69812345",
+          jenjang: inst.jenjang || "MI",
+          statusLembaga: inst.statusLembaga || "SWASTA",
+          desa: inst.desa || "DESA MAJU",
+          kecamatan: inst.kecamatan || "KECAMATAN PUSAT",
+          noIzin: "100/Kemenag/2020",
+          tglIzin: "2020-05-10",
+          akhirIzin: match ? match.akhirIzin : "2028-12-31",
+          akreditasi: match ? match.akreditasi : "A",
+          tglAkred: "2022-10-15",
+          akhirAkred: match ? match.akhirAkred : "2027-10-15",
+          npwp: "01.234.567.8-901.000",
+          namaKepala: "DRS. AHMAD FAUZI, M.Pd.I",
+          waKepala: "081234567890",
+          namaOp: "BUDI SANTOSO, S.Kom",
+          waOp: "081298765432",
+          lat: "-3.21456",
+          lng: "102.87654"
+        },
+        siswa: {
+          idSiswa: "SSW-001",
+          tahunPelajaran: currentTahunPelajaran,
+          detailKelas: [
+            { kelas: "1", laki: 20, perempuan: 25, total: 45 },
+            { kelas: "2", laki: 22, perempuan: 23, total: 45 },
+            { kelas: "3", laki: 18, perempuan: 22, total: 40 }
+          ],
+          totalL: match ? match.jmlL : 60,
+          totalP: match ? match.jmlP : 70,
+          totalSiswa: match ? match.jmlTotal : 130,
+          alumniL: 15,
+          alumniP: 20,
+          alumniTotal: 35,
+          tidakLulus: "Semua Lulus",
+          tidakLulusL: 0,
+          tidakLulusP: 0,
+          tidakLulusTotal: 0
+        },
+        sarpras: {
+          idSarpras: "SPR-001",
+          jumlahGedung: "2",
+          ruangKepala: "1",
+          ruangWakapu: "1",
+          ruangGuru: "1",
+          ruangKelas: "6",
+          toiletGuru: "2",
+          toiletSiswa: "4",
+          listEkstrakurikuler: "PRAMUKA, TAHFIDZ, DRUMBAND",
+          listLaboratorium: "LAB KOMPUTER, LAB IPA"
+        }
+      };
+      handleDetailLembagaResponse(dummyDetail, autoPrint);
     }
 
-    function renderAggregateGenderPerStatusPerJenjang(allData) {
-      var jenjangs = ["RA", "MI", "MTs", "MA"];
-      var statuses = ["NEGERI", "SWASTA"];
-      var matrix = {};
+    function handleDetailLembagaResponse(res, autoPrint) {
+      currentLoadedProfilData = res;
+      var container = document.getElementById('profil-preview-content');
+      var printBody = document.getElementById('print-document-body');
       
-      for (var i = 0; i < jenjangs.length; i++) {
-        matrix[jenjangs[i]] = {
-          "NEGERI": { totalLbg: 0, l: 0, p: 0, total: 0 },
-          "SWASTA": { totalLbg: 0, l: 0, p: 0, total: 0 }
-        };
-      }
+      var k = res.kelembagaan || {};
+      var s = res.siswa || {};
+      var p = res.sarpras || {};
+      var tp = res.tahunPelajaran || currentTahunPelajaran;
 
-      for (var d = 0; d < allData.length; d++) {
-        var row = allData[d];
-        var jg = row.jenjang;
-        var st = (row.statusLembaga || "").toUpperCase();
-        if (matrix[jg] && matrix[jg][st]) {
-          matrix[jg][st].totalLbg++;
-          matrix[jg][st].l += (row.jmlL || 0);
-          matrix[jg][st].p += (row.jmlP || 0);
-          matrix[jg][st].total += (row.jmlTotal || 0);
-        }
-      }
-
-      var thead = document.getElementById('aggregate-table-head');
-      var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="6" style="color:var(--primary-solid); font-weight:700;">📊 3. REKAPITULASI JENIS KELAMIN PER STATUS PER JENJANG</th></tr>' +
-        '<tr><th>JENJANG</th><th>STATUS</th><th style="text-align:center;">JML MADRASAH</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
-      
-      var html = '';
-      var grandLbg = 0, grandL = 0, grandP = 0, grandTot = 0;
-
-      for (var j = 0; j < jenjangs.length; j++) {
-        var curJg = jenjangs[j];
-        for (var s = 0; s < statuses.length; s++) {
-          var curSt = statuses[s];
-          var cell = matrix[curJg][curSt];
-          grandLbg += cell.totalLbg; grandL += cell.l; grandP += cell.p; grandTot += cell.total;
-          
-          var badge = curSt === 'NEGERI' 
-            ? '<span style="padding:2px 6px; border-radius:8px; font-size:0.7rem; font-weight:700; background:rgba(0,192,90,0.15); color:var(--primary-solid);">NEGERI</span>' 
-            : '<span style="padding:2px 6px; border-radius:8px; font-size:0.7rem; font-weight:700; background:rgba(59,130,246,0.15); color:#3B82F6;">SWASTA</span>';
-
-          html += '<tr>' +
-            '<td style="font-weight:700; color:var(--primary-solid);">' + curJg + '</td>' +
-            '<td>' + badge + '</td>' +
-            '<td style="text-align:center;">' + cell.totalLbg + ' Lembaga</td>' +
-            '<td style="text-align:right; font-weight:600;">' + cell.l.toLocaleString('id-ID') + '</td>' +
-            '<td style="text-align:right; font-weight:600;">' + cell.p.toLocaleString('id-ID') + '</td>' +
-            '<td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + cell.total.toLocaleString('id-ID') + '</td>' +
+      // Render Kelas Siswa
+      var kelasRows = '';
+      if (s.detailKelas && s.detailKelas.length > 0) {
+        for (var i = 0; i < s.detailKelas.length; i++) {
+          var cl = s.detailKelas[i];
+          kelasRows += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">Kelas ' + cl.kelas + '</td>' +
+            '<td style="text-align:right;">' + (cl.laki || 0) + '</td>' +
+            '<td style="text-align:right;">' + (cl.perempuan || 0) + '</td>' +
+            '<td style="text-align:right; font-weight:bold;">' + (cl.total || 0) + '</td>' +
           '</tr>';
         }
+      } else {
+        kelasRows = '<tr><td colspan="4" style="text-align:center; font-style:italic;">Data kelas belum diisi</td></tr>';
       }
 
-      html += '<tr style="background:var(--bg-body); font-weight:700;">' +
-        '<td colspan="2">TOTAL KESELURUHAN</td>' +
-        '<td style="text-align:center;">' + grandLbg + ' Lembaga</td>' +
-        '<td style="text-align:right;">' + grandL.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right;">' + grandP.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right; color:var(--primary-solid); font-size:1rem;">' + grandTot.toLocaleString('id-ID') + '</td>' +
-      '</tr>';
-      tbody.innerHTML = html;
-    }
+      // Template Dokumen Cetak Bersih (Kop Resmi Kemenag)
+      var docHtml = '' +
+        '<div class="print-kop-header">' +
+          '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
+          '<h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4>' +
+          '<h3>SEKSI PENDIDIKAN MADRASAH</h3>' +
+          '<p>Komplek Perkantoran Pemkab Musi Rawas, Muara Beliti, Sumatera Selatan | Kode Pos: 31661</p>' +
+        '</div>' +
 
-    function renderAggregateGenderAll(allData) {
-      var totalLbg = allData.length;
-      var totalL = 0, totalP = 0, totalSiswa = 0;
-      for (var i = 0; i < allData.length; i++) {
-        totalL += (allData[i].jmlL || 0);
-        totalP += (allData[i].jmlP || 0);
-        totalSiswa += (allData[i].jmlTotal || 0);
+        '<div class="print-title">LEMBAR REKAPITULASI PROFIL LEMBAGA</div>' +
+        '<div class="print-subtitle">Tahun Pelajaran: ' + tp + '</div>' +
+
+        '<div class="print-section-title">I. IDENTITAS POKOK & KELEMBAGAAN</div>' +
+        '<table class="print-table">' +
+          '<tr><th style="width:28%;">Nama Lembaga</th><td style="font-weight:bold;">' + (k.nama || '-') + '</td><th style="width:22%;">Jenjang / Status</th><td>' + (k.jenjang || '-') + ' / ' + (k.statusLembaga || '-') + '</td></tr>' +
+          '<tr><th>NSM</th><td>' + (k.nsm || '-') + '</td><th>NPSN</th><td>' + (k.npsn || '-') + '</td></tr>' +
+          '<tr><th>Alamat Desa/Kel.</th><td>' + (k.desa || '-') + '</td><th>Kecamatan</th><td>' + (k.kecamatan || '-') + '</td></tr>' +
+          '<tr><th>SK Izin Operasional</th><td>' + (k.noIzin || '-') + '</td><th>Masa Berlaku Izin</th><td>Tgl: ' + (k.tglIzin || '-') + ' s.d ' + (k.akhirIzin || '-') + '</td></tr>' +
+          '<tr><th>Status Akreditasi</th><td style="font-weight:bold;">' + (k.akreditasi || 'Belum Terakreditasi') + '</td><th>Masa Akreditasi</th><td>Tgl: ' + (k.tglAkred || '-') + ' s.d ' + (k.akhirAkred || '-') + '</td></tr>' +
+          '<tr><th>NPWP Lembaga</th><td>' + (k.npwp || '-') + '</td><th>Koordinat (Lat, Lng)</th><td>' + (k.lat || '-') + ', ' + (k.lng || '-') + '</td></tr>' +
+          '<tr><th>Kepala Lembaga</th><td>' + (k.namaKepala || '-') + ' (' + (k.waKepala || '-') + ')</td><th>Operator Pendataan</th><td>' + (k.namaOp || '-') + ' (' + (k.waOp || '-') + ')</td></tr>' +
+        '</table>' +
+
+        '<div class="print-section-title">II. DATA KESISWAAN & ALUMNI (TP ' + tp + ')</div>' +
+        '<table class="print-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th style="text-align:center; width:28%;">Rincian Kelas</th>' +
+              '<th style="text-align:right; width:24%;">Laki-Laki (L)</th>' +
+              '<th style="text-align:right; width:24%;">Perempuan (P)</th>' +
+              '<th style="text-align:right; width:24%;">Jumlah Total</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            kelasRows +
+            '<tr style="background:#E5E7EB; font-weight:bold;">' +
+              '<td style="text-align:center;">TOTAL SISWA AKTIF</td>' +
+              '<td style="text-align:right;">' + (s.totalL || 0) + '</td>' +
+              '<td style="text-align:right;">' + (s.totalP || 0) + '</td>' +
+              '<td style="text-align:right; font-size:11pt;">' + (s.totalSiswa || 0) + ' Orang</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+
+        '<table class="print-table">' +
+          '<tr>' +
+            '<th style="width:28%;">Jumlah Alumni</th>' +
+            '<td>L: <strong>' + (s.alumniL || 0) + '</strong> | P: <strong>' + (s.alumniP || 0) + '</strong> | Total: <strong>' + (s.alumniTotal || 0) + '</strong> Orang</td>' +
+            '<th style="width:22%;">Status Tidak Lulus</th>' +
+            '<td>' + (s.tidakLulus || 'Semua Lulus') + (s.tidakLulus && s.tidakLulus !== 'Semua Lulus' ? ' (' + (s.tidakLulusTotal || 0) + ' Orang)' : '') + '</td>' +
+          '</tr>' +
+        '</table>' +
+
+        '<div class="print-section-title">III. DATA SARANA DAN PRASARANA (SARPRAS)</div>' +
+        '<table class="print-table">' +
+          '<tr><th>Jumlah Bangunan Gedung</th><td><strong>' + (p.jumlahGedung || '0') + '</strong> Unit</td><th>Ruang Kelas</th><td><strong>' + (p.ruangKelas || '0') + '</strong> Ruang</td></tr>' +
+          '<tr><th>Ruang Kepala Lembaga</th><td><strong>' + (p.ruangKepala || '0') + '</strong> Ruang</td><th>Ruang Wakil Kepala</th><td><strong>' + (p.ruangWakapu || '0') + '</strong> Ruang</td></tr>' +
+          '<tr><th>Ruang Guru</th><td><strong>' + (p.ruangGuru || '0') + '</strong> Ruang</td><th>Toilet Guru / Siswa</th><td>Guru: <strong>' + (p.toiletGuru || '0') + '</strong> | Siswa: <strong>' + (p.toiletSiswa || '0') + '</strong></td></tr>' +
+          '<tr><th>Ekstrakurikuler</th><td colspan="3">' + (p.listEkstrakurikuler || 'TIDAK ADA') + '</td></tr>' +
+          '<tr><th>Laboratorium</th><td colspan="3">' + (p.listLaboratorium || 'TIDAK ADA') + '</td></tr>' +
+        '</table>' +
+
+        '<div class="print-signature-box">' +
+          '<div class="print-sign-col">' +
+            'Mengetahui,<br>Pengawas Madrasah Pembina<br><br><br><br>' +
+            '<u>__________________________</u><br>NIP. ' +
+          '</div>' +
+          '<div class="print-sign-col">' +
+            (k.kecamatan ? (k.kecamatan.charAt(0).toUpperCase() + k.kecamatan.slice(1).toLowerCase()) : 'Musi Rawas') + ', ' + new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) + '<br>Kepala ' + (k.nama || 'Madrasah') + '<br><br><br><br>' +
+            '<u><strong>' + (k.namaKepala || '...........................................') + '</strong></u>' +
+          '</div>' +
+        '</div>';
+
+      container.innerHTML = docHtml;
+      printBody.innerHTML = docHtml;
+
+      if (autoPrint) {
+        setTimeout(function() {
+          executePrintLembaran();
+        }, 300);
       }
-
-      var pctL = totalSiswa > 0 ? ((totalL / totalSiswa) * 100).toFixed(1) : 0;
-      var pctP = totalSiswa > 0 ? ((totalP / totalSiswa) * 100).toFixed(1) : 0;
-
-      var thead = document.getElementById('aggregate-table-head');
-      var tbody = document.getElementById('table-rekap-aggregate');
-      thead.innerHTML = '<tr style="background:var(--primary-light);"><th colspan="4" style="color:var(--primary-solid); font-weight:700;">👥 4. REKAPITULASI JENIS KELAMIN SELURUH JENJANG GABUNGAN</th></tr>' +
-        '<tr><th>KATEGORI</th><th style="text-align:right;">JUMLAH SISWA</th><th style="text-align:right;">PERSENTASE (%)</th><th style="text-align:center;">KETERANGAN</th></tr>';
-      
-      var html = '<tr>' +
-        '<td style="font-weight:700; color:#3B82F6;">👦 LAKI-LAKI (L)</td>' +
-        '<td style="text-align:right; font-weight:700; font-size:1rem;">' + totalL.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right; font-weight:600;">' + pctL + '%</td>' +
-        '<td style="text-align:center; color:var(--text-muted);">Siswa Putra</td>' +
-      '</tr>' +
-      '<tr>' +
-        '<td style="font-weight:700; color:#EC4899;">👧 PEREMPUAN (P)</td>' +
-        '<td style="text-align:right; font-weight:700; font-size:1rem;">' + totalP.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right; font-weight:600;">' + pctP + '%</td>' +
-        '<td style="text-align:center; color:var(--text-muted);">Siswi Putri</td>' +
-      '</tr>' +
-      '<tr style="background:var(--bg-body); font-weight:700;">' +
-        '<td>TOTAL GABUNGAN SISWA</td>' +
-        '<td style="text-align:right; color:var(--primary-solid); font-size:1.1rem;">' + totalSiswa.toLocaleString('id-ID') + '</td>' +
-        '<td style="text-align:right;">100%</td>' +
-        '<td style="text-align:center; color:var(--primary-solid);">' + totalLbg + ' Lembaga Madrasah</td>' +
-      '</tr>';
-      tbody.innerHTML = html;
     }
 
-    function exportExcel() {
-      fetch(APPS_SCRIPT_URL + "?action=getCompleteDataForExport")
-        .then(function(res) { return res.text(); })
-        .then(function(text) {
-          var res = safeParseJSON(text);
-          if(!res || res.length === 0) { showToast("Tidak ada data untuk diexport", "error"); return; }
-          var dataByJenjang = { "RA": [], "MI": [], "MTs": [], "MA": [] };
-          var headers = ["NSM", "NPSN", "NAMA LEMBAGA", "STATUS", "KECAMATAN", "DESA", "SK IZIN", "TGL IZIN", "AKHIR IZIN", "AKREDITASI", "NPWP", "KEPALA", "WA KEPALA", "OPERATOR", "WA OPERATOR", "LAT", "LNG", "S. LAKI", "S. PEREMPUAN", "TOT. SISWA", "TOT. ALUMNI", "STATUS TDK LULUS", "GEDUNG", "R. KEPALA", "R. GURU", "R. KELAS", "T. GURU", "T. SISWA", "EKSTRA", "LAB"];
-          for (var k in dataByJenjang) { dataByJenjang[k].push(headers); }
-          for(var i=0; i<res.length; i++) {
-            if (dataByJenjang[res[i].jenjang]) dataByJenjang[res[i].jenjang].push(res[i].data);
-          }
-          var wb = XLSX.utils.book_new();
-          for (var jg in dataByJenjang) {
-            var ws = XLSX.utils.aoa_to_sheet(dataByJenjang[jg].length > 1 ? dataByJenjang[jg] : [headers, ["Tidak ada data"]]);
-            XLSX.utils.book_append_sheet(wb, ws, jg);
-          }
-          XLSX.writeFile(wb, "Data_Madrasah_Musi_Rawas_" + currentTahunPelajaran.replace(/[^a-zA-Z0-9]/g, '_') + ".xlsx");
-          showToast("Export Excel berhasil diunduh!", "success");
-        })
-        .catch(function(err){ showToast("Gagal mengunduh Excel", "error"); });
+    function closePreviewProfilModal() {
+      document.getElementById('modal-preview-profil').classList.remove('active');
+    }
+
+    function executePrintLembaran() {
+      window.print();
     }
   </script>
 </body>
