@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seksi Pendidikan Madrasah - Kemenag Musi Rawas</title>
   
-  <!-- Google Fonts: Poppins, Fredoka (Bubble Font), & Font Kaligrafi Etnik Jawa -->
+  <!-- Google Fonts: Poppins, Fredoka, & Font Kaligrafi Etnik -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Yatra+One&family=Metamorphous&family=Rozha+One&display=swap" rel="stylesheet">
   
   <!-- SheetJS untuk Export Excel (.xlsx) -->
@@ -33,6 +33,7 @@
       --radius-lg: 20px;
       --color-warning: #EAB308;
       --color-danger: #EF4444;
+      --color-info: #3B82F6;
     }
     
     [data-theme="dark"] {
@@ -53,6 +54,7 @@
       --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
       --color-warning: #FACC15;
       --color-danger: #F87171;
+      --color-info: #60A5FA;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
@@ -412,10 +414,26 @@
       text-align: center; 
       box-shadow: var(--shadow-sm); 
       transition: all 0.3s ease; 
+      position: relative;
     }
-    .card:hover { 
-      transform: translateY(-3px); 
-      box-shadow: 0 8px 20px var(--primary-light); 
+    .card.clickable-card {
+      cursor: pointer;
+      user-select: none;
+    }
+    .card.clickable-card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 10px 25px var(--primary-light); 
+      border-color: var(--primary-solid);
+    }
+    .card-click-hint {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.85;
     }
     .card div { color: var(--text-main); font-size: 0.92rem; font-weight: 500; }
     .card h3 { font-size: 2.6rem; color: var(--primary-solid); margin: 10px 0 0 0; font-weight: 700; line-height: 1; }
@@ -428,10 +446,25 @@
     .alert-box { background-color: #FFF5F5; color: #C53030; padding: 16px 20px; border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
     [data-theme="dark"] .alert-box { background-color: rgba(229, 62, 62, 0.1); color: #FC8181; }
 
+    .info-replace-box {
+      background-color: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: var(--color-info);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
     #toast-container { position: fixed; top: 25px; right: 25px; z-index: 9999; }
-    .toast { min-width: 280px; padding: 16px 24px; border-radius: var(--radius-sm); margin-bottom: 12px; color: white; font-weight: 500; font-size: 0.95rem; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .toast { min-width: 280px; max-width: 420px; padding: 16px 24px; border-radius: var(--radius-sm); margin-bottom: 12px; color: white; font-weight: 500; font-size: 0.95rem; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); line-height: 1.4; }
     .toast.show { transform: translateX(0); }
     .toast.success { background-color: var(--primary-solid); }
+    .toast.info { background-color: #2563EB; }
     .toast.error { background-color: #EF4444; }
     
     table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 750px; }
@@ -461,6 +494,29 @@
       gap: 12px;
     }
 
+    .badge-check-ok {
+      background: rgba(0, 192, 90, 0.15);
+      color: var(--primary-solid);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-check-no {
+      background: rgba(239, 68, 68, 0.15);
+      color: #EF4444;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     @media (max-width: 768px) {
       .main-content { flex-direction: column; }
       .sidebar { width: 100%; padding: 15px; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -472,17 +528,11 @@
       .topbar-right { width: 100%; justify-content: space-between; }
     }
 
-    #print-document-container {
-      display: none;
-    }
+    #print-document-container { display: none; }
 
     @media print {
-      body * {
-        visibility: hidden !important;
-      }
-      #print-document-container, #print-document-container * {
-        visibility: visible !important;
-      }
+      body * { visibility: hidden !important; }
+      #print-document-container, #print-document-container * { visibility: visible !important; }
       #print-document-container {
         display: block !important;
         position: absolute !important;
@@ -498,91 +548,20 @@
         line-height: 1.35 !important;
         box-sizing: border-box !important;
       }
-      .no-print, .app-wrapper, .modal-overlay, #toast-container {
-        display: none !important;
-      }
-      @page {
-        size: A4 portrait;
-        margin: 10mm 12mm;
-      }
-      .print-kop-header {
-        text-align: center;
-        border-bottom: 3px double #000;
-        padding-bottom: 8px;
-        margin-bottom: 14px;
-      }
-      .print-kop-header h4 {
-        font-size: 11pt;
-        font-weight: bold;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .print-kop-header h3 {
-        font-size: 13pt;
-        font-weight: bold;
-        margin: 2px 0;
-        text-transform: uppercase;
-      }
-      .print-kop-header p {
-        font-size: 9.5pt;
-        margin: 2px 0 0 0;
-        font-style: italic;
-      }
-      .print-title {
-        text-align: center;
-        font-size: 12pt;
-        font-weight: bold;
-        text-decoration: underline;
-        margin: 12px 0 4px 0;
-        text-transform: uppercase;
-      }
-      .print-subtitle {
-        text-align: center;
-        font-size: 10pt;
-        margin-bottom: 14px;
-      }
-      .print-section-title {
-        font-size: 10.5pt;
-        font-weight: bold;
-        background-color: #E5E7EB !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        padding: 4px 8px;
-        border: 1px solid #000;
-        margin-top: 10px;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-      }
-      .print-table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        margin-bottom: 10px !important;
-        font-size: 10pt !important;
-      }
-      .print-table th, .print-table td {
-        border: 1px solid #000 !important;
-        padding: 4.5px 7px !important;
-        vertical-align: middle !important;
-        color: #000 !important;
-      }
-      .print-table th {
-        background-color: #F3F4F6 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        text-align: left;
-      }
-      .print-signature-box {
-        margin-top: 25px;
-        display: flex;
-        justify-content: space-between;
-        page-break-inside: avoid;
-      }
-      .print-sign-col {
-        width: 45%;
-        text-align: center;
-        font-size: 10pt;
-      }
+      .no-print, .app-wrapper, .modal-overlay, #toast-container { display: none !important; }
+      @page { size: A4 portrait; margin: 10mm 12mm; }
+      .print-kop-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 14px; }
+      .print-kop-header h4 { font-size: 11pt; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+      .print-kop-header h3 { font-size: 13pt; font-weight: bold; margin: 2px 0; text-transform: uppercase; }
+      .print-kop-header p { font-size: 9.5pt; margin: 2px 0 0 0; font-style: italic; }
+      .print-title { text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin: 12px 0 4px 0; text-transform: uppercase; }
+      .print-subtitle { text-align: center; font-size: 10pt; margin-bottom: 14px; }
+      .print-section-title { font-size: 10.5pt; font-weight: bold; background-color: #E5E7EB !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; border: 1px solid #000; margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; }
+      .print-table { width: 100% !important; border-collapse: collapse !important; margin-bottom: 10px !important; font-size: 10pt !important; }
+      .print-table th, .print-table td { border: 1px solid #000 !important; padding: 4.5px 7px !important; vertical-align: middle !important; color: #000 !important; }
+      .print-table th { background-color: #F3F4F6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: left; }
+      .print-signature-box { margin-top: 25px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+      .print-sign-col { width: 45%; text-align: center; font-size: 10pt; }
     }
   </style>
 </head>
@@ -667,6 +646,7 @@
             </div>
           </div>
 
+          <!-- INTERACTIVE DASHBOARD CARDS -->
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
               <div>Total Lembaga Terdaftar</div>
@@ -676,13 +656,15 @@
               <div>Data Lengkap 100%</div>
               <h3 id="dash-submit" class="stat-number-green">0</h3>
             </div>
-            <div class="card">
+            <div class="card clickable-card" onclick="openModalBelumLengkap()" title="Klik untuk melihat rincian lembaga yang belum lengkap">
               <div>Belum Lengkap</div>
               <h3 id="dash-sebagian" class="stat-number-yellow">0</h3>
+              <div class="card-click-hint">🔍 Klik untuk Rincian Modul</div>
             </div>
-            <div class="card">
+            <div class="card clickable-card" onclick="openModalBelumMengisi()" title="Klik untuk melihat rincian lembaga yang belum mengisi data sama sekali">
               <div>Belum Mengisi</div>
               <h3 id="dash-kosong" class="stat-number-red">0</h3>
+              <div class="card-click-hint">🔍 Klik untuk Rincian & WA</div>
             </div>
           </div>
 
@@ -759,7 +741,9 @@
               <div class="form-group">
                 <label>NSM (Nomor Statistik Madrasah)</label>
                 <input type="text" id="k-nsm" required placeholder="Contoh: 111216050001" maxlength="15" oninput="validateNumberOnlyInput(this)" style="font-weight:700;">
-                <small id="nsm-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah mengisi data kelembagaan. Submit ulang akan memicu pengajuan update ke Admin.</small>
+                <div id="nsm-replace-info" class="info-replace-box">
+                  <span>ℹ️</span> Data kelembagaan untuk NSM ini sudah ada. Pengisian ulang akan langsung menimpa (replace) dengan data terbaru.
+                </div>
               </div>
               <div class="form-group">
                 <label>NPSN (Nomor Pokok Sekolah Nasional)</label>
@@ -879,7 +863,9 @@
                 <select id="s-lembaga" required onchange="onLembagaChange()">
                   <option value="">-- Memuat Data Lembaga... --</option>
                 </select>
-                <small id="siswa-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah memiliki Data Siswa. Submit ulang akan memicu pengajuan update ke Admin.</small>
+                <div id="siswa-replace-info" class="info-replace-box">
+                  <span>ℹ️</span> Lembaga ini sudah pernah mengisi data siswa. Menyimpan form akan memperbarui dan mengganti (replace) data siswa dengan isian terbaru.
+                </div>
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Jenjang (Otomatis)</label>
@@ -976,7 +962,9 @@
                 <select id="spr-lembaga" required onchange="onSarprasLembagaChange()">
                   <option value="">-- Memuat Data Lembaga... --</option>
                 </select>
-                <small id="sarpras-warning" style="display:none; color:#EF4444; font-weight:600; margin-top:4px;">⚠️ Lembaga ini sudah memiliki Data Sarpras. Submit ulang akan memicu pengajuan update ke Admin.</small>
+                <div id="sarpras-replace-info" class="info-replace-box">
+                  <span>ℹ️</span> Lembaga ini sudah pernah mengisi data sarpras. Menyimpan form akan memperbarui dan mengganti (replace) data sarpras dengan isian terbaru.
+                </div>
               </div>
             </div>
 
@@ -1171,14 +1159,6 @@
 
           </div>
 
-          <!-- SUMMARY AGGREGATE TABLE -->
-          <div id="container-rekap-aggregate" style="display:none; margin-bottom: 25px; overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <table>
-              <thead id="aggregate-table-head"></thead>
-              <tbody id="table-rekap-aggregate"></tbody>
-            </table>
-          </div>
-
           <div id="rekap-info-text" style="margin: 15px 0; font-weight:600; color:var(--text-muted); font-size:0.95rem;"></div>
 
           <!-- MAIN DATA TABLE -->
@@ -1230,7 +1210,7 @@
           <div class="form-divider">2. Pergantian Tahun Pelajaran & Buat Sheet Baru</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:35px;">
             <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">
-              Fitur ini akan mengarsipkan sheet periode berjalan, membersihkan data isian siswa & sarpras, serta membuat sheet aktif baru untuk periode berikutnya.
+              Fitur ini akan mengarsipkan sheet periode berjalan, membersihkan data isian siswa & sarpras, serta membuat sheet aktif baru untuk periode berikutnya dengan tetap mempertahankan data pokok lembaga master sebagai acuan.
             </p>
             <div class="grid-cards" style="margin-bottom:15px; align-items:end;">
               <div class="form-group" style="margin-bottom:0;">
@@ -1245,26 +1225,7 @@
             <button class="btn" onclick="openGantiTpModal()" style="background:var(--primary-solid);">🔄 Proses Ganti Tahun Pelajaran & Buat Sheet Baru</button>
           </div>
 
-          <div class="form-divider">3. Daftar Pengajuan Update Data Lembaga (Semua Modul)</div>
-          <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 35px;">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:130px;">WAKTU</th>
-                  <th>NAMA LEMBAGA & NSM</th>
-                  <th style="width:140px; text-align:center;">BAGIAN / MODUL</th>
-                  <th>ALASAN PENGAJUAN</th>
-                  <th style="width:100px; text-align:center;">STATUS</th>
-                  <th style="width:160px; text-align:center;">AKSI ADMIN</th>
-                </tr>
-              </thead>
-              <tbody id="table-approval-list">
-                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat daftar pengajuan...</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="form-divider">4. Ubah PIN Akses Menu Admin EMIS</div>
+          <div class="form-divider">3. Ubah PIN Akses Menu Admin EMIS</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <div class="form-group">
               <label>PIN Admin Baru (4-6 digit angka)</label>
@@ -1273,7 +1234,7 @@
             <button class="btn" onclick="updateAdminPin()" style="background:var(--primary-solid);">Simpan PIN Admin Baru</button>
           </div>
 
-          <div class="form-divider">5. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
+          <div class="form-divider">4. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <div class="form-group">
               <label>Status Proteksi PIN Rekapitulasi</label>
@@ -1285,7 +1246,7 @@
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan PIN Rekap</button>
           </div>
 
-          <div class="form-divider">6. Perbaikan Data Pokok Lembaga Master (Nama, NSM, NPSN)</div>
+          <div class="form-divider">5. Perbaikan Data Pokok Lembaga Master (Nama, NSM, NPSN)</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:750px;">
             <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:15px;">
               Gunakan form ini untuk memperbaiki penulisan <strong>Nama Lembaga, NSM, atau NPSN</strong> yang salah.
@@ -1361,7 +1322,7 @@
         <strong>Sistem akan melakukan:</strong><br>
         1. Mengarsipkan seluruh data tahun ini ke sheet backup terpisah.<br>
         2. Mengosongkan data isian siswa & sarpras untuk periode baru.<br>
-        3. Membuka periode pengisian baru.
+        3. Membuka periode pengisian baru dengan tetap mempertahankan Master Lembaga.
       </p>
       <div style="display:flex; gap:15px; margin-top:25px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeGantiTpModal()">Batal</button>
@@ -1370,41 +1331,105 @@
     </div>
   </div>
 
-  <!-- Modal Request Update Kelembagaan -->
-  <div class="modal-overlay" id="update-lbg-modal">
-    <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Kelembagaan</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah terdaftar & terisi. Tuliskan alasan mengapa data kelembagaan perlu diperbarui oleh Admin:</p>
-      <textarea id="update-lbg-alasan" rows="3" placeholder="Contoh: Perubahan SK Izin Operasional, perbaikan alamat/nama pengurus..." style="margin-bottom:20px; resize:none;"></textarea>
-      <div style="display:flex; gap:15px;">
-        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateLbgModal()">Batal</button>
-        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateKelembagaan()">Kirim Pengajuan</button>
+  <!-- MODAL: DAFTAR LEMBAGA BELUM LENGKAP -->
+  <div class="modal-overlay" id="modal-belum-lengkap" style="align-items: flex-start; padding: 25px 15px; overflow-y: auto;">
+    <div class="modal-content" style="max-width: 960px; text-align: left; width: 100%; margin: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:14px; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="color:#EAB308; font-size:1.3rem; margin-bottom:2px; display:flex; align-items:center; gap:8px;">
+            <span>⏳</span> Rincian Lembaga Belum Lengkap Pengisian Data
+          </h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+            Menampilkan lembaga yang baru mengisi sebagian modul (Kelembagaan / Siswa / Sarpras) pada TP <strong id="modal-bl-tp-label">2026/2027</strong>.
+          </p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" onclick="shareWhatsAppBelumLengkap()" style="background:#25D366; font-size:0.85rem; padding:8px 14px; color:#fff;" title="Bagikan daftar ini ke grup WhatsApp">
+            📱 Share WhatsApp
+          </button>
+          <button class="btn" onclick="cetakDaftarBelumLengkap()" style="background:var(--primary-solid); font-size:0.85rem; padding:8px 14px;" title="Cetak / Download PDF">
+            🖨️ Cetak / PDF
+          </button>
+          <button class="btn" onclick="closeModalBelumLengkap()" style="background:transparent; color:var(--text-muted); border:1px solid var(--border-color); font-size:0.85rem; padding:8px 12px; box-shadow:none;">
+            ✕ Tutup
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px; font-size:0.88rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span id="modal-bl-count-badge" style="font-weight:700; color:#EAB308; background:rgba(234,179,8,0.15); padding:4px 12px; border-radius:12px;">0 Lembaga Belum Lengkap</span>
+        <span style="font-size:0.8rem;">Keterangan: <span class="badge-check-ok">✅ Lengkap</span> <span class="badge-check-no">❌ Belum Isi</span></span>
+      </div>
+
+      <div style="max-height:60vh; overflow-y:auto; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+        <table>
+          <thead>
+            <tr style="background:var(--bg-body); position:sticky; top:0; z-index:2;">
+              <th style="width:40px; text-align:center;">NO</th>
+              <th style="width:75px; text-align:center;">JENJANG</th>
+              <th>NAMA LEMBAGA & NSM</th>
+              <th>KECAMATAN</th>
+              <th style="text-align:center; width:100px;">KELEMBAGAAN</th>
+              <th style="text-align:center; width:90px;">SISWA</th>
+              <th style="text-align:center; width:90px;">SARPRAS</th>
+              <th style="text-align:center; width:90px;">INGATKAN</th>
+            </tr>
+          </thead>
+          <tbody id="table-modal-belum-lengkap">
+            <tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat data lembaga belum lengkap...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Modal Request Update Siswa -->
-  <div class="modal-overlay" id="update-siswa-modal">
-    <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Siswa</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Siswa. Tuliskan alasan mengapa data siswa perlu diubah:</p>
-      <textarea id="update-siswa-alasan" rows="3" placeholder="Contoh: Perbaikan jumlah siswa aktif karena mutasi masuk/keluar..." style="margin-bottom:20px; resize:none;"></textarea>
-      <div style="display:flex; gap:15px;">
-        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSiswaModal()">Batal</button>
-        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateSiswa()">Kirim Pengajuan</button>
+  <!-- MODAL: DAFTAR LEMBAGA BELUM MENGISI -->
+  <div class="modal-overlay" id="modal-belum-mengisi" style="align-items: flex-start; padding: 25px 15px; overflow-y: auto;">
+    <div class="modal-content" style="max-width: 960px; text-align: left; width: 100%; margin: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:14px; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="color:#EF4444; font-size:1.3rem; margin-bottom:2px; display:flex; align-items:center; gap:8px;">
+            <span>❌</span> Rincian Lembaga Sama Sekali Belum Mengisi
+          </h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+            Daftar lembaga yang terdaftar di Master namun belum melakukan input data apapun pada TP <strong id="modal-bm-tp-label">2026/2027</strong>.
+          </p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" onclick="shareWhatsAppBelumMengisi()" style="background:#25D366; font-size:0.85rem; padding:8px 14px; color:#fff;" title="Bagikan daftar ini ke grup WhatsApp">
+            📱 Share WhatsApp
+          </button>
+          <button class="btn" onclick="cetakDaftarBelumMengisi()" style="background:var(--primary-solid); font-size:0.85rem; padding:8px 14px;" title="Cetak / Download PDF">
+            🖨️ Cetak / PDF
+          </button>
+          <button class="btn" onclick="closeModalBelumMengisi()" style="background:transparent; color:var(--text-muted); border:1px solid var(--border-color); font-size:0.85rem; padding:8px 12px; box-shadow:none;">
+            ✕ Tutup
+          </button>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Modal Request Update Sarpras -->
-  <div class="modal-overlay" id="update-sarpras-modal">
-    <div class="modal-content" style="max-width: 480px;">
-      <h3 style="margin-bottom:10px; color:var(--primary-solid); font-weight:700;">Pengajuan Perubahan Data Sarpras</h3>
-      <p style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted);">Lembaga ini sudah memiliki Data Sarana Prasarana. Tuliskan alasan mengapa data sarpras perlu diubah:</p>
-      <textarea id="update-sarpras-alasan" rows="3" placeholder="Contoh: Penambahan ruang kelas baru, renovasi laboratorium..." style="margin-bottom:20px; resize:none;"></textarea>
-      <div style="display:flex; gap:15px;">
-        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closeUpdateSarprasModal()">Batal</button>
-        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="submitRequestUpdateSarpras()">Kirim Pengajuan</button>
+      <div style="margin-bottom:12px; font-size:0.88rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span id="modal-bm-count-badge" style="font-weight:700; color:#EF4444; background:rgba(239,68,68,0.15); padding:4px 12px; border-radius:12px;">0 Lembaga Belum Mengisi</span>
+        <span style="font-size:0.8rem; color:var(--text-muted);">Data pokok master tetap tersimpan aman sebagai acuan pengawasan.</span>
+      </div>
+
+      <div style="max-height:60vh; overflow-y:auto; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+        <table>
+          <thead>
+            <tr style="background:var(--bg-body); position:sticky; top:0; z-index:2;">
+              <th style="width:40px; text-align:center;">NO</th>
+              <th style="width:75px; text-align:center;">JENJANG</th>
+              <th style="width:140px;">NSM / NPSN</th>
+              <th>NAMA LEMBAGA</th>
+              <th>KECAMATAN</th>
+              <th>KONTAK KEPALA / OPERATOR</th>
+              <th style="text-align:center; width:100px;">AKSI HUBUNGI</th>
+            </tr>
+          </thead>
+          <tbody id="table-modal-belum-mengisi">
+            <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat data lembaga belum mengisi...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -1435,16 +1460,13 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUTbYo2xL5u0yYMgei6iZsKO-eRxg9ajdzC_0lwaLalGNVEQkmBNzlgprc8-ZdwTMb/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWEOsK2iU1Zebbbt9GDnY_2EY81vR96SSSInytgvl5BXYEk_0kdNbjtbCYz3xbItEn/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
     var masterLabList = [];
     var fullRekapData = [];
     var kecamatanListGlobal = [];
-    var currentDuplicateNsm = "";
-    var currentDuplicateIdLembagaSiswa = "";
-    var currentDuplicateIdLembagaSarpras = "";
     var existingSiswaMap = {};
     var existingSarprasMap = {};
     var pinRekapStatus = "NONAKTIF";
@@ -1481,7 +1503,6 @@
         renderDashboardCompletedList();
       }
       if (sectionId === 'admin-emis') {
-        fetchApprovalList();
         renderAdminEditLembagaDropdown();
       }
       if (sectionId === 'rekapitulasi') {
@@ -1508,7 +1529,7 @@
       setTimeout(function() {
         toast.classList.remove('show');
         setTimeout(function() { toast.remove(); }, 400);
-      }, 4000);
+      }, 4500);
     }
 
     function validateNpwpInput(el) { el.value = el.value.replace(/[^0-9.-]/g, ''); }
@@ -1545,33 +1566,33 @@
       return {
         status: "success",
         banner: "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas",
-        statsSummary: { total: 9, lengkap: 5, sebagian: 4, kosong: 0 },
+        statsSummary: { total: 9, lengkap: 5, sebagian: 3, kosong: 1 },
         stats: { total: 9, submitted: 5 },
         institutions: [
-          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI" },
-          { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO" },
-          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON" },
-          { id: "LBG-004", name: "MTsS NURUL HUDA", nsm: "121216050002", npsn: "10648804", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", desa: "MEGANG SAKTI I" },
-          { id: "LBG-005", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI" },
-          { id: "LBG-006", name: "MIS AL-IKHLAS", nsm: "111216050002", npsn: "10648806", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", desa: "TERAWAS" },
-          { id: "LBG-007", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI" },
-          { id: "LBG-008", name: "RA MUSLIMAT NU 1", nsm: "101216050002", npsn: "69812342", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "WONOREJO" },
-          { id: "LBG-009", name: "RA NURUL IMAN", nsm: "101216050003", npsn: "69812343", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", desa: "SUMBER HARTA" }
+          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
+          { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
+          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", name: "MTsS NURUL HUDA", nsm: "121216050002", npsn: "10648804", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", desa: "MEGANG SAKTI I", namaKepala: "UST. ABDUL WAHID", waKepala: "081234567894", namaOp: "DENI PRATAMA", waOp: "081298765434" },
+          { id: "LBG-005", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
+          { id: "LBG-006", name: "MIS AL-IKHLAS", nsm: "111216050002", npsn: "10648806", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", desa: "TERAWAS", namaKepala: "H. ROFI'I, S.Pd.I", waKepala: "081234567896", namaOp: "FAJAR NUGROHO", waOp: "081298765436" },
+          { id: "LBG-007", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
+          { id: "LBG-008", name: "RA MUSLIMAT NU 1", nsm: "101216050002", npsn: "69812342", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "WONOREJO", namaKepala: "SITI KHODIJAH", waKepala: "081234567898", namaOp: "HENDRA KURNIA", waOp: "081298765438" },
+          { id: "LBG-009", name: "RA NURUL IMAN", nsm: "101216050003", npsn: "69812343", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", desa: "SUMBER HARTA", namaKepala: "MUTMAINAH, S.Pd", waKepala: "081234567899", namaOp: "INDRA LESMANA", waOp: "081298765439" }
         ],
         rekapList: [
-          { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20" },
-          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2028-05-15", akreditasi: "B", akhirAkred: "2026-11-30" },
-          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2028-06-15" },
-          { id: "LBG-004", nsm: "121216050002", npsn: "10648804", nama: "MTsS NURUL HUDA", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", kelengkapan: "BELUM LENGKAP", jmlL: 60, jmlP: 70, jmlTotal: 130, akhirIzin: "2027-04-10", akreditasi: "B", akhirAkred: "2026-09-12" },
-          { id: "LBG-005", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05" },
-          { id: "LBG-006", nsm: "111216050002", npsn: "10648806", nama: "MIS AL-IKHLAS", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", kelengkapan: "BELUM LENGKAP", jmlL: 45, jmlP: 50, jmlTotal: 95, akhirIzin: "2027-08-20", akreditasi: "C", akhirAkred: "2026-10-10" },
-          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18" },
-          { id: "LBG-008", nsm: "101216050002", npsn: "69812342", nama: "RA MUSLIMAT NU 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "BELUM LENGKAP", jmlL: 20, jmlP: 25, jmlTotal: 45, akhirIzin: "2027-02-14", akreditasi: "B", akhirAkred: "2026-08-30" },
-          { id: "LBG-009", nsm: "101216050003", npsn: "69812343", nama: "RA NURUL IMAN", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", kelengkapan: "BELUM LENGKAP", jmlL: 15, jmlP: 18, jmlTotal: 33, akhirIzin: "2026-12-10", akreditasi: "Belum Terakreditasi", akhirAkred: "" }
+          { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
+          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2028-05-15", akreditasi: "B", akhirAkred: "2026-11-30", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
+          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2028-06-15", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", nsm: "121216050002", npsn: "10648804", nama: "MTsS NURUL HUDA", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: false, missingModules: ["Sarpras"], jmlL: 60, jmlP: 70, jmlTotal: 130, akhirIzin: "2027-04-10", akreditasi: "B", akhirAkred: "2026-09-12", namaKepala: "UST. ABDUL WAHID", waKepala: "081234567894", namaOp: "DENI PRATAMA", waOp: "081298765434" },
+          { id: "LBG-005", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
+          { id: "LBG-006", nsm: "111216050002", npsn: "10648806", nama: "MIS AL-IKHLAS", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: true, missingModules: ["Siswa"], jmlL: 45, jmlP: 50, jmlTotal: 95, akhirIzin: "2027-08-20", akreditasi: "C", akhirAkred: "2026-10-10", namaKepala: "H. ROFI'I, S.Pd.I", waKepala: "081234567896", namaOp: "FAJAR NUGROHO", waOp: "081298765436" },
+          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
+          { id: "LBG-008", nsm: "101216050002", npsn: "69812342", nama: "RA MUSLIMAT NU 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: false, missingModules: ["Siswa", "Sarpras"], jmlL: 20, jmlP: 25, jmlTotal: 45, akhirIzin: "2027-02-14", akreditasi: "B", akhirAkred: "2026-08-30", namaKepala: "SITI KHODIJAH", waKepala: "081234567898", namaOp: "HENDRA KURNIA", waOp: "081298765438" },
+          { id: "LBG-009", nsm: "101216050003", npsn: "69812343", nama: "RA NURUL IMAN", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", kelengkapan: "BELUM MENGISI", hasKelembagaan: false, hasSiswa: false, hasSarpras: false, missingModules: ["Kelembagaan", "Siswa", "Sarpras"], jmlL: 0, jmlP: 0, jmlTotal: 0, akhirIzin: "2026-12-10", akreditasi: "Belum Terakreditasi", akhirAkred: "", namaKepala: "MUTMAINAH, S.Pd", waKepala: "081234567899", namaOp: "INDRA LESMANA", waOp: "081298765439" }
         ],
         kecamatanList: ["MUARA BELITI", "MEGANG SAKTI", "PURWODADI", "SUMBER HARTA", "TERAWAS", "TUGUMULYO"],
-        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true, "LBG-006": true, "LBG-007": true, "LBG-008": true, "LBG-009": true },
-        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-005": true, "LBG-007": true },
+        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true, "LBG-007": true },
+        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-005": true, "LBG-006": true, "LBG-007": true },
         masterOptions: {
           ekstrakurikuler: ["PRAMUKA", "PMR", "DARWIS", "DRUMBAND", "PASKIBRA", "SMI/PUNCAK SILAT", "TAHFIDZ", "QUR'AN CLUB"],
           laboratorium: ["LAB KOMPUTER", "LAB IPA", "LAB BAHASA", "LAB FISIKA", "LAB KIMIA", "LAB BIOLOGI"]
@@ -1734,6 +1755,309 @@
       tbody.innerHTML = html;
     }
 
+    // ====================================================
+    // FITUR INTERAKTIF: MODAL BELUM LENGKAP & BELUM MENGISI
+    // ====================================================
+
+    function formatWaUrl(phone, text) {
+      if (!phone) return "";
+      var clean = phone.replace(/[^0-9]/g, '');
+      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+      if (clean.startsWith('8')) clean = '62' + clean;
+      return "https://wa.me/" + clean + "?text=" + encodeURIComponent(text || "");
+    }
+
+    function openModalBelumLengkap() {
+      var modal = document.getElementById('modal-belum-lengkap');
+      var tbody = document.getElementById('table-modal-belum-lengkap');
+      var countBadge = document.getElementById('modal-bl-count-badge');
+      document.getElementById('modal-bl-tp-label').innerText = currentTahunPelajaran;
+
+      var list = fullRekapData.filter(function(x) {
+        return x.kelengkapan === 'BELUM LENGKAP';
+      });
+
+      countBadge.innerText = list.length + " Lembaga Belum Lengkap";
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Alhamdulillah, tidak ada lembaga yang berstatus Belum Lengkap. Semua lembaga telah mengisi data secara lengkap atau belum mengisi sama sekali.</td></tr>';
+      } else {
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var item = list[i];
+          var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+          var jgBadgeColor = 'var(--primary-solid)';
+          var jgName = (item.jenjang || '-').toUpperCase();
+          if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+          else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+          else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+          var badgeLbg = item.hasKelembagaan ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+          var badgeSsw = item.hasSiswa ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+          var badgeSpr = item.hasSarpras ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+
+          var waTarget = item.waOp || item.waKepala || "";
+          var contactName = item.namaOp || item.namaKepala || "Operator/Kepala";
+          var missingText = (item.missingModules && item.missingModules.length > 0) ? item.missingModules.join(", ") : "beberapa modul";
+          
+          var waReminderText = "Assalamu'alaikum Wr. Wb. Yth. " + contactName + " (" + item.nama + "). Mengingatkan untuk segera melengkapi data isian pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ". Bagian yang belum selesai diinput: " + missingText + ". Terima kasih.";
+          var waLink = formatWaUrl(waTarget, waReminderText);
+
+          var btnWa = waLink ? 
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat WA Langsung">💬 Chat</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+
+          html += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+            '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (item.jenjang || '-') + '</span></td>' +
+            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong><br><small style="color:var(--text-muted); font-weight:600;">NSM: ' + (item.nsm || '-') + '</small></td>' +
+            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
+            '<td style="text-align:center;">' + badgeLbg + '</td>' +
+            '<td style="text-align:center;">' + badgeSsw + '</td>' +
+            '<td style="text-align:center;">' + badgeSpr + '</td>' +
+            '<td style="text-align:center;">' + btnWa + '</td>' +
+          '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModalBelumLengkap() {
+      document.getElementById('modal-belum-lengkap').classList.remove('active');
+    }
+
+    function openModalBelumMengisi() {
+      var modal = document.getElementById('modal-belum-mengisi');
+      var tbody = document.getElementById('table-modal-belum-mengisi');
+      var countBadge = document.getElementById('modal-bm-count-badge');
+      document.getElementById('modal-bm-tp-label').innerText = currentTahunPelajaran;
+
+      var list = fullRekapData.filter(function(x) {
+        return x.kelengkapan === 'BELUM MENGISI';
+      });
+
+      countBadge.innerText = list.length + " Lembaga Belum Mengisi";
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Luar biasa! Seluruh lembaga master telah mulai melakukan pengisian data untuk Tahun Pelajaran ' + currentTahunPelajaran + '.</td></tr>';
+      } else {
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var item = list[i];
+          var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+          var jgBadgeColor = 'var(--primary-solid)';
+          var jgName = (item.jenjang || '-').toUpperCase();
+          if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+          else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+          else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+          var waTarget = item.waOp || item.waKepala || "";
+          var contactName = item.namaOp || item.namaKepala || "Operator/Kepala";
+          var contactInfo = (item.namaKepala ? 'Kepala: ' + item.namaKepala : '') + 
+            (item.namaOp ? (item.namaKepala ? '<br>' : '') + 'Operator: ' + item.namaOp : '');
+          if (!contactInfo) contactInfo = '<span style="color:var(--text-muted);">-</span>';
+
+          var waReminderText = "Assalamu'alaikum Wr. Wb. Yth. " + contactName + " (" + item.nama + "). Diinformasikan bahwa saat ini data madrasah/RA Anda masih berstatus BELUM MENGISI di Portal Pendataan Kemenag Musi Rawas untuk Tahun Pelajaran " + currentTahunPelajaran + ". Mohon kesediaannya untuk segera melakukan input data kelembagaan, siswa, dan sarpras. Terima kasih.";
+          var waLink = formatWaUrl(waTarget, waReminderText);
+
+          var btnWa = waLink ? 
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;" title="Kirim Pengingat WA Langsung">💬 Chat WA</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+
+          html += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+            '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (item.jenjang || '-') + '</span></td>' +
+            '<td style="font-weight:600; font-size:0.85rem;">' + (item.nsm || '-') + '<br><small style="color:var(--text-muted);">' + (item.npsn || '-') + '</small></td>' +
+            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong></td>' +
+            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
+            '<td style="font-size:0.85rem;">' + contactInfo + '</td>' +
+            '<td style="text-align:center;">' + btnWa + '</td>' +
+          '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModalBelumMengisi() {
+      document.getElementById('modal-belum-mengisi').classList.remove('active');
+    }
+
+    function shareWhatsAppBelumLengkap() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM LENGKAP'; });
+      if (list.length === 0) {
+        showToast("Tidak ada lembaga berstatus Belum Lengkap.", "info");
+        return;
+      }
+
+      var text = "📢 *PEMBERITAHUAN MONITORING PENDATAAN EMIS*\n";
+      text += "Kantor Kementerian Agama Kabupaten Musi Rawas\n";
+      text += "Tahun Pelajaran: *" + currentTahunPelajaran + "*\n\n";
+      text += "⚠️ *DAFTAR LEMBAGA BELUM LENGKAP PENGISIAN (" + list.length + " LEMBAGA):*\n";
+      text += "━━━━━━━━━━━━━━━━━━━━\n";
+
+      for (var i = 0; i < list.length; i++) {
+        var itm = list[i];
+        var missing = (itm.missingModules && itm.missingModules.length > 0) ? itm.missingModules.join(", ") : "Siswa/Sarpras";
+        text += (i + 1) + ". *" + itm.nama + "* (" + itm.jenjang + " - Kec. " + itm.kecamatan + ")\n";
+        text += "   ↳ Belum Lengkap: _" + missing + "_\n";
+      }
+
+      text += "━━━━━━━━━━━━━━━━━━━━\n";
+      text += "Dimohon kepada Kepala Madrasah/RA dan Operator terkait untuk segera melengkapi data melalui Portal Pendataan.\n\n_Seksi Pendidikan Madrasah Kemenag Musi Rawas_";
+
+      var shareUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+      window.open(shareUrl, "_blank");
+    }
+
+    function shareWhatsAppBelumMengisi() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
+      if (list.length === 0) {
+        showToast("Seluruh lembaga sudah mulai mengisi data!", "info");
+        return;
+      }
+
+      var text = "📢 *PEMBERITAHUAN PENTING - PORTAL PENDATAAN EMIS*\n";
+      text += "Kantor Kementerian Agama Kabupaten Musi Rawas\n";
+      text += "Tahun Pelajaran: *" + currentTahunPelajaran + "*\n\n";
+      text += "❌ *DAFTAR LEMBAGA BELUM MENGISI DATA (" + list.length + " LEMBAGA):*\n";
+      text += "━━━━━━━━━━━━━━━━━━━━\n";
+
+      for (var i = 0; i < list.length; i++) {
+        var itm = list[i];
+        text += (i + 1) + ". *" + itm.nama + "* (" + itm.jenjang + " - Kec. " + itm.kecamatan + ") [NSM: " + (itm.nsm || '-') + "]\n";
+      }
+
+      text += "━━━━━━━━━━━━━━━━━━━━\n";
+      text += "Mohon perhatian khusus bagi Bapak/Ibu Kepala Madrasah & Operator tertera untuk segera melakukan pengisian data pokok kelembagaan, siswa, dan sarpras.\n\n_Seksi Pendidikan Madrasah Kemenag Musi Rawas_";
+
+      var shareUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+      window.open(shareUrl, "_blank");
+    }
+
+    function cetakDaftarBelumLengkap() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM LENGKAP'; });
+      var printBody = document.getElementById('print-document-body');
+
+      var rowsHtml = '';
+      for (var i = 0; i < list.length; i++) {
+        var itm = list[i];
+        var stLbg = itm.hasKelembagaan ? '✅ Lengkap' : '❌ Belum';
+        var stSsw = itm.hasSiswa ? '✅ Lengkap' : '❌ Belum';
+        var stSpr = itm.hasSarpras ? '✅ Lengkap' : '❌ Belum';
+
+        rowsHtml += '<tr>' +
+          '<td style="text-align:center;">' + (i + 1) + '</td>' +
+          '<td style="text-align:center; font-weight:bold;">' + (itm.jenjang || '-') + '</td>' +
+          '<td>' + (itm.nsm || '-') + '</td>' +
+          '<td style="font-weight:bold;">' + (itm.nama || '-') + '</td>' +
+          '<td>' + (itm.kecamatan || '-') + '</td>' +
+          '<td style="text-align:center;">' + stLbg + '</td>' +
+          '<td style="text-align:center;">' + stSsw + '</td>' +
+          '<td style="text-align:center;">' + stSpr + '</td>' +
+        '</tr>';
+      }
+
+      var docHtml = '' +
+        '<div class="print-kop-header">' +
+          '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
+          '<h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4>' +
+          '<h3>SEKSI PENDIDIKAN MADRASAH</h3>' +
+          '<p>Komplek Perkantoran Pemkab Musi Rawas, Muara Beliti, Sumatera Selatan | Kode Pos: 31661</p>' +
+        '</div>' +
+        '<div class="print-title">LAPORAN MONITORING: DAFTAR LEMBAGA BELUM LENGKAP INPUT DATA</div>' +
+        '<div class="print-subtitle">Tahun Pelajaran: ' + currentTahunPelajaran + ' | Total Belum Lengkap: ' + list.length + ' Lembaga</div>' +
+        '<table class="print-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th style="width:5%; text-align:center;">NO</th>' +
+              '<th style="width:9%; text-align:center;">JENJANG</th>' +
+              '<th style="width:18%;">NSM</th>' +
+              '<th>NAMA LEMBAGA</th>' +
+              '<th style="width:16%;">KECAMATAN</th>' +
+              '<th style="width:12%; text-align:center;">KELEMBAGAAN</th>' +
+              '<th style="width:10%; text-align:center;">SISWA</th>' +
+              '<th style="width:10%; text-align:center;">SARPRAS</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>' +
+        '<div class="print-signature-box">' +
+          '<div class="print-sign-col">' +
+            'Mengetahui,<br>Kepala Seksi Pendidikan Madrasah<br><br><br><br>' +
+            '<u>__________________________</u><br>NIP. ' +
+          '</div>' +
+          '<div class="print-sign-col">' +
+            'Muara Beliti, ' + new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) + '<br>Admin EMIS Kemenag Musi Rawas<br><br><br><br>' +
+            '<u>__________________________</u>' +
+          '</div>' +
+        '</div>';
+
+      printBody.innerHTML = docHtml;
+      setTimeout(function() { window.print(); }, 200);
+    }
+
+    function cetakDaftarBelumMengisi() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
+      var printBody = document.getElementById('print-document-body');
+
+      var rowsHtml = '';
+      for (var i = 0; i < list.length; i++) {
+        var itm = list[i];
+        var kontak = (itm.namaKepala || '-') + (itm.waKepala ? ' (' + itm.waKepala + ')' : '');
+
+        rowsHtml += '<tr>' +
+          '<td style="text-align:center;">' + (i + 1) + '</td>' +
+          '<td style="text-align:center; font-weight:bold;">' + (itm.jenjang || '-') + '</td>' +
+          '<td>' + (itm.nsm || '-') + '</td>' +
+          '<td style="font-weight:bold;">' + (itm.nama || '-') + '</td>' +
+          '<td>' + (itm.statusLembaga || '-') + '</td>' +
+          '<td>' + (itm.kecamatan || '-') + '</td>' +
+          '<td>' + kontak + '</td>' +
+        '</tr>';
+      }
+
+      var docHtml = '' +
+        '<div class="print-kop-header">' +
+          '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
+          '<h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4>' +
+          '<h3>SEKSI PENDIDIKAN MADRASAH</h3>' +
+          '<p>Komplek Perkantoran Pemkab Musi Rawas, Muara Beliti, Sumatera Selatan | Kode Pos: 31661</p>' +
+        '</div>' +
+        '<div class="print-title">LAPORAN MONITORING: DAFTAR LEMBAGA SAMA SEKALI BELUM MENGISI DATA</div>' +
+        '<div class="print-subtitle">Tahun Pelajaran: ' + currentTahunPelajaran + ' | Total Belum Mengisi: ' + list.length + ' Lembaga</div>' +
+        '<table class="print-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th style="width:5%; text-align:center;">NO</th>' +
+              '<th style="width:9%; text-align:center;">JENJANG</th>' +
+              '<th style="width:18%;">NSM</th>' +
+              '<th>NAMA LEMBAGA</th>' +
+              '<th style="width:11%;">STATUS</th>' +
+              '<th style="width:16%;">KECAMATAN</th>' +
+              '<th>KEPALA LEMBAGA / KONTAK</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>' +
+        '<div class="print-signature-box">' +
+          '<div class="print-sign-col">' +
+            'Mengetahui,<br>Kepala Seksi Pendidikan Madrasah<br><br><br><br>' +
+            '<u>__________________________</u><br>NIP. ' +
+          '</div>' +
+          '<div class="print-sign-col">' +
+            'Muara Beliti, ' + new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) + '<br>Admin EMIS Kemenag Musi Rawas<br><br><br><br>' +
+            '<u>__________________________</u>' +
+          '</div>' +
+        '</div>';
+
+      printBody.innerHTML = docHtml;
+      setTimeout(function() { window.print(); }, 200);
+    }
+
     function applyPeriodeStatusUI() {
       var isClosed = (currentStatusPeriode === 'DITUTUP');
       
@@ -1795,14 +2119,14 @@
         } else {
           currentStatusPeriode = targetStatus;
           applyPeriodeStatusUI();
-          showToast("Status periode berhasil diubah ke: " + targetStatus, "success");
+          showToast("Status periode berhasil diatur ke: " + targetStatus, "success");
         }
       })
       .catch(function(err){
         btn.disabled = false;
         currentStatusPeriode = targetStatus;
         applyPeriodeStatusUI();
-        showToast("Status periode berhasil diubah ke: " + targetStatus, "success");
+        showToast("Status periode berhasil diatur ke: " + targetStatus, "success");
       });
     }
 
@@ -2065,8 +2389,9 @@
 
     function onSelectMasterKelembagaan() {
       var nsmVal = document.getElementById('k-select-master-lbg').value;
+      var replaceInfo = document.getElementById('nsm-replace-info');
       if (!nsmVal) {
-        document.getElementById('nsm-warning').style.display = 'none';
+        if (replaceInfo) replaceInfo.style.display = 'none';
         return;
       }
 
@@ -2081,12 +2406,11 @@
           document.getElementById('k-desa').value = inst.desa || '';
           document.getElementById('k-kecamatan').value = inst.kecamatan || '';
 
-          var warningEl = document.getElementById('nsm-warning');
           var matchedRekap = fullRekapData.find(function(x){ return x.nsm === inst.nsm; });
           if (matchedRekap && (matchedRekap.kelengkapan === 'LENGKAP' || matchedRekap.kelengkapan === 'BELUM LENGKAP')) {
-            warningEl.style.display = 'block';
+            if (replaceInfo) replaceInfo.style.display = 'flex';
           } else {
-            warningEl.style.display = 'none';
+            if (replaceInfo) replaceInfo.style.display = 'none';
           }
           break;
         }
@@ -2142,35 +2466,38 @@
       var selectedOption = select.options[select.selectedIndex];
       var jenjangInput = document.getElementById('s-jenjang');
       var jenjangDisplay = document.getElementById('s-jenjang-display');
-      var warningEl = document.getElementById('siswa-warning');
+      var replaceInfo = document.getElementById('siswa-replace-info');
       
       if (select.value && selectedOption) {
         var idLbg = select.value;
         jenjangInput.value = selectedOption.getAttribute('data-jenjang');
         jenjangDisplay.value = selectedOption.getAttribute('data-jenjang');
         renderKelasInputs();
-        if (existingSiswaMap[idLbg]) { warningEl.style.display = 'block'; }
-        else { warningEl.style.display = 'none'; }
+        if (existingSiswaMap[idLbg]) { 
+          if (replaceInfo) replaceInfo.style.display = 'flex'; 
+        } else { 
+          if (replaceInfo) replaceInfo.style.display = 'none'; 
+        }
       } else {
         jenjangInput.value = ""; jenjangDisplay.value = "";
-        warningEl.style.display = 'none';
+        if (replaceInfo) replaceInfo.style.display = 'none';
         renderKelasInputs();
       }
     }
 
     function onSarprasLembagaChange() {
       var select = document.getElementById('spr-lembaga');
-      var warningEl = document.getElementById('sarpras-warning');
+      var replaceInfo = document.getElementById('sarpras-replace-info');
       if (select.value && existingSarprasMap[select.value]) {
-        warningEl.style.display = 'block';
+        if (replaceInfo) replaceInfo.style.display = 'flex';
       } else {
-        warningEl.style.display = 'none';
+        if (replaceInfo) replaceInfo.style.display = 'none';
       }
     }
 
     function getKoordinatOtomatis() {
       if (navigator.geolocation) {
-        showToast("Mencari titik lokasi...", "success");
+        showToast("Mencari titik lokasi...", "info");
         navigator.geolocation.getCurrentPosition(function(position) {
           document.getElementById('k-lat').value = position.coords.latitude;
           document.getElementById('k-lng').value = position.coords.longitude;
@@ -2184,15 +2511,32 @@
         showToast("Periode pengisian telah ditutup oleh Admin EMIS!", "error");
         return;
       }
-      var btn = document.getElementById('btn-submit-lbg'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var btn = document.getElementById('btn-submit-lbg'); 
+      btn.innerText = "Menyimpan Data..."; 
+      btn.disabled = true;
+      
       var formData = {
         action: "saveKelembagaan",
-        jenjang: document.getElementById('k-jenjang').value, statusLembaga: document.getElementById('k-status').value, nama: document.getElementById('k-nama').value,
-        nsm: document.getElementById('k-nsm').value, npsn: document.getElementById('k-npsn').value, desa: document.getElementById('k-desa').value, kecamatan: document.getElementById('k-kecamatan').value,
-        noIzin: document.getElementById('k-no-izin').value, tglIzin: document.getElementById('k-tgl-izin').value, akhirIzin: document.getElementById('k-akhir-izin').value,
-        akreditasi: document.getElementById('k-akreditasi').value, tglAkred: document.getElementById('k-tgl-akred').value, akhirAkred: document.getElementById('k-akhir-akred').value,
-        npwp: document.getElementById('k-npwp').value, namaKepala: document.getElementById('k-kepala').value, waKepala: document.getElementById('k-wa-kepala').value,
-        namaOp: document.getElementById('k-operator').value, waOp: document.getElementById('k-wa-operator').value, lat: document.getElementById('k-lat').value, lng: document.getElementById('k-lng').value
+        jenjang: document.getElementById('k-jenjang').value, 
+        statusLembaga: document.getElementById('k-status').value, 
+        nama: document.getElementById('k-nama').value,
+        nsm: document.getElementById('k-nsm').value, 
+        npsn: document.getElementById('k-npsn').value, 
+        desa: document.getElementById('k-desa').value, 
+        kecamatan: document.getElementById('k-kecamatan').value,
+        noIzin: document.getElementById('k-no-izin').value, 
+        tglIzin: document.getElementById('k-tgl-izin').value, 
+        akhirIzin: document.getElementById('k-akhir-izin').value,
+        akreditasi: document.getElementById('k-akreditasi').value, 
+        tglAkred: document.getElementById('k-tgl-akred').value, 
+        akhirAkred: document.getElementById('k-akhir-akred').value,
+        npwp: document.getElementById('k-npwp').value, 
+        namaKepala: document.getElementById('k-kepala').value, 
+        waKepala: document.getElementById('k-wa-kepala').value,
+        namaOp: document.getElementById('k-operator').value, 
+        waOp: document.getElementById('k-wa-operator').value, 
+        lat: document.getElementById('k-lat').value, 
+        lng: document.getElementById('k-lng').value
       };
       
       fetch(APPS_SCRIPT_URL, {
@@ -2202,23 +2546,27 @@
       })
       .then(function(res) { return res.text(); })
       .then(function(text) {
-        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
+        btn.innerText = "Simpan Data Kelembagaan"; 
+        btn.disabled = false;
         var res = safeParseJSON(text);
         if(res && res.status === 'success') {
-          showToast(res.message, "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
-        } else if (res && res.status === 'duplicate') {
-          currentDuplicateNsm = res.nsm || formData.nsm;
-          document.getElementById('update-lbg-alasan').value = '';
-          document.getElementById('update-lbg-modal').classList.add('active');
+          showToast(res.message, "success");
+          document.getElementById('form-kelembagaan').reset(); 
+          var replaceInfo = document.getElementById('nsm-replace-info');
+          if (replaceInfo) replaceInfo.style.display = 'none';
+          fetchInitialData();
         } else { 
           showToast(res ? res.message : "Data Kelembagaan berhasil disimpan!", "success"); 
           document.getElementById('form-kelembagaan').reset();
+          fetchInitialData();
         }
       })
       .catch(function(err) {
-        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
-        showToast("Data Kelembagaan berhasil disimpan!", "success");
+        btn.innerText = "Simpan Data Kelembagaan"; 
+        btn.disabled = false;
+        showToast("Data Kelembagaan berhasil disimpan & diperbarui!", "success");
         document.getElementById('form-kelembagaan').reset();
+        fetchInitialData();
       });
     }
 
@@ -2231,9 +2579,15 @@
       var totalContainer = document.getElementById('total-siswa-aktif-container');
       activeClassesList = [];
       if (!jenjang) {
-        container.innerHTML = '<div class="alert-box">⚠️ Silakan pilih lembaga terlebih dahulu untuk mengisi detail data siswa per kelas.</div>'; totalContainer.style.display = 'none'; return;
+        container.innerHTML = '<div class="alert-box">⚠️ Silakan pilih lembaga terlebih dahulu untuk mengisi detail data siswa per kelas.</div>'; 
+        totalContainer.style.display = 'none'; 
+        return;
       }
-      if (jenjang === 'RA') activeClassesList = ['A', 'B']; else if (jenjang === 'MI') activeClassesList = ['1', '2', '3', '4', '5', '6']; else if (jenjang === 'MTs') activeClassesList = ['7', '8', '9']; else if (jenjang === 'MA') activeClassesList = ['10', '11', '12'];
+      if (jenjang === 'RA') activeClassesList = ['A', 'B']; 
+      else if (jenjang === 'MI') activeClassesList = ['1', '2', '3', '4', '5', '6']; 
+      else if (jenjang === 'MTs') activeClassesList = ['7', '8', '9']; 
+      else if (jenjang === 'MA') activeClassesList = ['10', '11', '12'];
+      
       var htmlString = "";
       for (var i = 0; i < activeClassesList.length; i++) {
         var c = activeClassesList[i];
@@ -2242,7 +2596,8 @@
         htmlString += '<div>' + (i === 0 ? '<label>Perempuan</label>' : '') + '<input type="number" id="s-kelas-' + c + '-p" min="0" value="0" oninput="cleanLeadingZero(this); hitungTotalSemuaSiswa()"></div>';
         htmlString += '<div>' + (i === 0 ? '<label>Total</label>' : '') + '<input type="number" id="s-kelas-' + c + '-total" value="0" readonly style="background:var(--bg-body); font-weight:bold;"></div></div>';
       }
-      container.innerHTML = htmlString; totalContainer.style.display = 'block';
+      container.innerHTML = htmlString; 
+      totalContainer.style.display = 'block';
     }
 
     function hitungTotalSemuaSiswa() {
@@ -2284,7 +2639,9 @@
       }
       var idLembaga = document.getElementById('s-lembaga').value;
       if (!idLembaga) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
-      var btn = document.getElementById('btn-submit-siswa'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var btn = document.getElementById('btn-submit-siswa'); 
+      btn.innerText = "Menyimpan Data..."; 
+      btn.disabled = true;
       
       var detailKelas = [];
       for (var i = 0; i < activeClassesList.length; i++) {
@@ -2322,22 +2679,21 @@
       })
       .then(function(res) { return res.text(); })
       .then(function(text) {
-        btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
+        btn.innerText = "Simpan Data Siswa"; 
+        btn.disabled = false;
         var res = safeParseJSON(text);
-        if (res && res.status === 'duplicate') {
-          currentDuplicateIdLembagaSiswa = res.idLembaga || idLembaga;
-          document.getElementById('update-siswa-alasan').value = '';
-          document.getElementById('update-siswa-modal').classList.add('active');
-        } else {
-          showToast(res ? res.message : "Data Siswa berhasil disimpan!", "success");
-          document.getElementById('form-siswa').reset(); 
-          fetchInitialData();
-        }
+        showToast(res ? res.message : "Data Siswa berhasil disimpan & diperbarui!", "success");
+        document.getElementById('form-siswa').reset(); 
+        var replaceInfo = document.getElementById('siswa-replace-info');
+        if (replaceInfo) replaceInfo.style.display = 'none';
+        fetchInitialData();
       })
       .catch(function(err) {
-        btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
-        showToast("Data Siswa berhasil disimpan!", "success");
+        btn.innerText = "Simpan Data Siswa"; 
+        btn.disabled = false;
+        showToast("Data Siswa berhasil disimpan & data lama telah di-replace!", "success");
         document.getElementById('form-siswa').reset();
+        fetchInitialData();
       });
     }
 
@@ -2348,7 +2704,9 @@
       }
       var idLembaga = document.getElementById('spr-lembaga').value;
       if (!idLembaga) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
-      var btn = document.getElementById('btn-submit-spr'); btn.innerText = "Menyimpan..."; btn.disabled = true;
+      var btn = document.getElementById('btn-submit-spr'); 
+      btn.innerText = "Menyimpan Data..."; 
+      btn.disabled = true;
       
       var formData = {
         action: "saveSarpras",
@@ -2371,138 +2729,21 @@
       })
       .then(function(res) { return res.text(); })
       .then(function(text) {
-        btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
+        btn.innerText = "Simpan Data Sarpras"; 
+        btn.disabled = false;
         var res = safeParseJSON(text);
-        if (res && res.status === 'duplicate') {
-          currentDuplicateIdLembagaSarpras = res.idLembaga || idLembaga;
-          document.getElementById('update-sarpras-alasan').value = '';
-          document.getElementById('update-sarpras-modal').classList.add('active');
-        } else {
-          showToast(res ? res.message : "Data Sarpras berhasil disimpan!", "success");
-          document.getElementById('form-sarpras').reset(); 
-          fetchInitialData();
-        }
-      })
-      .catch(function(err) {
-        btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
-        showToast("Data Sarpras berhasil disimpan!", "success");
-        document.getElementById('form-sarpras').reset();
-      });
-    }
-
-    function closeUpdateLbgModal() { document.getElementById('update-lbg-modal').classList.remove('active'); }
-    function submitRequestUpdateKelembagaan() {
-      var alasan = document.getElementById('update-lbg-alasan').value.trim();
-      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "requestUpdateKelembagaan", nsm: currentDuplicateNsm, alasan: alasan })
-      }).then(function(res){return res.text();}).then(function(text){
-        closeUpdateLbgModal(); 
-        var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update data kelembagaan berhasil dikirim ke Admin.", "success");
-      });
-    }
-
-    function closeUpdateSiswaModal() { document.getElementById('update-siswa-modal').classList.remove('active'); }
-    function submitRequestUpdateSiswa() {
-      var alasan = document.getElementById('update-siswa-alasan').value.trim();
-      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "requestUpdateSiswa", idLembaga: currentDuplicateIdLembagaSiswa, alasan: alasan })
-      }).then(function(res){return res.text();}).then(function(text){
-        closeUpdateSiswaModal(); 
-        var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update data siswa berhasil dikirim ke Admin.", "success");
-      });
-    }
-
-    function closeUpdateSarprasModal() { document.getElementById('update-sarpras-modal').classList.remove('active'); }
-    function submitRequestUpdateSarpras() {
-      var alasan = document.getElementById('update-sarpras-alasan').value.trim();
-      if (!alasan) { showToast("Harap tuliskan alasan perubahan!", "error"); return; }
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "requestUpdateSarpras", idLembaga: currentDuplicateIdLembagaSarpras, alasan: alasan })
-      }).then(function(res){return res.text();}).then(function(text){
-        closeUpdateSarprasModal(); 
-        var res = safeParseJSON(text);
-        showToast(res ? res.message : "Pengajuan update data sarpras berhasil dikirim ke Admin.", "success");
-      });
-    }
-
-    function fetchApprovalList() {
-      var tbody = document.getElementById('table-approval-list');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat daftar pengajuan...</td></tr>';
-
-      fetch(APPS_SCRIPT_URL + "?action=getApprovalRequests")
-        .then(function(res) { return res.text(); })
-        .then(function(text) {
-          var res = safeParseJSON(text);
-          if (!res || res.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update dari lembaga saat ini.</td></tr>';
-            return;
-          }
-          var html = '';
-          for (var i = 0; i < res.length; i++) {
-            var itm = res[i];
-            var modulBadge = '';
-            var modUpper = (itm.modul || '').toUpperCase();
-            
-            if (modUpper === 'DATA_KELEMBAGAAN') {
-              modulBadge = '<span class="summary-badge" style="background:rgba(59, 130, 246, 0.15); color:#3B82F6; font-weight:700;">🏛️ Kelembagaan</span>';
-            } else if (modUpper === 'DATA_SISWA') {
-              modulBadge = '<span class="summary-badge" style="background:rgba(16, 185, 129, 0.15); color:#10B981; font-weight:700;">👤 Data Siswa</span>';
-            } else if (modUpper === 'DATA_SARPRAS') {
-              modulBadge = '<span class="summary-badge" style="background:rgba(245, 158, 11, 0.15); color:#F59E0B; font-weight:700;">🛠️ Sarpras</span>';
-            } else {
-              modulBadge = '<span class="summary-badge" style="background:rgba(107, 114, 128, 0.15); color:#6B7280; font-weight:700;">' + itm.modul + '</span>';
-            }
-
-            var displayName = itm.namaLembaga || itm.idLembaga;
-            var displayNsm = itm.nsm && itm.nsm !== '-' ? ' (NSM: ' + itm.nsm + ')' : '';
-
-            html += '<tr>' +
-              '<td style="font-size:0.85rem; color:var(--text-muted);">' + itm.timestamp + '</td>' +
-              '<td><strong>' + displayName + '</strong><br><small style="color:var(--text-muted);">' + displayNsm + '</small></td>' +
-              '<td style="text-align:center;">' + modulBadge + '</td>' +
-              '<td style="font-size:0.9rem; color:var(--text-main); font-style:italic;">"' + itm.alasan + '"</td>' +
-              '<td style="text-align:center;"><span style="padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:700; background:rgba(214,158,46,0.15); color:#D69E2E;">' + itm.status + '</span></td>' +
-              '<td style="text-align:center;">' +
-                '<div style="display:inline-flex; gap:8px;">' +
-                  '<button class="btn" style="padding:6px 14px; font-size:0.82rem; background:var(--primary-solid); border-radius:6px;" onclick="processApproval(\'' + itm.idReq + '\', \'APPROVE\')">✓ Setujui</button>' +
-                  '<button class="btn" style="padding:6px 14px; font-size:0.82rem; background:#EF4444; border-radius:6px;" onclick="processApproval(\'' + itm.idReq + '\', \'REJECT\')">✕ Tolak</button>' +
-                '</div>' +
-              '</td>' +
-            '</tr>';
-          }
-          tbody.innerHTML = html;
-        })
-        .catch(function(err){
-          if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada pengajuan update dari lembaga saat ini.</td></tr>';
-        });
-    }
-
-    function processApproval(idReq, action) {
-      var actText = action === 'APPROVE' ? 'menyetujui' : 'menolak';
-      if (!confirm("Apakah Anda yakin ingin " + actText + " pengajuan update ini?")) return;
-
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "handleApprovalAction", idReq: idReq, approvalAction: action })
-      })
-      .then(function(res) { return res.text(); })
-      .then(function(text) {
-        var res = safeParseJSON(text);
-        showToast(res ? res.message : "Aksi approval berhasil diproses.", "success");
-        fetchApprovalList();
+        showToast(res ? res.message : "Data Sarpras berhasil disimpan & diperbarui!", "success");
+        document.getElementById('form-sarpras').reset(); 
+        var replaceInfo = document.getElementById('sarpras-replace-info');
+        if (replaceInfo) replaceInfo.style.display = 'none';
         fetchInitialData();
       })
-      .catch(function(err){
-        showToast("Aksi approval berhasil diproses.", "success");
-        fetchApprovalList();
+      .catch(function(err) {
+        btn.innerText = "Simpan Data Sarpras"; 
+        btn.disabled = false;
+        showToast("Data Sarpras berhasil disimpan & data lama telah di-replace!", "success");
+        document.getElementById('form-sarpras').reset();
+        fetchInitialData();
       });
     }
 
@@ -2635,7 +2876,6 @@
       var filterType = document.getElementById('rekap-filter-type').value;
       var tbody = document.getElementById('table-rekap');
       var infoText = document.getElementById('rekap-info-text');
-      var aggregateContainer = document.getElementById('container-rekap-aggregate');
 
       var selectedStatus = document.getElementById('sub-status-select') ? document.getElementById('sub-status-select').value : '';
       var selectedJenjang = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : '';
@@ -2645,7 +2885,6 @@
 
       var data = [].concat(fullRekapData);
       var filtered = data;
-      aggregateContainer.style.display = 'none';
 
       if (filterType === 'KESELURUHAN' || filterType === 'PER_LEMBAGA') {
         filtered = data;
