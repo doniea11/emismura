@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seksi Pendidikan Madrasah - Kemenag Musi Rawas</title>
   
-  <!-- Font Poppins, Fredoka (Bubble Font), & Font Kaligrafi Etnik Jawa -->
+  <!-- Google Fonts: Poppins, Fredoka (Bubble Font), & Font Kaligrafi Etnik Jawa (Yatra One, Metamorphous, Rozha One) -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Yatra+One&family=Metamorphous&family=Rozha+One&display=swap" rel="stylesheet">
   
   <!-- SheetJS untuk Export Excel (.xlsx) -->
@@ -60,7 +60,7 @@
     .banner { 
       background-color: var(--primary-solid); 
       color: #FFFFFF; 
-      padding: 10px 20px; 
+      padding: 9px 20px; 
       font-size: 13.5px; 
       font-weight: 500; 
       display: flex;
@@ -72,31 +72,34 @@
     }
     .banner marquee { font-weight: 500; letter-spacing: 0.3px; display: flex; align-items: center; }
 
-    /* Desain Tipografi Bergaya Aksara Jawa (Huruf Latin Terbaca Bahasa Indonesia) */
+    /* Desain Tipografi Aksara Jawa Samakan dengan @2026 by masdonie */
     .aksara-jawa-style-text {
-      font-family: 'Yatra One', 'Metamorphous', 'Rozha One', 'Poppins', serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #FFF67E;
-      letter-spacing: 1.1px;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+      font-family: 'Yatra One', 'Metamorphous', 'Rozha One', 'Poppins', serif !important;
+      font-size: 0.95rem !important;
+      font-weight: 700 !important;
+      font-style: italic !important;
+      letter-spacing: 0.6px !important;
+      color: #FFF67E !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
     .aksara-ornament {
-      font-size: 1.25rem;
-      color: #FFE552;
+      font-family: 'Yatra One', 'Metamorphous', 'Rozha One', serif !important;
+      font-size: 1.15rem !important;
+      color: #FFF67E !important;
+      font-style: normal !important;
       opacity: 0.95;
     }
     .aksara-jawa-badge {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.22);
-      padding: 5px 18px;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px 18px;
       border-radius: 25px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     /* Topbar Header */
@@ -138,7 +141,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       
-      /* Animasi Cahaya Berjalan Dibuat Lambat & Halus (8 Detik) */
+      /* Animasi Cahaya Berjalan Pelan & Halus (8 Detik) */
       animation: shimmerLightSweep 8s ease-in-out infinite;
       
       /* Efek 3D Menggelembung (Bubble & Depth Drop-Shadow) */
@@ -167,15 +170,9 @@
     }
 
     @keyframes shimmerLightSweep {
-      0% {
-        background-position: 220% 0;
-      }
-      40% {
-        background-position: -220% 0;
-      }
-      100% {
-        background-position: -220% 0;
-      }
+      0% { background-position: 220% 0; }
+      40% { background-position: -220% 0; }
+      100% { background-position: -220% 0; }
     }
 
     .topbar-center .sublogo { 
@@ -491,11 +488,11 @@
       <span>📢</span>
       <marquee id="marquee-text" scrollamount="6">
         <span class="aksara-jawa-badge">
-          <span class="aksara-ornament">꧁ ꧅</span>
-          <span class="aksara-jawa-style-text">
+          <span class="aksara-ornament">꧁</span>
+          <span class="aksara-jawa-style-text" id="marquee-text-content">
             Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas
           </span>
-          <span class="aksara-ornament">꧅ ꧂</span>
+          <span class="aksara-ornament">꧂</span>
         </span>
       </marquee>
     </div>
@@ -1295,7 +1292,7 @@
 
   <script>
     // URL Web App Google Apps Script
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLB8nbfYOhlefBWhsAkzzxo-9U7CwLSOvfcEXYyMQIa6C5Zx7M6nEpoQj6HmHiNRhl/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAzQNWhsTbUvydHVLJOsqmulH4gDbKJn9LxpzpZM6bsd_OVtMnIWrTVg6lrZpLx-vv/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1475,7 +1472,20 @@
         .then(function(res) { return res.json(); })
         .then(function(res) {
           if(res.status === 'success') {
-            if (res.banner) document.getElementById('marquee-text').innerText = res.banner;
+            var marqueeContainer = document.getElementById('marquee-text');
+            var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
+            
+            // Format kata RA/Madrasah menjadi 'RA dan Madrasah' jika masih berformat lama dari spreadsheet
+            var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
+
+            if (marqueeContainer) {
+              marqueeContainer.innerHTML = '<span class="aksara-jawa-badge">' +
+                '<span class="aksara-ornament">꧁</span>' +
+                '<span class="aksara-jawa-style-text" id="marquee-text-content">' + cleanBannerText + '</span>' +
+                '<span class="aksara-ornament">꧂</span>' +
+              '</span>';
+            }
+            
             document.getElementById('dash-total').innerText = res.stats.total;
             document.getElementById('dash-submit').innerText = res.statsSummary.lengkap;
             document.getElementById('dash-sebagian').innerText = res.statsSummary.sebagian;
