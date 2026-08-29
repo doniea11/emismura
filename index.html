@@ -267,7 +267,7 @@
     .sidebar { 
       width: 260px; 
       background-color: var(--sidebar-bg); 
-      padding: 24px 16px 8px 16px; 
+      padding: 24px 16px 6px 16px; 
       display: flex; 
       flex-direction: column; 
       justify-content: space-between; 
@@ -303,18 +303,19 @@
       margin-top: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding-top: 14px;
+      align-items: center;
+      justify-content: center;
+      padding-top: 10px;
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       margin-bottom: 0;
       padding-bottom: 0;
     }
     .watermark-donie { 
       font-family: 'Yatra One', 'Metamorphous', 'Rozha One', 'Poppins', serif;
-      font-size: 0.84rem; 
+      font-size: 0.72rem; 
       font-weight: 700;
       font-style: italic;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.6px;
       color: #FFF67E; 
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
       display: flex;
@@ -322,22 +323,9 @@
       justify-content: center;
       text-align: center;
       width: 100%;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
-    .kemenag-brand-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      color: #FFFFFF;
-      font-size: 0.88rem;
-      font-weight: 600;
-    }
-    .kemenag-brand-box img {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
+      gap: 5px;
+      margin-bottom: 0px;
+      opacity: 0.92;
     }
 
     /* Content Area */
@@ -561,10 +549,6 @@
         </div>
 
         <div class="sidebar-bottom">
-          <div class="kemenag-brand-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Logo_Kementerian_Agama_Republik_Indonesia.png" alt="Kemenag Logo" onerror="this.style.display='none'">
-            <span>Kementerian Agama</span>
-          </div>
           <div class="watermark-donie">
             <span>꧁</span> @2026 by masdonie <span>꧂</span>
           </div>
@@ -605,8 +589,6 @@
               <h3 id="dash-kosong">-</h3>
             </div>
           </div>
-          
-          <div id="dashboard-ews-container" style="margin-top: 25px;"></div>
         </section>
 
         <!-- SECTION: INPUT KELEMBAGAAN -->
@@ -1265,7 +1247,7 @@
 
   <script>
     // URL Web App Google Apps Script
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmXwL7Gnh982wgRCDBBSZVSWzQkvCgiCHhnylRbwdXCmddlBi4KPeOSMDlZAjTNEip/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNYzOQo2Pg28HRnyIaYwDC20_N-KaBvarJNkoksEkEhBglXGwtLM-r_-2AzHXZRJCP/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1668,7 +1650,7 @@
         if (globalInstitutions.length === 0) {
           selectSarpras.innerHTML = '<option value="">-- Belum ada lembaga terdaftar --</option>';
         } else {
-          var html = '<option value="">-- Pilih Lembaga --</option>';
+          var html = '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
           for (var i = 0; i < globalInstitutions.length; i++) {
             var inst = globalInstitutions[i];
             html += '<option value="' + inst.id + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
@@ -2009,8 +1991,7 @@
 
     function checkAndRenderEwsAlerts() {
       var containerRekap = document.getElementById('rekap-ews-container');
-      var containerDash = document.getElementById('dashboard-ews-container');
-      if (!containerRekap && !containerDash) return;
+      if (!containerRekap) return;
 
       var now = new Date();
       var sixMonthsAhead = new Date();
@@ -2041,14 +2022,14 @@
       if (expiringIzin.length > 0 || expiringAkred.length > 0) {
         ewsHtml += '<div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); padding:20px; border-radius:var(--radius-sm); margin-bottom:20px;">' +
           '<div style="font-weight:700; color:#EF4444; font-size:1rem; margin-bottom:10px; display:flex; align-items:center; gap:8px;">' +
-            '⚠️ PERINGATAN DINI (EARLY WARNING SYSTEM) - KEDALUWARSA &lt; 6 BULAN' +
+            '⚠️ EARLY WARNING SYSTEM - EXPIRATION DATE &lt; 6 BULAN' +
           '</div>';
 
         if (expiringIzin.length > 0) {
           ewsHtml += '<div style="margin-bottom:10px; font-weight:600; color:var(--text-main); font-size:0.9rem;">📜 Izin Operasional Mendekati / Lewat Masa Berlaku (' + expiringIzin.length + ' Lembaga):</div><ul style="padding-left:20px; font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">';
           for (var a = 0; a < expiringIzin.length; a++) {
             var itmIz = expiringIzin[a];
-            ewsHtml += '<li><strong>' + itmIz.name + '</strong> (NSM: ' + itmIz.nsm + ') - Habis: <span style="color:' + (itmIz.expired ? '#EF4444' : '#D69E2E') + '; font-weight:700;">' + itmIz.tgl + (itmIz.expired ? ' (KEDALUWARSA)' : '') + '</span></li>';
+            ewsHtml += '<li><strong>' + itmIz.name + '</strong> (NSM: ' + itmIz.nsm + ') - Habis: <span style="color:' + (itmIz.expired ? '#EF4444' : '#D69E2E') + '; font-weight:700;">' + itmIz.tgl + (itmIz.expired ? ' (EXPIRATION DATE)' : '') + '</span></li>';
           }
           ewsHtml += '</ul>';
         }
@@ -2057,7 +2038,7 @@
           ewsHtml += '<div style="margin-bottom:10px; font-weight:600; color:var(--text-main); font-size:0.9rem;">🎖️ Akreditasi Mendekati / Lewat Masa Berlaku (' + expiringAkred.length + ' Lembaga):</div><ul style="padding-left:20px; font-size:0.85rem; color:var(--text-muted);">';
           for (var b = 0; b < expiringAkred.length; b++) {
             var itmAk = expiringAkred[b];
-            ewsHtml += '<li><strong>' + itmAk.name + '</strong> (' + itmAk.akred + ' - NSM: ' + itmAk.nsm + ') - Habis: <span style="color:' + (itmAk.expired ? '#EF4444' : '#D69E2E') + '; font-weight:700;">' + itmAk.tgl + (itmAk.expired ? ' (KEDALUWARSA)' : '') + '</span></li>';
+            ewsHtml += '<li><strong>' + itmAk.name + '</strong> (' + itmAk.akred + ' - NSM: ' + itmAk.nsm + ') - Habis: <span style="color:' + (itmAk.expired ? '#EF4444' : '#D69E2E') + '; font-weight:700;">' + itmAk.tgl + (itmAk.expired ? ' (EXPIRATION DATE)' : '') + '</span></li>';
           }
           ewsHtml += '</ul>';
         }
@@ -2065,8 +2046,7 @@
         ewsHtml += '</div>';
       }
 
-      if (containerRekap) containerRekap.innerHTML = ewsHtml;
-      if (containerDash) containerDash.innerHTML = ewsHtml;
+      containerRekap.innerHTML = ewsHtml;
     }
 
     function renderKecamatanSubFilters() {
