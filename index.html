@@ -577,7 +577,7 @@
                 </tr>
               </thead>
               <tbody id="table-approval-list">
-                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada daftar pengajuan.</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Memuat daftar pengajuan...</td></tr>
               </tbody>
             </table>
           </div>
@@ -659,7 +659,7 @@
 
   <script>
     // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG BERAKHIRAN /exec
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrl_HG0Q3Fr4bmZVLH6BHwer9OHhXjSOsAjzWJLXi1cOoorXD5FQsIHGkhjPCnKv7/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzv9gcRseMFoSCiFxl5pkN-3mfIGwtdfhvo8I2A-cDv7MTEpL-lAGO5jnQQH6lfbsOT/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -764,6 +764,7 @@
       })
       .catch(function(err) {
         btn.innerText = "Masuk";
+        showToast("Gagal memverifikasi PIN", "error");
       });
     }
 
@@ -781,8 +782,7 @@
           showToast(res.message, "success");
           document.getElementById('admin-new-pin').value = '';
         } else { showToast(res.message, "error"); }
-      })
-      .catch(function(err){});
+      });
     }
 
     function fetchInitialData() {
@@ -826,7 +826,7 @@
           }
         })
         .catch(function(err) {
-          // Diamkan error background non-kritis agar tidak mengganggu UI utama
+          showToast("Gagal memuat data dari server", "error");
         });
     }
 
@@ -854,8 +854,7 @@
             '</tr>';
           }
           tbody.innerHTML = html;
-        })
-        .catch(function(err){});
+        });
     }
 
     function processApproval(idReq, action) {
@@ -869,8 +868,7 @@
         showToast(res.message, res.status === 'success' ? 'success' : 'error');
         fetchApprovalList();
         fetchInitialData();
-      })
-      .catch(function(err){});
+      });
     }
 
     function onRekapFilterChange() {
@@ -1115,10 +1113,6 @@
           document.getElementById('update-siswa-alasan').value = '';
           document.getElementById('update-siswa-modal').classList.add('active');
         } else { showToast(res.message, "error"); }
-      })
-      .catch(function(err){
-        btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
-        showToast("Gagal menyimpan data", "error");
       });
     }
 
@@ -1148,10 +1142,6 @@
           document.getElementById('update-sarpras-alasan').value = '';
           document.getElementById('update-sarpras-modal').classList.add('active');
         } else { showToast(res.message, "error"); }
-      })
-      .catch(function(err){
-        btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
-        showToast("Gagal menyimpan data", "error");
       });
     }
 
@@ -1167,8 +1157,7 @@
       .then(function(res) { return res.json(); })
       .then(function(res) {
         closeUpdateLbgModal(); showToast(res.message, "success");
-      })
-      .catch(function(err){});
+      });
     }
 
     function closeUpdateSiswaModal() { document.getElementById('update-siswa-modal').classList.remove('active'); }
@@ -1183,8 +1172,7 @@
       .then(function(res) { return res.json(); })
       .then(function(res) {
         closeUpdateSiswaModal(); showToast(res.message, "success");
-      })
-      .catch(function(err){});
+      });
     }
 
     function closeUpdateSarprasModal() { document.getElementById('update-sarpras-modal').classList.remove('active'); }
@@ -1199,8 +1187,7 @@
       .then(function(res) { return res.json(); })
       .then(function(res) {
         closeUpdateSarprasModal(); showToast(res.message, "success");
-      })
-      .catch(function(err){});
+      });
     }
 
     function exportExcel() {
@@ -1213,7 +1200,7 @@
           var headers = ["NSM", "NPSN", "NAMA LEMBAGA", "STATUS", "KECAMATAN", "DESA", "SK IZIN", "TGL IZIN", "AKHIR IZIN", "AKREDITASI", "NPWP", "KEPALA", "WA KEPALA", "OPERATOR", "WA OPERATOR", "LAT", "LNG", "S. LAKI", "S. PEREMPUAN", "TOT. SISWA", "TOT. ALUMNI", "STATUS TDK LULUS", "GEDUNG", "R. KEPALA", "R. GURU", "R. KELAS", "T. GURU", "T. SISWA", "EKSTRA", "LAB"];
           for (var k in dataByJenjang) { dataByJenjang[k].push(headers); }
           for(var i=0; i<res.length; i++) {
-            if (dataByJenjang[res[i].jenjang]) dataByJenjang[res[i].jenjang].push(res[i].data);
+            if (dataByJersey[res[i].jenjang]) dataByJenjang[res[i].jenjang].push(res[i].data);
           }
           var wb = XLSX.utils.book_new();
           for (var jg in dataByJenjang) {
@@ -1222,9 +1209,6 @@
           }
           XLSX.writeFile(wb, "Data_Madrasah_Musi_Rawas.xlsx");
           showToast("Export Excel berhasil diunduh!", "success");
-        })
-        .catch(function(err){
-          showToast("Gagal mengexport file Excel", "error");
         });
     }
   </script>
