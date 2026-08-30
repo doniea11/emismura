@@ -491,28 +491,28 @@
         top: 0 !important;
         width: 100% !important;
         margin: 0 !important;
-        padding: 12mm 15mm !important;
+        padding: 10mm 12mm !important;
         background: #FFFFFF !important;
         color: #000000 !important;
         font-family: 'Times New Roman', Times, serif !important;
-        font-size: 11pt !important;
+        font-size: 10pt !important;
         line-height: 1.35 !important;
         box-sizing: border-box !important;
       }
       .no-print, .app-wrapper, .modal-overlay, #toast-container { display: none !important; }
-      @page { size: A4 portrait; margin: 10mm 12mm; }
-      .print-kop-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 14px; }
+      @page { size: A4 landscape; margin: 8mm 10mm; }
+      .print-kop-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 12px; }
       .print-kop-header h4 { font-size: 11pt; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
       .print-kop-header h3 { font-size: 13pt; font-weight: bold; margin: 2px 0; text-transform: uppercase; }
       .print-kop-header p { font-size: 9.5pt; margin: 2px 0 0 0; font-style: italic; }
-      .print-title { text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin: 12px 0 4px 0; text-transform: uppercase; }
-      .print-subtitle { text-align: center; font-size: 10pt; margin-bottom: 14px; }
-      .print-section-title { font-size: 10.5pt; font-weight: bold; background-color: #E5E7EB !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; border: 1px solid #000; margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; }
-      .print-table { width: 100% !important; border-collapse: collapse !important; margin-bottom: 10px !important; font-size: 10pt !important; }
-      .print-table th, .print-table td { border: 1px solid #000 !important; padding: 4.5px 7px !important; vertical-align: middle !important; color: #000 !important; }
-      .print-table th { background-color: #F3F4F6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: left; }
-      .print-signature-box { margin-top: 25px; display: flex; justify-content: space-between; page-break-inside: avoid; }
-      .print-sign-col { width: 45%; text-align: center; font-size: 10pt; }
+      .print-title { text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin: 10px 0 4px 0; text-transform: uppercase; }
+      .print-subtitle { text-align: center; font-size: 9.5pt; margin-bottom: 12px; }
+      .print-section-title { font-size: 10pt; font-weight: bold; background-color: #E5E7EB !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 4px 8px; border: 1px solid #000; margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; }
+      .print-table { width: 100% !important; border-collapse: collapse !important; margin-bottom: 10px !important; font-size: 9.5pt !important; }
+      .print-table th, .print-table td { border: 1px solid #000 !important; padding: 4px 6px !important; vertical-align: middle !important; color: #000 !important; }
+      .print-table th { background-color: #F3F4F6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: left; font-weight: bold; }
+      .print-signature-box { margin-top: 20px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+      .print-sign-col { width: 45%; text-align: center; font-size: 9.5pt; }
     }
   </style>
 </head>
@@ -997,9 +997,10 @@
                   <option value="PER_LEMBAGA">📄 9. REKAP & CETAK PER LEMBAGA</option>
                 </select>
               </div>
-              <div class="form-group" style="margin-bottom:0; display:flex; gap:10px;">
-                <button class="btn" onclick="window.print()" style="flex:1; background:var(--bg-container); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none;">🖨️ Cetak</button>
-                <button class="btn" onclick="exportExcel()" style="flex:1; background:var(--primary-solid); box-shadow:none;">📥 Export Excel (.xlsx)</button>
+              <div class="form-group" style="margin-bottom:0; display:flex; flex-wrap:wrap; gap:8px;">
+                <button type="button" class="btn" onclick="cetakTabelRekapitulasi()" style="flex:1; min-width:120px; background:var(--bg-container); color:var(--text-main); border: 1px solid var(--border-color); box-shadow:none; font-weight:600;" title="Cetak khusus lembaran isi tabel rekapitulasi">🖨️ Print</button>
+                <button type="button" class="btn" onclick="exportPdfRekapitulasi()" style="flex:1; min-width:130px; background:#DC2626; color:#fff; box-shadow:none; font-weight:600;" title="Simpan sebagai dokumen PDF resmi">📄 Export PDF</button>
+                <button type="button" class="btn" onclick="exportExcel()" style="flex:1; min-width:140px; background:var(--primary-solid); color:#fff; box-shadow:none; font-weight:600;" title="Export tabel ke file Microsoft Excel (.xlsx)">📥 Export Excel</button>
               </div>
             </div>
 
@@ -1121,7 +1122,7 @@
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                  <button class="btn" onclick="cetakProfilLembagaTerpilih()" style="width:100%; background:var(--primary-solid); font-weight:700;">🖨️ Cetak Lembar Profil Lembaga</button>
+                  <button type="button" class="btn" onclick="cetakProfilLembagaTerpilih()" style="width:100%; background:var(--primary-solid); font-weight:700;">🖨️ Cetak Lembar Profil Lembaga</button>
                 </div>
               </div>
             </div>
@@ -1200,13 +1201,16 @@
             <button class="btn" onclick="updateAdminPin()" style="background:var(--primary-solid);">Simpan PIN Admin Baru</button>
           </div>
 
-          <div class="form-divider">4. Ubah PIN Akses Menu Rekapitulasi</div>
+          <div class="form-divider">4. Ubah PIN Akses Menu Rekapitulasi & Fitur Terproteksi</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+              PIN ini berlaku untuk membuka akses <strong>Menu Rekapitulasi</strong> dan seluruh <strong>fitur terproteksi lainnya</strong> (seperti melihat rincian lembaga Belum Lengkap & Belum Mengisi di Dashboard).
+            </p>
             <div class="form-group">
-              <label>PIN Rekapitulasi Baru (4-6 digit angka)</label>
+              <label>PIN Rekapitulasi / Fitur Terbatas Baru (4-6 digit angka)</label>
               <input type="password" id="rekap-new-pin" placeholder="••••" maxlength="6" style="background:var(--bg-container); font-size:1.2rem; font-weight:bold; letter-spacing:4px;">
             </div>
-            <button class="btn" onclick="updateRekapPin()" style="background:var(--primary-solid);">Simpan PIN Rekapitulasi Baru</button>
+            <button class="btn" onclick="updateRekapPin()" style="background:var(--primary-solid);">Simpan PIN Baru</button>
           </div>
 
           <div class="form-divider">5. Pengaturan Keamanan PIN Menu Rekapitulasi</div>
@@ -1215,7 +1219,7 @@
               <label>Status Proteksi PIN Rekapitulasi</label>
               <select id="admin-pin-rekap-select" style="background:var(--bg-container); font-weight:600;">
                 <option value="NONAKTIF">🔓 NONAKTIF (Bebas diakses tanpa PIN)</option>
-                <option value="AKTIF">🔒 AKTIF (Wajib memasukkan PIN Rekapitulasi)</option>
+                <option value="AKTIF">🔒 AKTIF (Wajib memasukkan PIN)</option>
               </select>
             </div>
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan Proteksi PIN</button>
@@ -1232,7 +1236,8 @@
   <!-- PIN Modal -->
   <div class="modal-overlay" id="pin-modal">
     <div class="modal-content">
-      <h3 id="pin-modal-title" style="margin-bottom:25px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3>
+      <h3 id="pin-modal-title" style="margin-bottom:8px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3>
+      <p id="pin-modal-desc" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Silakan masukkan PIN untuk melanjutkan.</p>
       <input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing: 12px; font-weight:700; font-size:1.5rem; background: var(--bg-body);" onkeydown="handlePinKeydown(event)">
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button>
@@ -1361,12 +1366,13 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZJeLHYLk06MN6o2wBjF-LLpJnfQDGZ3RfwPOn-94JNFPPTa5LHAxMJKXuHXs-Kqul/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPgjojqI13MD5hTHSCxi_mM4VkxEdf0DwcV-tkvkrmNfbHIuUwetS67Zy-Ye__yGC8/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
     var masterLabList = [];
     var fullRekapData = [];
+    var currentFilteredData = [];
     var kecamatanListGlobal = [];
     var existingSiswaMap = {};
     var existingSarprasMap = {};
@@ -1443,363 +1449,24 @@
     function openPinModal(target) {
       pinModalTarget = target || 'admin-emis';
       var titleEl = document.getElementById('pin-modal-title');
+      var descEl = document.getElementById('pin-modal-desc');
+      
       if (pinModalTarget === 'rekapitulasi') {
-        titleEl.innerText = "🔒 Masukkan PIN Rekapitulasi";
+        titleEl.innerText = "🔒 Akses Rekapitulasi";
+        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk membuka halaman laporan data.";
       } else if (pinModalTarget === 'modal-belum-lengkap') {
         titleEl.innerText = "🔒 Otorisasi: Data Belum Lengkap";
+        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk melihat rincian lembaga yang belum lengkap.";
       } else if (pinModalTarget === 'modal-belum-mengisi') {
         titleEl.innerText = "🔒 Otorisasi: Data Belum Mengisi";
+        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk melihat rincian lembaga yang belum mengisi.";
       } else {
         titleEl.innerText = "⚙️ Otorisasi Admin EMIS";
+        if (descEl) descEl.innerText = "Masukkan PIN khusus Administrator EMIS.";
       }
       document.getElementById('pin-input').value = '';
       document.getElementById('pin-modal').classList.add('active');
       setTimeout(function() { document.getElementById('pin-input').focus(); }, 100);
-    }
-
-    function closePinModal() { document.getElementById('pin-modal').classList.remove('active'); }
-    function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
-
-    function safeParseJSON(text) {
-      try {
-        return JSON.parse(text);
-      } catch (err) {
-        return null;
-      }
-    }
-
-    function getFallbackPreviewData() {
-      return {
-        status: "success",
-        banner: "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas",
-        statsSummary: { total: 9, lengkap: 5, sebagian: 3, kosong: 1 },
-        stats: { total: 9, submitted: 5 },
-        institutions: [
-          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
-          { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
-          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
-          { id: "LBG-004", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
-          { id: "LBG-005", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" }
-        ],
-        rekapList: [
-          { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20" },
-          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2026-11-15", akreditasi: "B", akhirAkred: "2026-06-30", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
-          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2026-05-01", akreditasi: "A", akhirAkred: "2026-12-15", namaOp: "CITRA LESTARI", waOp: "081298765433" },
-          { id: "LBG-004", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05" },
-          { id: "LBG-005", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2026-04-10", akreditasi: "B", akhirAkred: "2026-05-18", namaOp: "GITA PERTIWI", waOp: "081298765437" }
-        ],
-        kecamatanList: ["MUARA BELITI", "PURWODADI", "TUGUMULYO"],
-        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true },
-        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true },
-        masterOptions: {
-          ekstrakurikuler: ["PRAMUKA", "PMR", "DARWIS", "DRUMBAND"],
-          laboratorium: ["LAB KOMPUTER", "LAB IPA", "LAB BAHASA"]
-        },
-        pinRekapStatus: "NONAKTIF",
-        statusPeriode: "DIBUKA",
-        tahunPelajaran: "2026/2027",
-        isAllCompleted: false
-      };
-    }
-
-    function fetchInitialData() {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(function(res) {
-            handleInitialDataResponse(res);
-          })
-          .withFailureHandler(function(err) {
-            var fallback = getFallbackPreviewData();
-            handleInitialDataResponse(fallback);
-          })
-          .getInitialDataObj();
-        return;
-      }
-
-      fetch(APPS_SCRIPT_URL + "?action=getInitialData")
-        .then(function(res) { return res.text(); })
-        .then(function(text) {
-          var res = safeParseJSON(text);
-          if (res) {
-            handleInitialDataResponse(res);
-          } else {
-            var fallbackData = getFallbackPreviewData();
-            handleInitialDataResponse(fallbackData);
-          }
-        })
-        .catch(function(err) {
-          var fallbackData = getFallbackPreviewData();
-          handleInitialDataResponse(fallbackData);
-        });
-    }
-
-    function handleInitialDataResponse(res) {
-      if(!res || res.status !== 'success') {
-        if(res && res.message) showToast(res.message, "error");
-        return;
-      }
-
-      var marqueeContainer = document.getElementById('marquee-text');
-      var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
-      var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
-
-      if (marqueeContainer) {
-        marqueeContainer.innerHTML = '<span class="aksara-jawa-badge">' +
-          '<span class="aksara-ornament">꧁</span>' +
-          '<span class="aksara-jawa-style-text" id="marquee-text-content">' + cleanBannerText + '</span>' +
-          '<span class="aksara-ornament">꧂</span>' +
-        '</span>';
-      }
-      
-      var stats = res.stats || {};
-      var statsSummary = res.statsSummary || {};
-      
-      document.getElementById('dash-total').innerText = stats.total !== undefined ? stats.total : (statsSummary.total || 0);
-      document.getElementById('dash-submit').innerText = statsSummary.lengkap !== undefined ? statsSummary.lengkap : (stats.submitted || 0);
-      document.getElementById('dash-sebagian').innerText = statsSummary.sebagian !== undefined ? statsSummary.sebagian : 0;
-      document.getElementById('dash-kosong').innerText = statsSummary.kosong !== undefined ? statsSummary.kosong : 0;
-      
-      globalInstitutions = res.institutions || [];
-      masterEkstraList = (res.masterOptions && res.masterOptions.ekstrakurikuler) ? res.masterOptions.ekstrakurikuler : [];
-      masterLabList = (res.masterOptions && res.masterOptions.laboratorium) ? res.masterOptions.laboratorium : [];
-      fullRekapData = res.rekapList || [];
-      kecamatanListGlobal = res.kecamatanList || [];
-      existingSiswaMap = res.existingSiswaMap || {};
-      existingSarprasMap = res.existingSarprasMap || {};
-      
-      currentStatusPeriode = res.statusPeriode || "DIBUKA";
-      currentTahunPelajaran = res.tahunPelajaran || "2026/2027";
-      isAllInstitutionsCompleted = res.isAllCompleted || false;
-      
-      document.getElementById('badge-tp-display').innerText = "TP: " + currentTahunPelajaran;
-      document.getElementById('label-tp-siswa').innerText = currentTahunPelajaran;
-      document.getElementById('admin-cur-tp-input').value = currentTahunPelajaran;
-
-      if (res.pinRekapStatus) {
-        pinRekapStatus = res.pinRekapStatus;
-        var pinSelect = document.getElementById('admin-pin-rekap-select');
-        if (pinSelect) pinSelect.value = pinRekapStatus;
-      }
-      
-      applyPeriodeStatusUI();
-      renderDashboardCompletedList();
-      renderMasterLembagaDropdown();
-      renderLembagaDropdowns();
-      renderSarprasDropdowns();
-      renderKecamatanSubFilters();
-      renderPerLembagaDropdown();
-      onJenjangFilterChange();
-      renderRekapTable();
-      checkAndRenderEwsAlerts();
-    }
-
-    function renderDashboardCompletedList() {
-      var tbody = document.getElementById('table-dashboard-completed');
-      var badgeCount = document.getElementById('dash-completed-count');
-      if (!tbody) return;
-
-      var completedList = fullRekapData.filter(function(item) {
-        return item.kelengkapan === "LENGKAP";
-      });
-
-      if (badgeCount) {
-        badgeCount.innerText = completedList.length + " Lembaga Selesai";
-      }
-
-      if (completedList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Belum ada lembaga yang menyelesaikan seluruh pengisian data.</td></tr>';
-        return;
-      }
-
-      var jenjangPriority = { "MA": 1, "MTS": 2, "MI": 3, "RA": 4 };
-
-      completedList.sort(function(a, b) {
-        var jgA = (a.jenjang || "").toUpperCase().trim();
-        var jgB = (b.jenjang || "").toUpperCase().trim();
-        var prioA = jenjangPriority[jgA] !== undefined ? jenjangPriority[jgA] : 99;
-        var prioB = jenjangPriority[jgB] !== undefined ? jenjangPriority[jgB] : 99;
-
-        if (prioA !== prioB) {
-          return prioA - prioB;
-        }
-
-        var nsmA = String(a.nsm || "").trim();
-        var nsmB = String(b.nsm || "").trim();
-        return nsmA.localeCompare(nsmB, undefined, { numeric: true });
-      });
-
-      var html = '';
-      for (var i = 0; i < completedList.length; i++) {
-        var row = completedList[i];
-        var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
-        var jgBadgeColor = 'var(--primary-solid)';
-        var jgName = (row.jenjang || '-').toUpperCase().trim();
-
-        if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
-        else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
-        else if (jgName === 'MI') { jgBadgeBg = 'rgba(0, 192, 90, 0.15)'; jgBadgeColor = 'var(--primary-solid)'; }
-        else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
-
-        html += '<tr>' +
-          '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
-          '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (row.jenjang || '-') + '</span></td>' +
-          '<td style="font-weight:600; letter-spacing:0.5px;">' + (row.nsm || '-') + '</td>' +
-          '<td style="font-weight:700; color:var(--text-main);">' + (row.nama || '-') + '</td>' +
-          '<td><span style="display:inline-flex; align-items:center; gap:4px;">📍 ' + (row.kecamatan || '-') + '</span></td>' +
-          '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid); font-weight:700;">✅ LENGKAP</span></td>' +
-        '</tr>';
-      }
-      tbody.innerHTML = html;
-    }
-
-    function formatMissingModulesText(missingModules) {
-      if (!missingModules || missingModules.length === 0) return "Kelembagaan, Siswa, dan Sarana Prasarana";
-      var mapped = missingModules.map(function(m) {
-        if (m === "Sarpras") return "Sarana Prasarana";
-        return m;
-      });
-      if (mapped.length === 1) return mapped[0];
-      if (mapped.length === 2) return mapped[0] + " dan " + mapped[1];
-      return mapped.slice(0, -1).join(", ") + ", dan " + mapped[mapped.length - 1];
-    }
-
-    function formatWaUrl(phone, text) {
-      if (!phone) return "";
-      var clean = phone.replace(/[^0-9]/g, '');
-      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
-      if (clean.startsWith('8')) clean = '62' + clean;
-      return "https://wa.me/" + clean + "?text=" + encodeURIComponent(text || "");
-    }
-
-    function openModalBelumLengkap() {
-      var modal = document.getElementById('modal-belum-lengkap');
-      var tbody = document.getElementById('table-modal-belum-lengkap');
-      document.getElementById('modal-bl-tp-label').innerText = currentTahunPelajaran;
-
-      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM LENGKAP'; });
-
-      if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Semua lembaga telah mengisi lengkap.</td></tr>';
-      } else {
-        var html = '';
-        for (var i = 0; i < list.length; i++) {
-          var item = list[i];
-          var badgeLbg = item.hasKelembagaan ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
-          var badgeSsw = item.hasSiswa ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
-          var badgeSpr = item.hasSarpras ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
-          var missingText = formatMissingModulesText(item.missingModules);
-
-          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
-            "Kepada Yth. Operator " + item.nama + "\n" +
-            "Mohon segera melengkapi data pada Portal Pendataan Kemenag Musi Rawas TP " + currentTahunPelajaran + " pada bagian " + missingText + ".\n" +
-            "Terima kasih.";
-
-          var waLink = formatWaUrl(item.waOp, waReminderText);
-          var btnWa = waLink ? '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;">💬 Chat WA</a>' : '-';
-
-          html += '<tr>' +
-            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
-            '<td style="text-align:center;">' + (item.jenjang || '-') + '</td>' +
-            '<td><strong>' + (item.nama || '-') + '</strong><br><small style="color:var(--text-muted);">NSM: ' + (item.nsm || '-') + '</small></td>' +
-            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
-            '<td style="text-align:center;">' + badgeLbg + '</td>' +
-            '<td style="text-align:center;">' + badgeSsw + '</td>' +
-            '<td style="text-align:center;">' + badgeSpr + '</td>' +
-            '<td style="text-align:center;">' + btnWa + '</td>' +
-          '</tr>';
-        }
-        tbody.innerHTML = html;
-      }
-      modal.classList.add('active');
-    }
-
-    function closeModalBelumLengkap() { document.getElementById('modal-belum-lengkap').classList.remove('active'); }
-
-    function openModalBelumMengisi() {
-      var modal = document.getElementById('modal-belum-mengisi');
-      var tbody = document.getElementById('table-modal-belum-mengisi');
-      document.getElementById('modal-bm-tp-label').innerText = currentTahunPelajaran;
-
-      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
-
-      if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Seluruh lembaga telah mulai melakukan pengisian data.</td></tr>';
-      } else {
-        var html = '';
-        for (var i = 0; i < list.length; i++) {
-          var item = list[i];
-          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
-            "Kepada Yth. Operator " + item.nama + "\n" +
-            "Mohon segera mengisi data pada Portal Pendataan Kemenag Musi Rawas TP " + currentTahunPelajaran + ".\n" +
-            "Terima kasih.";
-
-          var waLink = formatWaUrl(item.waOp, waReminderText);
-          var btnWa = waLink ? '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;">💬 Chat WA</a>' : '-';
-
-          html += '<tr>' +
-            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
-            '<td style="text-align:center;">' + (item.jenjang || '-') + '</td>' +
-            '<td>' + (item.nsm || '-') + '<br><small style="color:var(--text-muted);">' + (item.npsn || '-') + '</small></td>' +
-            '<td><strong>' + (item.nama || '-') + '</strong></td>' +
-            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
-            '<td style="font-size:0.85rem;">' + (item.namaOp || '-') + ' (' + (item.waOp || '-') + ')</td>' +
-            '<td style="text-align:center;">' + btnWa + '</td>' +
-          '</tr>';
-        }
-        tbody.innerHTML = html;
-      }
-      modal.classList.add('active');
-    }
-
-    function closeModalBelumMengisi() { document.getElementById('modal-belum-mengisi').classList.remove('active'); }
-
-    function applyPeriodeStatusUI() {
-      var isClosed = (currentStatusPeriode === 'DITUTUP');
-      document.getElementById('dashboard-periode-alert').style.display = isClosed ? 'flex' : 'none';
-      document.getElementById('form-lbg-closed-alert').style.display = isClosed ? 'flex' : 'none';
-      document.getElementById('form-siswa-closed-alert').style.display = isClosed ? 'flex' : 'none';
-      document.getElementById('form-spr-closed-alert').style.display = isClosed ? 'flex' : 'none';
-
-      document.getElementById('btn-submit-lbg').disabled = isClosed;
-      document.getElementById('btn-submit-siswa').disabled = isClosed;
-      document.getElementById('btn-submit-spr').disabled = isClosed;
-
-      var badge = document.getElementById('admin-periode-status-badge');
-      var btnToggle = document.getElementById('btn-toggle-tutup-periode');
-
-      if (isClosed) {
-        badge.innerText = "DITUTUP (Pengisian Dikunci)";
-        badge.style.background = "rgba(239, 68, 68, 0.15)";
-        badge.style.color = "#EF4444";
-        btnToggle.innerText = "🔓 Buka Kembali Periode Pengisian";
-        btnToggle.style.background = "var(--primary-solid)";
-      } else {
-        badge.innerText = "DIBUKA (Bebas Input)";
-        badge.style.background = "rgba(0, 192, 90, 0.15)";
-        badge.style.color = "var(--primary-solid)";
-        btnToggle.innerText = "🔒 Tutup Periode Pengisian";
-        btnToggle.style.background = "#EF4444";
-      }
-    }
-
-    function togglePeriodeAction() {
-      var targetStatus = (currentStatusPeriode === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus })
-      })
-      .then(function(res){ return res.text(); })
-      .then(function(text){
-        currentStatusPeriode = targetStatus;
-        applyPeriodeStatusUI();
-        showToast("Status periode berhasil diatur ke: " + targetStatus, "success");
-      })
-      .catch(function(err){
-        currentStatusPeriode = targetStatus;
-        applyPeriodeStatusUI();
-        showToast("Status periode berhasil diatur ke: " + targetStatus, "success");
-      });
     }
 
     function verifyPinSubmit() {
@@ -1842,30 +1509,16 @@
       });
     }
 
-    function updateAdminPin() {
-      var newPin = document.getElementById('admin-new-pin').value;
-      if (!newPin || newPin.length < 4) { showToast("PIN baru minimal 4 digit!", "error"); return; }
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "setAdminPin", newPin: newPin })
-      })
-      .then(function() {
-        showToast("PIN Admin berhasil diperbarui!", "success");
-        document.getElementById('admin-new-pin').value = '';
-      });
-    }
-
     function updateRekapPin() {
       var newPin = document.getElementById('rekap-new-pin').value;
-      if (!newPin || newPin.length < 4) { showToast("PIN Rekapitulasi baru minimal 4 digit!", "error"); return; }
+      if (!newPin || newPin.length < 4) { showToast("PIN baru minimal 4 digit!", "error"); return; }
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "setRekapPin", newPin: newPin })
       })
       .then(function() {
-        showToast("PIN Rekapitulasi berhasil diperbarui!", "success");
+        showToast("PIN Rekapitulasi & Fitur Terbatas berhasil diperbarui!", "success");
         document.getElementById('rekap-new-pin').value = '';
       });
     }
@@ -2477,6 +2130,8 @@
         filtered = filtered.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
       }
 
+      currentFilteredData = filtered;
+
       var sumL = 0, sumP = 0, sumTotal = 0;
       for (var s = 0; s < filtered.length; s++) {
         sumL += (filtered[s].jmlL || 0);
@@ -2517,6 +2172,100 @@
       tbody.innerHTML = html;
     }
 
+    // ====================================================
+    // CETAK KHUSUS LEMBARAN ISI REKAPITULASI (PRINT & PDF)
+    // ====================================================
+    function preparePrintDocumentTable(titleSuffix) {
+      var printBody = document.getElementById('print-document-body');
+      var filtered = (currentFilteredData && currentFilteredData.length > 0) ? currentFilteredData : fullRekapData;
+      
+      var sumL = 0, sumP = 0, sumTotal = 0;
+      var rowsHtml = '';
+
+      for (var i = 0; i < filtered.length; i++) {
+        var itm = filtered[i];
+        sumL += (itm.jmlL || 0);
+        sumP += (itm.jmlP || 0);
+        sumTotal += (itm.jmlTotal || 0);
+
+        rowsHtml += '<tr>' +
+          '<td style="text-align:center;">' + (i + 1) + '</td>' +
+          '<td style="text-align:center; font-weight:bold;">' + (itm.jenjang || '-') + '</td>' +
+          '<td>' + (itm.nsm || '-') + '</td>' +
+          '<td>' + (itm.npsn || '-') + '</td>' +
+          '<td style="font-weight:bold;">' + (itm.nama || '-') + '</td>' +
+          '<td>' + (itm.statusLembaga || '-') + '</td>' +
+          '<td>' + (itm.kecamatan || '-') + '</td>' +
+          '<td style="text-align:right;">' + (itm.jmlL || 0).toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right;">' + (itm.jmlP || 0).toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:right; font-weight:bold;">' + (itm.jmlTotal || 0).toLocaleString('id-ID') + '</td>' +
+          '<td style="text-align:center; font-weight:bold;">' + (itm.kelengkapan || '-') + '</td>' +
+        '</tr>';
+      }
+
+      var currentDateStr = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+      var docHtml = '' +
+        '<div class="print-kop-header">' +
+          '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
+          '<h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4>' +
+          '<h3>SEKSI PENDIDIKAN MADRASAH</h3>' +
+          '<p>Komplek Perkantoran Pemkab Musi Rawas, Muara Beliti, Sumatera Selatan | Kode Pos: 31661</p>' +
+        '</div>' +
+        '<div class="print-title">LEMBAR LAPORAN REKAPITULASI DATA RA DAN MADRASAH</div>' +
+        '<div class="print-subtitle">Tahun Pelajaran: ' + currentTahunPelajaran + (titleSuffix ? ' | ' + titleSuffix : '') + ' | Total Lembaga: ' + filtered.length + ' Lembaga</div>' +
+        '<table class="print-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th style="width:4%; text-align:center;">NO</th>' +
+              '<th style="width:7%; text-align:center;">JENJANG</th>' +
+              '<th style="width:13%;">NSM</th>' +
+              '<th style="width:9%;">NPSN</th>' +
+              '<th>NAMA LEMBAGA</th>' +
+              '<th style="width:9%;">STATUS</th>' +
+              '<th style="width:13%;">KECAMATAN</th>' +
+              '<th style="width:6%; text-align:right;">L</th>' +
+              '<th style="width:6%; text-align:right;">P</th>' +
+              '<th style="width:8%; text-align:right;">TOTAL</th>' +
+              '<th style="width:12%; text-align:center;">STATUS</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            rowsHtml +
+            '<tr style="background:#E5E7EB; font-weight:bold;">' +
+              '<td colspan="7" style="text-align:center;">TOTAL KESELURUHAN</td>' +
+              '<td style="text-align:right;">' + sumL.toLocaleString('id-ID') + '</td>' +
+              '<td style="text-align:right;">' + sumP.toLocaleString('id-ID') + '</td>' +
+              '<td style="text-align:right;">' + sumTotal.toLocaleString('id-ID') + '</td>' +
+              '<td style="text-align:center;">' + filtered.length + ' Lembaga</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<div class="print-signature-box">' +
+          '<div class="print-sign-col">' +
+            'Mengetahui,<br>Kepala Seksi Pendidikan Madrasah<br><br><br><br>' +
+            '<u>__________________________</u><br>NIP. ' +
+          '</div>' +
+          '<div class="print-sign-col">' +
+            'Muara Beliti, ' + currentDateStr + '<br>Admin EMIS Kemenag Musi Rawas<br><br><br><br>' +
+            '<u>__________________________</u>' +
+          '</div>' +
+        '</div>';
+
+      printBody.innerHTML = docHtml;
+    }
+
+    function cetakTabelRekapitulasi() {
+      preparePrintDocumentTable("Laporan Rekapitulasi");
+      setTimeout(function() { window.print(); }, 200);
+    }
+
+    function exportPdfRekapitulasi() {
+      preparePrintDocumentTable("Export Dokumen PDF");
+      showToast("Menyiapkan lembaran PDF... Pilih 'Save as PDF' / 'Simpan sebagai PDF' pada jendela cetak", "info");
+      setTimeout(function() { window.print(); }, 300);
+    }
+
     function openProfilLembagaModal(idLembaga, autoPrint) {
       var modal = document.getElementById('modal-preview-profil');
       var container = document.getElementById('profil-preview-content');
@@ -2543,18 +2292,39 @@
       var k = res.kelembagaan || {};
       var s = res.siswa || {};
       var p = res.sarpras || {};
+      var tp = res.tahunPelajaran || currentTahunPelajaran;
 
       var docHtml = '' +
         '<div class="print-kop-header">' +
           '<h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4>' +
-          '<h3>SEKSI PENDIDIKAN MADRASAH KABUPATEN MUSI RAWAS</h3>' +
+          '<h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4>' +
+          '<h3>SEKSI PENDIDIKAN MADRASAH</h3>' +
+          '<p>Komplek Perkantoran Pemkab Musi Rawas, Muara Beliti, Sumatera Selatan | Kode Pos: 31661</p>' +
         '</div>' +
-        '<div class="print-title">LEMBAR PROFIL LEMBAGA: ' + (k.nama || '-') + '</div>' +
+        '<div class="print-title">LEMBAR REKAPITULASI PROFIL LEMBAGA: ' + (k.nama || '-') + '</div>' +
+        '<div class="print-subtitle">Tahun Pelajaran: ' + tp + '</div>' +
+        '<div class="print-section-title">I. DATA IDENTITAS KELEMBAGAAN</div>' +
         '<table class="print-table">' +
-          '<tr><th>NSM / NPSN</th><td>' + (k.nsm || '-') + ' / ' + (k.npsn || '-') + '</td><th>Jenjang / Status</th><td>' + (k.jenjang || '-') + ' / ' + (k.statusLembaga || '-') + '</td></tr>' +
-          '<tr><th>Kecamatan</th><td>' + (k.kecamatan || '-') + '</td><th>Kepala / Operator</th><td>' + (k.namaKepala || '-') + ' / ' + (k.namaOp || '-') + '</td></tr>' +
-          '<tr><th>Total Siswa</th><td>' + (s.totalSiswa || 0) + ' Siswa</td><th>Total Bangunan Gedung</th><td>' + (p.jumlahGedung || 0) + ' Unit</td></tr>' +
-        '</table>';
+          '<tr><th style="width:25%;">NSM / NPSN</th><td>' + (k.nsm || '-') + ' / ' + (k.npsn || '-') + '</td><th style="width:25%;">Jenjang / Status</th><td>' + (k.jenjang || '-') + ' / ' + (k.statusLembaga || '-') + '</td></tr>' +
+          '<tr><th>Kecamatan / Desa</th><td>' + (k.kecamatan || '-') + ' / ' + (k.desa || '-') + '</td><th>Kepala / Operator</th><td>' + (k.namaKepala || '-') + ' / ' + (k.namaOp || '-') + '</td></tr>' +
+          '<tr><th>SK Izin Operasional</th><td>' + (k.noIzin || '-') + ' (' + (k.tglIzin || '-') + ' s.d ' + (k.akhirIzin || '-') + ')</td><th>Akreditasi</th><td>' + (k.akreditasi || 'Belum Terakreditasi') + ' (s.d ' + (k.akhirAkred || '-') + ')</td></tr>' +
+        '</table>' +
+        '<div class="print-section-title">II. DATA SISWA & SARPRAS</div>' +
+        '<table class="print-table">' +
+          '<tr><th>Total Siswa Aktif</th><td>L: ' + (s.totalL || 0) + ' | P: ' + (s.totalP || 0) + ' | <strong>Total: ' + (s.totalSiswa || 0) + ' Siswa</strong></td><th>Alumni / Kelulusan</th><td>Total Alumni: ' + (s.alumniTotal || 0) + ' | Status: ' + (s.tidakLulus || 'Semua Lulus') + '</td></tr>' +
+          '<tr><th>Bangunan Gedung</th><td>' + (p.jumlahGedung || 0) + ' Unit | Ruang Kelas: ' + (p.ruangKelas || 0) + '</td><th>Toilet Guru / Siswa</th><td>Guru: ' + (p.toiletGuru || 0) + ' | Siswa: ' + (p.toiletSiswa || 0) + '</td></tr>' +
+          '<tr><th>Ekstrakurikuler</th><td>' + (p.listEkstrakurikuler || 'TIDAK ADA') + '</td><th>Laboratorium</th><td>' + (p.listLaboratorium || 'TIDAK ADA') + '</td></tr>' +
+        '</table>' +
+        '<div class="print-signature-box">' +
+          '<div class="print-sign-col">' +
+            'Mengetahui,<br>Pengawas Madrasah Pembina<br><br><br><br>' +
+            '<u>__________________________</u><br>NIP. ' +
+          '</div>' +
+          '<div class="print-sign-col">' +
+            'Muara Beliti, ' + new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) + '<br>Kepala ' + (k.nama || 'Madrasah') + '<br><br><br><br>' +
+            '<u>' + (k.namaKepala || '...........................................') + '</u>' +
+          '</div>' +
+        '</div>';
 
       container.innerHTML = docHtml;
       printBody.innerHTML = docHtml;
@@ -2566,7 +2336,9 @@
 
     function exportExcel() {
       if (typeof XLSX === 'undefined') { showToast("Library Excel belum siap!", "error"); return; }
-      var dataToExport = fullRekapData.map(function(item, idx) {
+      var dataToUse = (currentFilteredData && currentFilteredData.length > 0) ? currentFilteredData : fullRekapData;
+      
+      var dataToExport = dataToUse.map(function(item, idx) {
         return {
           "NO": idx + 1,
           "NSM": item.nsm || "-",
@@ -2575,15 +2347,17 @@
           "JENJANG": item.jenjang || "-",
           "STATUS": item.statusLembaga || "-",
           "KECAMATAN": item.kecamatan || "-",
+          "SISWA LAKI-LAKI": item.jmlL || 0,
+          "SISWA PEREMPUAN": item.jmlP || 0,
           "TOTAL SISWA": item.jmlTotal || 0,
-          "KELENGKAPAN": item.kelengkapan || "BELUM MENGISI"
+          "STATUS KELENGKAPAN": item.kelengkapan || "BELUM MENGISI"
         };
       });
       var ws = XLSX.utils.json_to_sheet(dataToExport);
       var wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi");
-      XLSX.writeFile(wb, "Rekapitulasi_Madrasah_Musi_Rawas.xlsx");
-      showToast("Berhasil export Excel!", "success");
+      XLSX.writeFile(wb, "Rekapitulasi_Madrasah_Musi_Rawas_" + currentTahunPelajaran.replace('/', '_') + ".xlsx");
+      showToast("Berhasil export Excel (.xlsx)!", "success");
     }
   </script>
 </body>
