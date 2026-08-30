@@ -1365,7 +1365,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYZ3dooGnguA3xmzjNHFzjmCsL1ZfWJcz3U1J-FawZ5OAa35pzvLeLzt4CjUXBirJb/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzygMPssL9a74PJSzvIn_qTPLNkzE4RZtHcK8weNadILBv5iwkRlnW6TiSq8C-WOxlK/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
 
     var globalInstitutions = [];
@@ -1520,7 +1520,7 @@
           { id: "LBG-004", nsm: "121216050002", npsn: "10648804", nama: "MTsS NURUL HUDA", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: false, missingModules: ["Sarpras"], jmlL: 60, jmlP: 70, jmlTotal: 130, akhirIzin: "2027-04-10", akreditasi: "B", akhirAkred: "2026-09-12", namaKepala: "UST. ABDUL WAHID", waKepala: "081234567894", namaOp: "DENI PRATAMA", waOp: "081298765434" },
           { id: "LBG-005", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
           { id: "LBG-006", nsm: "111216050002", npsn: "10648806", nama: "MIS AL-IKHLAS", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: true, missingModules: ["Siswa"], jmlL: 45, jmlP: 50, jmlTotal: 95, akhirIzin: "2027-08-20", akreditasi: "C", akhirAkred: "2026-10-10", namaKepala: "H. ROFI'I, S.Pd.I", waKepala: "081234567896", namaOp: "FAJAR NUGROHO", waOp: "081298765436" },
-          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
+          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
           { id: "LBG-008", nsm: "101216050002", npsn: "69812342", nama: "RA MUSLIMAT NU 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: false, missingModules: ["Siswa", "Sarpras"], jmlL: 20, jmlP: 25, jmlTotal: 45, akhirIzin: "2027-02-14", akreditasi: "B", akhirAkred: "2026-08-30", namaKepala: "SITI KHODIJAH", waKepala: "081234567898", namaOp: "HENDRA KURNIA", waOp: "081298765438" },
           { id: "LBG-009", nsm: "101216050003", npsn: "69812343", nama: "RA NURUL IMAN", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", kelengkapan: "BELUM MENGISI", hasKelembagaan: false, hasSiswa: false, hasSarpras: false, missingModules: ["Kelembagaan", "Siswa", "Sarpras"], jmlL: 0, jmlP: 0, jmlTotal: 0, akhirIzin: "2026-12-10", akreditasi: "Belum Terakreditasi", akhirAkred: "", namaKepala: "MUTMAINAH, S.Pd", waKepala: "081234567899", namaOp: "INDRA LESMANA", waOp: "081298765439" }
         ],
@@ -2377,8 +2377,17 @@
       var totalEwsCount = izinExpired.length + izinExpiring.length + akredExpired.length + akredExpiring.length;
       if (totalEwsCount === 0) {
         containerRekap.innerHTML = '';
+        window.currentEwsData = null;
         return;
       }
+
+      // Simpan data EWS terkini untuk fitur Export Excel
+      window.currentEwsData = {
+        izinExpired: izinExpired,
+        izinExpiring: izinExpiring,
+        akredExpired: akredExpired,
+        akredExpiring: akredExpiring
+      };
 
       function buildTableHtml(list, isExpired, typeName) {
         var out = '<table><thead><tr style="background:var(--bg-body);">' +
@@ -2423,8 +2432,13 @@
         return out;
       }
 
-      var html = '<div style="margin-bottom:12px; font-weight:700; font-size:1.05rem; color:#EF4444; display:flex; align-items:center; gap:8px;">' +
-        '<span>⚠️</span> EARLY WARNING SYSTEM (EWS) - KONTROL PERPANJANGAN IZIN & AKREDITASI' +
+      var html = '<div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">' +
+        '<div style="font-weight:700; font-size:1.05rem; color:#EF4444; display:flex; align-items:center; gap:8px;">' +
+          '<span>⚠️</span> LAPORAN MONITORING MASA BERLAKU IZIN OPERASIONAL DAN AKREDITASI' +
+        '</div>' +
+        '<button type="button" class="btn" onclick="exportMonitoringEwsExcel()" style="background:#10B981; color:#fff; padding:7px 14px; font-size:0.85rem; font-weight:600; box-shadow:none;" title="Download Laporan Monitoring Izin & Akreditasi ke file Excel">' +
+          '📥 Export Excel Monitoring (.xlsx)' +
+        '</button>' +
       '</div>';
 
       if (izinExpired.length > 0) {
@@ -2815,6 +2829,50 @@
       XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi");
       XLSX.writeFile(wb, "Rekapitulasi_Madrasah_Musi_Rawas_" + currentTahunPelajaran.replace('/', '_') + ".xlsx");
       showToast("Berhasil export Excel (.xlsx)!", "success");
+    }
+
+    function exportMonitoringEwsExcel() {
+      if (typeof XLSX === 'undefined') { showToast("Library Excel belum siap!", "error"); return; }
+      if (!window.currentEwsData) { showToast("Tidak ada data monitoring yang perlu diekspor.", "info"); return; }
+
+      var data = window.currentEwsData;
+      var exportRows = [];
+      var no = 1;
+
+      function addRows(list, kategori, isExpired) {
+        for (var i = 0; i < list.length; i++) {
+          var itm = list[i];
+          exportRows.push({
+            "NO": no++,
+            "KATEGORI MONITORING": kategori,
+            "JENJANG": itm.jenjang || "-",
+            "NSM": itm.nsm || "-",
+            "NAMA LEMBAGA": itm.nama || "-",
+            "KECAMATAN": itm.kecamatan || "-",
+            "NILAI AKREDITASI": itm.akred || "-",
+            "TANGGAL BERAKHIR": itm.tgl || "-",
+            "STATUS TEMPO": isExpired ? ("Lewat " + itm.diffDays + " Hari (Expired)") : ("Sisa " + itm.diffDays + " Hari (< 6 Bulan)"),
+            "NAMA OPERATOR": itm.namaOp || "-",
+            "NO WA OPERATOR": itm.waOp || "-"
+          });
+        }
+      }
+
+      addRows(data.izinExpired, "1. Izin Operasional Habis (Expired)", true);
+      addRows(data.izinExpiring, "2. Izin Operasional Akan Habis (< 6 Bulan)", false);
+      addRows(data.akredExpired, "3. Akreditasi Habis (Expired)", true);
+      addRows(data.akredExpiring, "4. Akreditasi Akan Habis (< 6 Bulan)", false);
+
+      if (exportRows.length === 0) {
+        showToast("Seluruh lembaga memiliki izin dan akreditasi yang masih berlaku aktif.", "info");
+        return;
+      }
+
+      var ws = XLSX.utils.json_to_sheet(exportRows);
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Monitoring Izin & Akreditasi");
+      XLSX.writeFile(wb, "Monitoring_Masa_Berlaku_Izin_Akreditasi_Penmad_Musi_Rawas_" + currentTahunPelajaran.replace('/', '_') + ".xlsx");
+      showToast("Berhasil mengekspor Laporan Monitoring Izin & Akreditasi ke Excel (.xlsx)!", "success");
     }
 
     // Inisialisasi otomatis DOM & Window
