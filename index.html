@@ -303,7 +303,7 @@
       background-color: var(--bg-container); 
       box-shadow: 0 0 0 4px var(--primary-light); 
     }
-    input:disabled, input[readonly] { opacity: 0.85; cursor: not-allowed; background-color: rgba(148, 163, 184, 0.15) !important; }
+    input:disabled, select:disabled, input[readonly] { opacity: 0.8; cursor: not-allowed; background-color: rgba(148, 163, 184, 0.15) !important; }
     .uppercase-input { text-transform: uppercase; }
     
     .btn { 
@@ -420,6 +420,53 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* EWS STYLES */
+    .ews-card {
+      background: var(--bg-container);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 22px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .ews-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+    .ews-header-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #EF4444;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .ews-header-warning {
+      background: rgba(234, 179, 8, 0.12);
+      color: #B45309;
+      border-bottom: 1px solid rgba(234, 179, 8, 0.25);
+    }
+    [data-theme="dark"] .ews-header-warning {
+      color: #FACC15;
+    }
+    .ews-body {
+      padding: 0;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .ews-badge-count {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .badge-count-red { background: #EF4444; color: #fff; }
+    .badge-count-yellow { background: #EAB308; color: #000; }
 
     @media (max-width: 768px) {
       .main-content { flex-direction: column; }
@@ -570,7 +617,8 @@
           </div>
 
           <div class="form-divider" style="margin-top: 30px;">🏆 Lembaga yang Sudah Selesai Input Semua (Lengkap 100%)</div>
-          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:flex-end; align-items:center;">
+          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span style="font-size:0.85rem; color:var(--text-muted);">Urutan Tampilan: Jenjang <strong>MA ➔ MTs ➔ MI ➔ RA</strong> & NSM terurut naik.</span>
             <span id="dash-completed-count" style="font-weight:700; color:var(--primary-solid); background:var(--primary-light); padding:4px 12px; border-radius:15px;">0 Lembaga Selesai</span>
           </div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
@@ -910,7 +958,8 @@
         <section id="rekapitulasi" class="page-section">
           <h2>Rekapitulasi & Statistik Data Madrasah</h2>
           
-          <div id="rekap-ews-container" style="margin-bottom: 20px;"></div>
+          <!-- EWS ALERTS CONTAINER -->
+          <div id="rekap-ews-container" style="margin-bottom: 25px;"></div>
 
           <div class="grid-cards" style="margin-bottom: 25px;">
             <div class="card">
@@ -992,12 +1041,12 @@
               </div>
             </div>
 
-            <!-- SUB FILTER: PER JENJANG -->
+            <!-- SUB FILTER: PER JENJANG DENGAN SUB-FILTER KELENGKAPAN & STATUS DISABLE OTOMATIS -->
             <div id="sub-filter-jenjang-container" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
               <div class="grid-cards" style="margin-bottom:0;">
                 <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Pilih Jenjang Pendidikan</label>
-                  <select id="sub-jenjang-select" onchange="renderRekapTable()">
+                  <label style="font-weight:600; color:var(--primary-solid); margin-bottom:5px;">Pilih Jenjang Pendidikan</label>
+                  <select id="sub-jenjang-select" onchange="onJenjangFilterChange()" style="font-weight:600;">
                     <option value="">-- Semua Jenjang --</option>
                     <option value="RA">RA (Raudhatul Athfal)</option>
                     <option value="MI">MI (Madrasah Ibtidaiyah)</option>
@@ -1006,9 +1055,18 @@
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Filter Status (Opsional)</label>
+                  <label style="font-weight:600; color:var(--primary-solid); margin-bottom:5px;">Filter Status Kelengkapan</label>
+                  <select id="sub-jenjang-kelengkapan-select" onchange="renderRekapTable()" style="font-weight:600;">
+                    <option value="">-- Semua Status Kelengkapan --</option>
+                    <option value="LENGKAP">✅ Sudah Lengkap (100%)</option>
+                    <option value="BELUM LENGKAP">⏳ Belum Lengkap (Sebagian)</option>
+                    <option value="BELUM MENGISI">❌ Belum Mengisi</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-weight:600; color:var(--text-main); margin-bottom:5px;">Filter Status Lembaga</label>
                   <select id="sub-jenjang-status-select" onchange="renderRekapTable()">
-                    <option value="">-- Semua Status --</option>
+                    <option value="">-- Semua Status (Negeri & Swasta) --</option>
                     <option value="NEGERI">NEGERI</option>
                     <option value="SWASTA">SWASTA</option>
                   </select>
@@ -1303,7 +1361,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-gMALBl5ZD8m3-CC7vo0xZCjc2MS3zYxoPpVdqOAWnpyy6f0TpjTQw7M9-hPJylUZ/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZJeLHYLk06MN6o2wBjF-LLpJnfQDGZ3RfwPOn-94JNFPPTa5LHAxMJKXuHXs-Kqul/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1417,18 +1475,22 @@
         statsSummary: { total: 9, lengkap: 5, sebagian: 3, kosong: 1 },
         stats: { total: 9, submitted: 5 },
         institutions: [
-          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR偏 MUARA BELITI", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
+          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
           { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
-          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" }
+          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
+          { id: "LBG-005", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" }
         ],
         rekapList: [
           { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20" },
-          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2028-05-15", akreditasi: "B", akhirAkred: "2026-11-30" },
-          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2028-06-15" }
+          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2026-11-15", akreditasi: "B", akhirAkred: "2026-06-30", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
+          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2026-05-01", akreditasi: "A", akhirAkred: "2026-12-15", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05" },
+          { id: "LBG-005", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2026-04-10", akreditasi: "B", akhirAkred: "2026-05-18", namaOp: "GITA PERTIWI", waOp: "081298765437" }
         ],
-        kecamatanList: ["MUARA BELITI", "TUGUMULYO"],
-        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true },
-        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true },
+        kecamatanList: ["MUARA BELITI", "PURWODADI", "TUGUMULYO"],
+        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true },
+        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true },
         masterOptions: {
           ekstrakurikuler: ["PRAMUKA", "PMR", "DARWIS", "DRUMBAND"],
           laboratorium: ["LAB KOMPUTER", "LAB IPA", "LAB BAHASA"]
@@ -1526,6 +1588,7 @@
       renderSarprasDropdowns();
       renderKecamatanSubFilters();
       renderPerLembagaDropdown();
+      onJenjangFilterChange();
       renderRekapTable();
       checkAndRenderEwsAlerts();
     }
@@ -1548,15 +1611,41 @@
         return;
       }
 
+      var jenjangPriority = { "MA": 1, "MTS": 2, "MI": 3, "RA": 4 };
+
+      completedList.sort(function(a, b) {
+        var jgA = (a.jenjang || "").toUpperCase().trim();
+        var jgB = (b.jenjang || "").toUpperCase().trim();
+        var prioA = jenjangPriority[jgA] !== undefined ? jenjangPriority[jgA] : 99;
+        var prioB = jenjangPriority[jgB] !== undefined ? jenjangPriority[jgB] : 99;
+
+        if (prioA !== prioB) {
+          return prioA - prioB;
+        }
+
+        var nsmA = String(a.nsm || "").trim();
+        var nsmB = String(b.nsm || "").trim();
+        return nsmA.localeCompare(nsmB, undefined, { numeric: true });
+      });
+
       var html = '';
       for (var i = 0; i < completedList.length; i++) {
         var row = completedList[i];
+        var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+        var jgBadgeColor = 'var(--primary-solid)';
+        var jgName = (row.jenjang || '-').toUpperCase().trim();
+
+        if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+        else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+        else if (jgName === 'MI') { jgBadgeBg = 'rgba(0, 192, 90, 0.15)'; jgBadgeColor = 'var(--primary-solid)'; }
+        else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
         html += '<tr>' +
           '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
-          '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid); font-weight:700;">' + (row.jenjang || '-') + '</span></td>' +
-          '<td style="font-weight:600;">' + (row.nsm || '-') + '</td>' +
-          '<td style="font-weight:700;">' + (row.nama || '-') + '</td>' +
-          '<td>📍 ' + (row.kecamatan || '-') + '</td>' +
+          '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (row.jenjang || '-') + '</span></td>' +
+          '<td style="font-weight:600; letter-spacing:0.5px;">' + (row.nsm || '-') + '</td>' +
+          '<td style="font-weight:700; color:var(--text-main);">' + (row.nama || '-') + '</td>' +
+          '<td><span style="display:inline-flex; align-items:center; gap:4px;">📍 ' + (row.kecamatan || '-') + '</span></td>' +
           '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid); font-weight:700;">✅ LENGKAP</span></td>' +
         '</tr>';
       }
@@ -2092,31 +2181,175 @@
       });
     }
 
+    // ====================================================
+    // EARLY WARNING SYSTEM (EWS): TERPISAH IZIN OP & AKREDITASI
+    // (TERPISAH STATUS SUDAH HABIS & AKAN HABIS < 6 BULAN)
+    // ====================================================
     function checkAndRenderEwsAlerts() {
       var containerRekap = document.getElementById('rekap-ews-container');
       if (!containerRekap) return;
-      var now = new Date();
-      var sixMonthsAhead = new Date();
-      sixMonthsAhead.setDate(now.getDate() + 180);
 
-      var expiringIzin = [];
+      var now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      var sixMonthsAhead = new Date(now.getTime());
+      sixMonthsAhead.setDate(sixMonthsAhead.getDate() + 180);
+
+      var izinExpired = [];
+      var izinExpiring = [];
+      var akredExpired = [];
+      var akredExpiring = [];
+
+      function parseDateClean(dateStr) {
+        if (!dateStr || String(dateStr).trim() === "" || dateStr === "-") return null;
+        var parts = dateStr.split("-");
+        if (parts.length === 3) {
+          var y = parseInt(parts[0], 10);
+          var m = parseInt(parts[1], 10) - 1;
+          var d = parseInt(parts[2], 10);
+          var dt = new Date(y, m, d);
+          if (!isNaN(dt.getTime())) return dt;
+        }
+        var dtDirect = new Date(dateStr);
+        return isNaN(dtDirect.getTime()) ? null : dtDirect;
+      }
+
       for (var i = 0; i < fullRekapData.length; i++) {
         var row = fullRekapData[i];
+
+        // 1. Cek Izin Operasional
         if (row.akhirIzin) {
-          var tglIzin = new Date(row.akhirIzin);
-          if (!isNaN(tglIzin.getTime()) && tglIzin <= sixMonthsAhead) {
-            expiringIzin.push({ name: row.nama, nsm: row.nsm, tgl: row.akhirIzin });
+          var dtIzin = parseDateClean(row.akhirIzin);
+          if (dtIzin) {
+            dtIzin.setHours(0, 0, 0, 0);
+            var diffDaysIzin = Math.ceil((dtIzin.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            
+            if (dtIzin < now) {
+              izinExpired.push({
+                nama: row.nama, nsm: row.nsm, jenjang: row.jenjang, kecamatan: row.kecamatan,
+                tgl: row.akhirIzin, diffDays: Math.abs(diffDaysIzin), waOp: row.waOp, namaOp: row.namaOp
+              });
+            } else if (dtIzin <= sixMonthsAhead) {
+              izinExpiring.push({
+                nama: row.nama, nsm: row.nsm, jenjang: row.jenjang, kecamatan: row.kecamatan,
+                tgl: row.akhirIzin, diffDays: diffDaysIzin, waOp: row.waOp, namaOp: row.namaOp
+              });
+            }
+          }
+        }
+
+        // 2. Cek Akreditasi
+        if (row.akhirAkred) {
+          var dtAkred = parseDateClean(row.akhirAkred);
+          if (dtAkred) {
+            dtAkred.setHours(0, 0, 0, 0);
+            var diffDaysAkred = Math.ceil((dtAkred.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (dtAkred < now) {
+              akredExpired.push({
+                nama: row.nama, nsm: row.nsm, jenjang: row.jenjang, kecamatan: row.kecamatan, akred: row.akreditasi || "-",
+                tgl: row.akhirAkred, diffDays: Math.abs(diffDaysAkred), waOp: row.waOp, namaOp: row.namaOp
+              });
+            } else if (dtAkred <= sixMonthsAhead) {
+              akredExpiring.push({
+                nama: row.nama, nsm: row.nsm, jenjang: row.jenjang, kecamatan: row.kecamatan, akred: row.akreditasi || "-",
+                tgl: row.akhirAkred, diffDays: diffDaysAkred, waOp: row.waOp, namaOp: row.namaOp
+              });
+            }
           }
         }
       }
 
-      if (expiringIzin.length > 0) {
-        var html = '<div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); padding:16px; border-radius:var(--radius-sm);">' +
-          '<strong style="color:#EF4444;">⚠️ EARLY WARNING SYSTEM: ' + expiringIzin.length + ' Lembaga Izin Operasional &lt; 6 Bulan</strong></div>';
-        containerRekap.innerHTML = html;
-      } else {
+      var totalEwsCount = izinExpired.length + izinExpiring.length + akredExpired.length + akredExpiring.length;
+      if (totalEwsCount === 0) {
         containerRekap.innerHTML = '';
+        return;
       }
+
+      function buildTableHtml(list, isExpired, typeName) {
+        var out = '<table><thead><tr style="background:var(--bg-body);">' +
+          '<th style="width:40px; text-align:center;">NO</th>' +
+          '<th style="width:75px; text-align:center;">JENJANG</th>' +
+          '<th>NAMA LEMBAGA & NSM</th>' +
+          '<th>KECAMATAN</th>' +
+          (typeName === 'AKREDITASI' ? '<th style="text-align:center; width:90px;">NILAI</th>' : '') +
+          '<th style="width:130px; text-align:center;">TGL BERAKHIR</th>' +
+          '<th style="width:160px; text-align:center;">STATUS TEMPO</th>' +
+          '<th style="width:110px; text-align:center;">HUBUNGI</th>' +
+        '</tr></thead><tbody>';
+
+        for (var k = 0; k < list.length; k++) {
+          var itm = list[k];
+          var waMsg = "Assalamu'alaikum Wr. Wb.\n" +
+            "Kepada Yth. Operator " + itm.nama + "\n" +
+            "Pemberitahuan: Masa berlaku " + (typeName === 'IZIN_OP' ? "Izin Operasional" : "Akreditasi") + " madrasah Anda tercatat " + 
+            (isExpired ? "SUDAH HABIS sejak tanggal " + itm.tgl + " (" + itm.diffDays + " hari lalu)" : "AKAN SEGERA HABIS pada tanggal " + itm.tgl + " (" + itm.diffDays + " hari lagi)") + ".\n" +
+            "Mohon untuk segera mengurus perpanjangan izin terkait ke Seksi Penmad Kemenag Musi Rawas. Terima kasih.";
+
+          var waLink = formatWaUrl(itm.waOp, waMsg);
+          var btnWa = waLink ? '<a href="' + waLink + '" target="_blank" class="btn" style="padding:4px 10px; font-size:0.75rem; background:#25D366; text-decoration:none; color:#fff;">💬 Chat WA</a>' : '<span style="font-size:0.75rem; color:var(--text-muted);">-</span>';
+
+          var tempoBadge = isExpired ? 
+            '<span style="background:rgba(239,68,68,0.15); color:#EF4444; font-weight:700; padding:3px 8px; border-radius:6px; font-size:0.78rem;">❌ Lewat ' + itm.diffDays + ' Hari</span>' : 
+            '<span style="background:rgba(234,179,8,0.18); color:#B45309; font-weight:700; padding:3px 8px; border-radius:6px; font-size:0.78rem;">⏳ Sisa ' + itm.diffDays + ' Hari</span>';
+
+          out += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">' + (k + 1) + '</td>' +
+            '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.12); color:var(--primary-solid); font-weight:700;">' + (itm.jenjang || '-') + '</span></td>' +
+            '<td><strong>' + itm.nama + '</strong><br><small style="color:var(--text-muted);">NSM: ' + itm.nsm + '</small></td>' +
+            '<td>📍 ' + itm.kecamatan + '</td>' +
+            (typeName === 'AKREDITASI' ? '<td style="text-align:center; font-weight:700; color:var(--primary-solid);">' + (itm.akred || '-') + '</td>' : '') +
+            '<td style="text-align:center; font-weight:600;">' + itm.tgl + '</td>' +
+            '<td style="text-align:center;">' + tempoBadge + '</td>' +
+            '<td style="text-align:center;">' + btnWa + '</td>' +
+          '</tr>';
+        }
+
+        out += '</tbody></table>';
+        return out;
+      }
+
+      var html = '<div style="margin-bottom:12px; font-weight:700; font-size:1.05rem; color:#EF4444; display:flex; align-items:center; gap:8px;">' +
+        '<span>⚠️</span> EARLY WARNING SYSTEM (EWS) - KONTROL PERPANJANGAN IZIN & AKREDITASI' +
+      '</div>';
+
+      if (izinExpired.length > 0) {
+        html += '<div class="ews-card">' +
+          '<div class="ews-header ews-header-danger">' +
+            '<span>📜 1. Izin Operasional SUDAH HABIS MASA BERLAKU (Expired) <span class="ews-badge-count badge-count-red">' + izinExpired.length + ' Lembaga</span></span>' +
+          '</div>' +
+          '<div class="ews-body">' + buildTableHtml(izinExpired, true, 'IZIN_OP') + '</div>' +
+        '</div>';
+      }
+
+      if (izinExpiring.length > 0) {
+        html += '<div class="ews-card">' +
+          '<div class="ews-header ews-header-warning">' +
+            '<span>📜 2. Izin Operasional AKAN HABIS MASA BERLAKU (&lt; 6 Bulan ke Depan) <span class="ews-badge-count badge-count-yellow">' + izinExpiring.length + ' Lembaga</span></span>' +
+          '</div>' +
+          '<div class="ews-body">' + buildTableHtml(izinExpiring, false, 'IZIN_OP') + '</div>' +
+        '</div>';
+      }
+
+      if (akredExpired.length > 0) {
+        html += '<div class="ews-card">' +
+          '<div class="ews-header ews-header-danger">' +
+            '<span>🎖️ 3. Akreditasi SUDAH HABIS MASA BERLAKU (Expired) <span class="ews-badge-count badge-count-red">' + akredExpired.length + ' Lembaga</span></span>' +
+          '</div>' +
+          '<div class="ews-body">' + buildTableHtml(akredExpired, true, 'AKREDITASI') + '</div>' +
+        '</div>';
+      }
+
+      if (akredExpiring.length > 0) {
+        html += '<div class="ews-card">' +
+          '<div class="ews-header ews-header-warning">' +
+            '<span>🎖️ 4. Akreditasi AKAN HABIS MASA BERLAKU (&lt; 6 Bulan ke Depan) <span class="ews-badge-count badge-count-yellow">' + akredExpiring.length + ' Lembaga</span></span>' +
+          '</div>' +
+          '<div class="ews-body">' + buildTableHtml(akredExpiring, false, 'AKREDITASI') + '</div>' +
+        '</div>';
+      }
+
+      containerRekap.innerHTML = html;
     }
 
     function renderKecamatanSubFilters() {
@@ -2160,6 +2393,22 @@
       if (idLbg) openProfilLembagaModal(idLbg, true);
     }
 
+    function onJenjangFilterChange() {
+      var jg = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : '';
+      var statusSel = document.getElementById('sub-jenjang-status-select');
+      
+      if (statusSel) {
+        if (jg === 'RA') {
+          // Khusus jenjang RA di data kelembagaan berstatus SWASTA
+          statusSel.value = 'SWASTA';
+          statusSel.disabled = true;
+        } else {
+          statusSel.disabled = false;
+        }
+      }
+      renderRekapTable();
+    }
+
     function onRekapFilterChange() {
       var filterType = document.getElementById('rekap-filter-type').value;
       var subSudahIsi = document.getElementById('sub-filter-sudah-isi-container');
@@ -2178,7 +2427,10 @@
 
       if (filterType === 'SUDAH_MENGISI' && subSudahIsi) subSudahIsi.style.display = 'block';
       if (filterType === 'PER_STATUS' && subStatus) subStatus.style.display = 'block';
-      if (filterType === 'PER_JENJANG' && subJenjang) subJenjang.style.display = 'block';
+      if (filterType === 'PER_JENJANG' && subJenjang) {
+        subJenjang.style.display = 'block';
+        onJenjangFilterChange();
+      }
       if (filterType === 'PER_KECAMATAN' && subKec) subKec.style.display = 'block';
       if (filterType === 'REKAP_JK' && subJk) subJk.style.display = 'block';
       if (filterType === 'PER_LEMBAGA' && subPerLbg) subPerLbg.style.display = 'block';
@@ -2201,9 +2453,17 @@
         var stSel = document.getElementById('sub-status-select').value;
         filtered = filtered.filter(function(x) { return !stSel || x.statusLembaga === stSel; });
       } else if (filterType === 'PER_JENJANG') {
-        var jgSel = document.getElementById('sub-jenjang-select').value;
-        var jgSt = document.getElementById('sub-jenjang-status-select').value;
-        filtered = filtered.filter(function(x) { return (!jgSel || x.jenjang === jgSel) && (!jgSt || x.statusLembaga === jgSt); });
+        var jgSel = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value : '';
+        var klkSel = document.getElementById('sub-jenjang-kelengkapan-select') ? document.getElementById('sub-jenjang-kelengkapan-select').value : '';
+        var statusSelectEl = document.getElementById('sub-jenjang-status-select');
+        var jgSt = (statusSelectEl && !statusSelectEl.disabled) ? statusSelectEl.value : (jgSel === 'RA' ? 'SWASTA' : (statusSelectEl ? statusSelectEl.value : ''));
+        
+        filtered = filtered.filter(function(x) {
+          var matchJg = !jgSel || x.jenjang === jgSel;
+          var matchKlk = !klkSel || x.kelengkapan === klkSel;
+          var matchSt = !jgSt || x.statusLembaga === jgSt;
+          return matchJg && matchKlk && matchSt;
+        });
       } else if (filterType === 'PER_KECAMATAN') {
         var kecSel = String(document.getElementById('sub-kecamatan-select').value || '').trim().toUpperCase();
         var kecJg = document.getElementById('sub-kecamatan-jenjang-select').value;
@@ -2236,8 +2496,8 @@
       var html = '';
       for (var j = 0; j < filtered.length; j++) {
         var itm = filtered[j];
-        var badgeBg = itm.kelengkapan === 'LENGKAP' ? 'rgba(0, 192, 90, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-        var badgeColor = itm.kelengkapan === 'LENGKAP' ? 'var(--primary-solid)' : '#EF4444';
+        var badgeBg = itm.kelengkapan === 'LENGKAP' ? 'rgba(0, 192, 90, 0.15)' : (itm.kelengkapan === 'BELUM LENGKAP' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(239, 68, 68, 0.15)');
+        var badgeColor = itm.kelengkapan === 'LENGKAP' ? 'var(--primary-solid)' : (itm.kelengkapan === 'BELUM LENGKAP' ? '#D97706' : '#EF4444');
         
         html += '<tr>' +
           '<td style="text-align:center; font-weight:600;">' + (j + 1) + '</td>' +
