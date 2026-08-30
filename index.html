@@ -1365,7 +1365,8 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUCofqDmjSwtjdEUGzXFSIg1tHZ3QnlLMX38zFxKxOT2Rk_0oKC5usKTmtCfrhFCw/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxXJj4Avuc5nOHF9c9x5nhVmV92nmEt0bCc9cnDjK4jML4lIJEMyngIvbX3pp0KYE0/exec";
+    var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1383,8 +1384,25 @@
     var currentLoadedProfilData = null;
 
     window.onload = function() {
+      // 1. INSTANT HYDRATION: Muat data dari cache lokal secara instan (0 ms)
+      tryHydrateFromLocalCache();
+      // 2. FETCH TERBARU: Perbarui data secara mulus di latar belakang
       fetchInitialData();
     };
+
+    function tryHydrateFromLocalCache() {
+      try {
+        var cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          var parsed = JSON.parse(cached);
+          if (parsed && parsed.status === 'success') {
+            handleInitialDataResponse(parsed, true);
+          }
+        }
+      } catch (e) {
+        console.warn("Local cache not accessible", e);
+      }
+    }
 
     function toggleTheme() {
       var body = document.body;
@@ -1398,12 +1416,12 @@
     function navigate(sectionId, navElement) {
       var items = document.querySelectorAll('.nav-item');
       var sections = document.querySelectorAll('.page-section');
-      for(var i=0; i<items.length; i++) { items[i].classList.remove('active'); }
-      for(var j=0; j<sections.length; j++) { sections[j].classList.remove('active'); }
-      if(navElement) navElement.classList.add('active');
+      for (var i = 0; i < items.length; i++) { items[i].classList.remove('active'); }
+      for (var j = 0; j < sections.length; j++) { sections[j].classList.remove('active'); }
+      if (navElement) navElement.classList.add('active');
       
       var targetSection = document.getElementById(sectionId);
-      if(targetSection) targetSection.classList.add('active');
+      if (targetSection) targetSection.classList.add('active');
       
       if (sectionId === 'dashboard') {
         renderDashboardCompletedList();
@@ -1449,19 +1467,18 @@
       pinModalTarget = target || 'admin-emis';
       var titleEl = document.getElementById('pin-modal-title');
       var descEl = document.getElementById('pin-modal-desc');
-      
       if (pinModalTarget === 'rekapitulasi') {
-        titleEl.innerText = "🔒 Akses Rekapitulasi";
-        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk membuka halaman laporan data.";
+        titleEl.innerText = "🔒 Akses Menu Rekapitulasi";
+        descEl.innerText = "Menu Rekapitulasi diproteksi. Masukkan PIN untuk membuka.";
       } else if (pinModalTarget === 'modal-belum-lengkap') {
-        titleEl.innerText = "🔒 Otorisasi: Data Belum Lengkap";
-        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk melihat rincian lembaga yang belum lengkap.";
+        titleEl.innerText = "🔒 Rincian Belum Lengkap";
+        descEl.innerText = "Masukkan PIN Rekapitulasi / Fitur Terbatas untuk melihat rincian.";
       } else if (pinModalTarget === 'modal-belum-mengisi') {
-        titleEl.innerText = "🔒 Otorisasi: Data Belum Mengisi";
-        if (descEl) descEl.innerText = "Masukkan PIN Rekapitulasi untuk melihat rincian lembaga yang belum mengisi.";
+        titleEl.innerText = "🔒 Rincian Belum Mengisi";
+        descEl.innerText = "Masukkan PIN Rekapitulasi / Fitur Terbatas untuk melihat rincian.";
       } else {
         titleEl.innerText = "⚙️ Otorisasi Admin EMIS";
-        if (descEl) descEl.innerText = "Masukkan PIN khusus Administrator EMIS.";
+        descEl.innerText = "Masukkan PIN khusus Admin EMIS untuk membuka menu kontrol.";
       }
       document.getElementById('pin-input').value = '';
       document.getElementById('pin-modal').classList.add('active');
@@ -1472,7 +1489,11 @@
     function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
 
     function safeParseJSON(text) {
-      try { return JSON.parse(text); } catch (err) { return null; }
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return null;
+      }
     }
 
     function getFallbackPreviewData() {
@@ -1520,8 +1541,12 @@
     function fetchInitialData() {
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
-          .withSuccessHandler(function(res) { handleInitialDataResponse(res); })
-          .withFailureHandler(function(err) { handleInitialDataResponse(getFallbackPreviewData()); })
+          .withSuccessHandler(function(res) { 
+            handleInitialDataResponse(res, false); 
+          })
+          .withFailureHandler(function(err) { 
+            handleInitialDataResponse(getFallbackPreviewData(), false); 
+          })
           .getInitialDataObj();
         return;
       }
@@ -1530,17 +1555,24 @@
         .then(function(res) { return res.text(); })
         .then(function(text) {
           var res = safeParseJSON(text) || getFallbackPreviewData();
-          handleInitialDataResponse(res);
+          handleInitialDataResponse(res, false);
         })
         .catch(function(err) {
-          handleInitialDataResponse(getFallbackPreviewData());
+          handleInitialDataResponse(getFallbackPreviewData(), false);
         });
     }
 
-    function handleInitialDataResponse(res) {
+    function handleInitialDataResponse(res, isFromCache) {
       if(!res || res.status !== 'success') {
-        if(res && res.message) showToast(res.message, "error");
+        if(res && res.message && !isFromCache) showToast(res.message, "error");
         return;
+      }
+
+      // Simpan payload valid ke local cache untuk fast load berikutnya
+      if (!isFromCache) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+        } catch (e) {}
       }
 
       var marqueeContainer = document.getElementById('marquee-text');
@@ -2783,6 +2815,13 @@
       XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi");
       XLSX.writeFile(wb, "Rekapitulasi_Madrasah_Musi_Rawas_" + currentTahunPelajaran.replace('/', '_') + ".xlsx");
       showToast("Berhasil export Excel (.xlsx)!", "success");
+    }
+
+    // Inisialisasi otomatis DOM & Window
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fetchInitialData);
+    } else {
+      fetchInitialData();
     }
   </script>
 </body>
