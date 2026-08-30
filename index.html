@@ -617,8 +617,7 @@
           </div>
 
           <div class="form-divider" style="margin-top: 30px;">🏆 Lembaga yang Sudah Selesai Input Semua (Lengkap 100%)</div>
-          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <span style="font-size:0.85rem; color:var(--text-muted);">Urutan Tampilan: Jenjang <strong>MA ➔ MTs ➔ MI ➔ RA</strong> & NSM terurut naik.</span>
+          <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:10px;">
             <span id="dash-completed-count" style="font-weight:700; color:var(--primary-solid); background:var(--primary-light); padding:4px 12px; border-radius:15px;">0 Lembaga Selesai</span>
           </div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
@@ -1366,7 +1365,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPgjojqI13MD5hTHSCxi_mM4VkxEdf0DwcV-tkvkrmNfbHIuUwetS67Zy-Ye__yGC8/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUCofqDmjSwtjdEUGzXFSIg1tHZ3QnlLMX38zFxKxOT2Rk_0oKC5usKTmtCfrhFCw/exec";
 
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1469,6 +1468,430 @@
       setTimeout(function() { document.getElementById('pin-input').focus(); }, 100);
     }
 
+    function closePinModal() { document.getElementById('pin-modal').classList.remove('active'); }
+    function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
+
+    function safeParseJSON(text) {
+      try { return JSON.parse(text); } catch (err) { return null; }
+    }
+
+    function getFallbackPreviewData() {
+      return {
+        status: "success",
+        banner: "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas",
+        statsSummary: { total: 9, lengkap: 5, sebagian: 3, kosong: 1 },
+        stats: { total: 9, submitted: 5 },
+        institutions: [
+          { id: "LBG-001", name: "MAN 1 MUSI RAWAS", nsm: "131116050001", npsn: "10648801", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", desa: "PASAR MUARA BELITI", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
+          { id: "LBG-002", name: "MAS AL-MUHAJIRIN", nsm: "131216050002", npsn: "10648802", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "TRIKOYO", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
+          { id: "LBG-003", name: "MTsN 1 MUSI RAWAS", nsm: "121116050001", npsn: "10648803", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", desa: "SRIKATON", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", name: "MTsS NURUL HUDA", nsm: "121216050002", npsn: "10648804", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", desa: "MEGANG SAKTI I", namaKepala: "UST. ABDUL WAHID", waKepala: "081234567894", namaOp: "DENI PRATAMA", waOp: "081298765434" },
+          { id: "LBG-005", name: "MIN 1 MUSI RAWAS", nsm: "111116050001", npsn: "10648805", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", desa: "PURWODADI", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
+          { id: "LBG-006", name: "MIS AL-IKHLAS", nsm: "111216050002", npsn: "10648806", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", desa: "TERAWAS", namaKepala: "H. ROFI'I, S.Pd.I", waKepala: "081234567896", namaOp: "FAJAR NUGROHO", waOp: "081298765436" },
+          { id: "LBG-007", name: "RA PERWANIDA 1", nsm: "101216050001", npsn: "69812341", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", desa: "MUARA BELITI", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
+          { id: "LBG-008", name: "RA MUSLIMAT NU 1", nsm: "101216050002", npsn: "69812342", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", desa: "WONOREJO", namaKepala: "SITI KHODIJAH", waKepala: "081234567898", namaOp: "HENDRA KURNIA", waOp: "081298765438" },
+          { id: "LBG-009", name: "RA NURUL IMAN", nsm: "101216050003", npsn: "69812343", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", desa: "SUMBER HARTA", namaKepala: "MUTMAINAH, S.Pd", waKepala: "081234567899", namaOp: "INDRA LESMANA", waOp: "081298765439" }
+        ],
+        rekapList: [
+          { id: "LBG-001", nsm: "131116050001", npsn: "10648801", nama: "MAN 1 MUSI RAWAS", jenjang: "MA", statusLembaga: "NEGERI", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 140, jmlP: 180, jmlTotal: 320, akhirIzin: "2029-12-31", akreditasi: "A", akhirAkred: "2027-10-20", namaKepala: "H. SYAHRIL, M.Pd.I", waKepala: "081234567891", namaOp: "ANDI SETIAWAN", waOp: "081298765431" },
+          { id: "LBG-002", nsm: "131216050002", npsn: "10648802", nama: "MAS AL-MUHAJIRIN", jenjang: "MA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 85, jmlP: 95, jmlTotal: 180, akhirIzin: "2028-05-15", akreditasi: "B", akhirAkred: "2026-11-30", namaKepala: "Drs. M. ZAINURI", waKepala: "081234567892", namaOp: "BAYU SAPUTRA", waOp: "081298765432" },
+          { id: "LBG-003", nsm: "121116050001", npsn: "10648803", nama: "MTsN 1 MUSI RAWAS", jenjang: "MTs", statusLembaga: "NEGERI", kecamatan: "TUGUMULYO", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 195, jmlP: 210, jmlTotal: 405, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2028-06-15", namaKepala: "Drs. H. MASHURI", waKepala: "081234567893", namaOp: "CITRA LESTARI", waOp: "081298765433" },
+          { id: "LBG-004", nsm: "121216050002", npsn: "10648804", nama: "MTsS NURUL HUDA", jenjang: "MTs", statusLembaga: "SWASTA", kecamatan: "MEGANG SAKTI", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: false, missingModules: ["Sarpras"], jmlL: 60, jmlP: 70, jmlTotal: 130, akhirIzin: "2027-04-10", akreditasi: "B", akhirAkred: "2026-09-12", namaKepala: "UST. ABDUL WAHID", waKepala: "081234567894", namaOp: "DENI PRATAMA", waOp: "081298765434" },
+          { id: "LBG-005", nsm: "111116050001", npsn: "10648805", nama: "MIN 1 MUSI RAWAS", jenjang: "MI", statusLembaga: "NEGERI", kecamatan: "PURWODADI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 110, jmlP: 125, jmlTotal: 235, akhirIzin: "2030-01-01", akreditasi: "A", akhirAkred: "2027-12-05", namaKepala: "HJ. SITI AMINAH", waKepala: "081234567895", namaOp: "EKO WAHYUDI", waOp: "081298765435" },
+          { id: "LBG-006", nsm: "111216050002", npsn: "10648806", nama: "MIS AL-IKHLAS", jenjang: "MI", statusLembaga: "SWASTA", kecamatan: "TERAWAS", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: true, missingModules: ["Siswa"], jmlL: 45, jmlP: 50, jmlTotal: 95, akhirIzin: "2027-08-20", akreditasi: "C", akhirAkred: "2026-10-10", namaKepala: "H. ROFI'I, S.Pd.I", waKepala: "081234567896", namaOp: "FAJAR NUGROHO", waOp: "081298765436" },
+          { id: "LBG-007", nsm: "101216050001", npsn: "69812341", nama: "RA PERWANIDA 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "MUARA BELITI", kelengkapan: "LENGKAP", hasKelembagaan: true, hasSiswa: true, hasSarpras: true, missingModules: [], jmlL: 30, jmlP: 35, jmlTotal: 65, akhirIzin: "2028-09-01", akreditasi: "B", akhirAkred: "2027-05-18", namaKepala: "NURUL HIDAYAH, S.Pd", waKepala: "081234567897", namaOp: "GITA PERTIWI", waOp: "081298765437" },
+          { id: "LBG-008", nsm: "101216050002", npsn: "69812342", nama: "RA MUSLIMAT NU 1", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "TUGUMULYO", kelengkapan: "BELUM LENGKAP", hasKelembagaan: true, hasSiswa: false, hasSarpras: false, missingModules: ["Siswa", "Sarpras"], jmlL: 20, jmlP: 25, jmlTotal: 45, akhirIzin: "2027-02-14", akreditasi: "B", akhirAkred: "2026-08-30", namaKepala: "SITI KHODIJAH", waKepala: "081234567898", namaOp: "HENDRA KURNIA", waOp: "081298765438" },
+          { id: "LBG-009", nsm: "101216050003", npsn: "69812343", nama: "RA NURUL IMAN", jenjang: "RA", statusLembaga: "SWASTA", kecamatan: "SUMBER HARTA", kelengkapan: "BELUM MENGISI", hasKelembagaan: false, hasSiswa: false, hasSarpras: false, missingModules: ["Kelembagaan", "Siswa", "Sarpras"], jmlL: 0, jmlP: 0, jmlTotal: 0, akhirIzin: "2026-12-10", akreditasi: "Belum Terakreditasi", akhirAkred: "", namaKepala: "MUTMAINAH, S.Pd", waKepala: "081234567899", namaOp: "INDRA LESMANA", waOp: "081298765439" }
+        ],
+        kecamatanList: ["MUARA BELITI", "MEGANG SAKTI", "PURWODADI", "SUMBER HARTA", "TERAWAS", "TUGUMULYO"],
+        existingSiswaMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-004": true, "LBG-005": true, "LBG-007": true },
+        existingSarprasMap: { "LBG-001": true, "LBG-002": true, "LBG-003": true, "LBG-005": true, "LBG-006": true, "LBG-007": true },
+        masterOptions: {
+          ekstrakurikuler: ["PRAMUKA", "PMR", "DARWIS", "DRUMBAND", "PASKIBRA", "SMI/PUNCAK SILAT", "TAHFIDZ", "QUR'AN CLUB"],
+          laboratorium: ["LAB KOMPUTER", "LAB IPA", "LAB BAHASA", "LAB FISIKA", "LAB KIMIA", "LAB BIOLOGI"]
+        },
+        pinRekapStatus: "NONAKTIF",
+        statusPeriode: "DIBUKA",
+        tahunPelajaran: "2026/2027",
+        isAllCompleted: false
+      };
+    }
+
+    function fetchInitialData() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(res) { handleInitialDataResponse(res); })
+          .withFailureHandler(function(err) { handleInitialDataResponse(getFallbackPreviewData()); })
+          .getInitialDataObj();
+        return;
+      }
+
+      fetch(APPS_SCRIPT_URL + "?action=getInitialData")
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text) || getFallbackPreviewData();
+          handleInitialDataResponse(res);
+        })
+        .catch(function(err) {
+          handleInitialDataResponse(getFallbackPreviewData());
+        });
+    }
+
+    function handleInitialDataResponse(res) {
+      if(!res || res.status !== 'success') {
+        if(res && res.message) showToast(res.message, "error");
+        return;
+      }
+
+      var marqueeContainer = document.getElementById('marquee-text');
+      var rawBannerText = res.banner || "Selamat Datang di Portal Pendataan RA dan Madrasah di Lingkungan Kantor Kementerian Agama Kabupaten Musi Rawas";
+      var cleanBannerText = rawBannerText.replace(/RA\/Madrasah/gi, "RA dan Madrasah");
+
+      if (marqueeContainer) {
+        marqueeContainer.innerHTML = '<span class="aksara-jawa-badge">' +
+          '<span class="aksara-ornament">꧁</span>' +
+          '<span class="aksara-jawa-style-text" id="marquee-text-content">' + cleanBannerText + '</span>' +
+          '<span class="aksara-ornament">꧂</span>' +
+        '</span>';
+      }
+      
+      var stats = res.stats || {};
+      var statsSummary = res.statsSummary || {};
+      
+      document.getElementById('dash-total').innerText = stats.total !== undefined ? stats.total : (statsSummary.total || 0);
+      document.getElementById('dash-submit').innerText = statsSummary.lengkap !== undefined ? statsSummary.lengkap : (stats.submitted || 0);
+      document.getElementById('dash-sebagian').innerText = statsSummary.sebagian !== undefined ? statsSummary.sebagian : 0;
+      document.getElementById('dash-kosong').innerText = statsSummary.kosong !== undefined ? statsSummary.kosong : 0;
+      
+      globalInstitutions = res.institutions || [];
+      masterEkstraList = (res.masterOptions && res.masterOptions.ekstrakurikuler) ? res.masterOptions.ekstrakurikuler : [];
+      masterLabList = (res.masterOptions && res.masterOptions.laboratorium) ? res.masterOptions.laboratorium : [];
+      fullRekapData = res.rekapList || [];
+      kecamatanListGlobal = res.kecamatanList || [];
+      existingSiswaMap = res.existingSiswaMap || {};
+      existingSarprasMap = res.existingSarprasMap || {};
+      
+      currentStatusPeriode = res.statusPeriode || "DIBUKA";
+      currentTahunPelajaran = res.tahunPelajaran || "2026/2027";
+      isAllInstitutionsCompleted = res.isAllCompleted || false;
+      
+      document.getElementById('badge-tp-display').innerText = "TP: " + currentTahunPelajaran;
+      document.getElementById('label-tp-siswa').innerText = currentTahunPelajaran;
+      document.getElementById('admin-cur-tp-input').value = currentTahunPelajaran;
+
+      if (res.pinRekapStatus) {
+        pinRekapStatus = res.pinRekapStatus;
+        var pinSelect = document.getElementById('admin-pin-rekap-select');
+        if (pinSelect) pinSelect.value = pinRekapStatus;
+      }
+      
+      applyPeriodeStatusUI();
+      renderDashboardCompletedList();
+      renderMasterLembagaDropdown();
+      renderLembagaDropdowns();
+      renderSarprasDropdowns();
+      renderKecamatanSubFilters();
+      renderPerLembagaDropdown();
+      renderRekapTable();
+      checkAndRenderEwsAlerts();
+    }
+
+    function renderDashboardCompletedList() {
+      var tbody = document.getElementById('table-dashboard-completed');
+      var badgeCount = document.getElementById('dash-completed-count');
+      if (!tbody) return;
+
+      var completedList = fullRekapData.filter(function(item) {
+        return item.kelengkapan === "LENGKAP";
+      });
+
+      if (badgeCount) {
+        badgeCount.innerText = completedList.length + " Lembaga Selesai";
+      }
+
+      if (completedList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Belum ada lembaga yang menyelesaikan seluruh pengisian data (Kelembagaan, Siswa, dan Sarpras).</td></tr>';
+        return;
+      }
+
+      var jenjangPriority = { "MA": 1, "MTS": 2, "MI": 3, "RA": 4 };
+
+      completedList.sort(function(a, b) {
+        var jgA = (a.jenjang || "").toUpperCase();
+        var jgB = (b.jenjang || "").toUpperCase();
+        var prioA = jenjangPriority[jgA] || 99;
+        var prioB = jenjangPriority[jgB] || 99;
+
+        if (prioA !== prioB) {
+          return prioA - prioB;
+        }
+
+        var nsmA = String(a.nsm || "");
+        var nsmB = String(b.nsm || "");
+        return nsmA.localeCompare(nsmB, undefined, { numeric: true });
+      });
+
+      var html = '';
+      for (var i = 0; i < completedList.length; i++) {
+        var row = completedList[i];
+        var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+        var jgBadgeColor = 'var(--primary-solid)';
+        var jgName = (row.jenjang || '-').toUpperCase();
+
+        if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+        else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+        else if (jgName === 'MI') { jgBadgeBg = 'rgba(0, 192, 90, 0.15)'; jgBadgeColor = 'var(--primary-solid)'; }
+        else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+        html += '<tr>' +
+          '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+          '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (row.jenjang || '-') + '</span></td>' +
+          '<td style="font-weight:600; letter-spacing:0.5px;">' + (row.nsm || '-') + '</td>' +
+          '<td style="font-weight:700; color:var(--text-main);">' + (row.nama || '-') + '</td>' +
+          '<td><span style="display:inline-flex; align-items:center; gap:4px;">📍 ' + (row.kecamatan || '-') + '</span></td>' +
+          '<td style="text-align:center;"><span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid); font-weight:700;">✅ LENGKAP</span></td>' +
+        '</tr>';
+      }
+
+      tbody.innerHTML = html;
+    }
+
+    function formatMissingModulesText(missingModules) {
+      if (!missingModules || missingModules.length === 0) return "Kelembagaan, Siswa, dan Sarana Prasarana";
+      var mapped = missingModules.map(function(m) {
+        if (m === "Sarpras") return "Sarana Prasarana";
+        return m;
+      });
+      if (mapped.length === 1) return mapped[0];
+      if (mapped.length === 2) return mapped[0] + " dan " + mapped[1];
+      return mapped.slice(0, -1).join(", ") + ", dan " + mapped[mapped.length - 1];
+    }
+
+    function formatWaUrl(phone, text) {
+      if (!phone) return "";
+      var clean = phone.replace(/[^0-9]/g, '');
+      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+      if (clean.startsWith('8')) clean = '62' + clean;
+      return "https://wa.me/" + clean + "?text=" + encodeURIComponent(text || "");
+    }
+
+    function openModalBelumLengkap() {
+      var modal = document.getElementById('modal-belum-lengkap');
+      var tbody = document.getElementById('table-modal-belum-lengkap');
+      document.getElementById('modal-bl-tp-label').innerText = currentTahunPelajaran;
+
+      var list = fullRekapData.filter(function(x) {
+        return x.kelengkapan === 'BELUM LENGKAP';
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Alhamdulillah, seluruh lembaga telah mengisi data secara lengkap atau belum mengisi sama sekali.</td></tr>';
+      } else {
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var item = list[i];
+          var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+          var jgBadgeColor = 'var(--primary-solid)';
+          var jgName = (item.jenjang || '-').toUpperCase();
+          if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+          else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+          else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+          var badgeLbg = item.hasKelembagaan ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+          var badgeSsw = item.hasSiswa ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+          var badgeSpr = item.hasSarpras ? '<span class="badge-check-ok">✅ Lengkap</span>' : '<span class="badge-check-no">❌ Belum</span>';
+
+          var missingText = formatMissingModulesText(item.missingModules);
+          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
+            "Kepada Yth. Operator " + item.nama + "\n" +
+            "Mohon untuk segera melengkapi data isian pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ". Bagian yang belum selesai diinput: " + missingText + ".\n" +
+            "Terima kasih.";
+
+          var waLink = formatWaUrl(item.waOp, waReminderText);
+          var btnWa = waLink ? 
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;">💬 Chat WA</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+
+          html += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+            '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (item.jenjang || '-') + '</span></td>' +
+            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong><br><small style="color:var(--text-muted); font-weight:600;">NSM: ' + (item.nsm || '-') + '</small></td>' +
+            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
+            '<td style="text-align:center;">' + badgeLbg + '</td>' +
+            '<td style="text-align:center;">' + badgeSsw + '</td>' +
+            '<td style="text-align:center;">' + badgeSpr + '</td>' +
+            '<td style="text-align:center;">' + btnWa + '</td>' +
+          '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModalBelumLengkap() { document.getElementById('modal-belum-lengkap').classList.remove('active'); }
+
+    function openModalBelumMengisi() {
+      var modal = document.getElementById('modal-belum-mengisi');
+      var tbody = document.getElementById('table-modal-belum-mengisi');
+      document.getElementById('modal-bm-tp-label').innerText = currentTahunPelajaran;
+
+      var list = fullRekapData.filter(function(x) {
+        return x.kelengkapan === 'BELUM MENGISI';
+      });
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Seluruh lembaga master telah mulai mengisi data untuk TP ' + currentTahunPelajaran + '.</td></tr>';
+      } else {
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var item = list[i];
+          var jgBadgeBg = 'rgba(0, 192, 90, 0.15)';
+          var jgBadgeColor = 'var(--primary-solid)';
+          var jgName = (item.jenjang || '-').toUpperCase();
+          if (jgName === 'MA') { jgBadgeBg = 'rgba(147, 51, 234, 0.15)'; jgBadgeColor = '#9333EA'; }
+          else if (jgName === 'MTS') { jgBadgeBg = 'rgba(59, 130, 246, 0.15)'; jgBadgeColor = '#3B82F6'; }
+          else if (jgName === 'RA') { jgBadgeBg = 'rgba(236, 72, 153, 0.15)'; jgBadgeColor = '#EC4899'; }
+
+          var contactInfo = (item.namaOp ? 'Op: <strong>' + item.namaOp + '</strong>' + (item.waOp ? '<br><small style="color:var(--text-muted);">' + item.waOp + '</small>' : '') : '') + 
+            (item.namaKepala ? (item.namaOp ? '<br>' : '') + '<small style="color:var(--text-muted);">Kepala: ' + item.namaKepala + '</small>' : '');
+          if (!contactInfo) contactInfo = '<span style="color:var(--text-muted);">-</span>';
+
+          var waReminderText = "Assalamu'alaikum Wr. Wb.\n" +
+            "Kepada Yth. Operator " + item.nama + "\n" +
+            "Mohon untuk segera melakukan pengisian data pada Portal Pendataan Madrasah/RA Kemenag Musi Rawas TP " + currentTahunPelajaran + ".\n" +
+            "Terima kasih.";
+
+          var waLink = formatWaUrl(item.waOp, waReminderText);
+          var btnWa = waLink ? 
+            '<a href="' + waLink + '" target="_blank" class="btn" style="padding:5px 10px; font-size:0.78rem; background:#25D366; text-decoration:none; color:#fff;">💬 Chat WA</a>' : 
+            '<span style="color:var(--text-muted); font-size:0.75rem;">No WA -</span>';
+
+          html += '<tr>' +
+            '<td style="text-align:center; font-weight:600;">' + (i + 1) + '</td>' +
+            '<td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + '; font-weight:700;">' + (item.jenjang || '-') + '</span></td>' +
+            '<td style="font-weight:600; font-size:0.85rem;">' + (item.nsm || '-') + '<br><small style="color:var(--text-muted);">' + (item.npsn || '-') + '</small></td>' +
+            '<td><strong style="color:var(--text-main);">' + (item.nama || '-') + '</strong></td>' +
+            '<td>📍 ' + (item.kecamatan || '-') + '</td>' +
+            '<td style="font-size:0.85rem;">' + contactInfo + '</td>' +
+            '<td style="text-align:center;">' + btnWa + '</td>' +
+          '</tr>';
+        }
+        tbody.innerHTML = html;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModalBelumMengisi() { document.getElementById('modal-belum-mengisi').classList.remove('active'); }
+
+    function shareWhatsAppBelumLengkap() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM LENGKAP'; });
+      if (list.length === 0) { showToast("Tidak ada lembaga berstatus Belum Lengkap.", "info"); return; }
+      var text = "Assalamu'alaikum Wr. Wb.\n\n📢 *MONITORING DATA EMIS MUSI RAWAS*\nTP: *" + currentTahunPelajaran + "*\n\n⚠️ *DAFTAR LEMBAGA BELUM LENGKAP (" + list.length + " LEMBAGA):*\n━━━━━━━━━━━━━━━━━━━━\n";
+      for (var i = 0; i < list.length; i++) {
+        text += (i + 1) + ". *" + list[i].nama + "* (" + list[i].jenjang + " - Kec. " + list[i].kecamatan + ")\n   ↳ Belum: _" + formatMissingModulesText(list[i].missingModules) + "_\n";
+      }
+      text += "━━━━━━━━━━━━━━━━━━━━\nMohon segera dilengkapi. Terima kasih.";
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+    }
+
+    function shareWhatsAppBelumMengisi() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
+      if (list.length === 0) { showToast("Seluruh lembaga sudah mulai mengisi data!", "info"); return; }
+      var text = "Assalamu'alaikum Wr. Wb.\n\n📢 *MONITORING DATA EMIS MUSI RAWAS*\nTP: *" + currentTahunPelajaran + "*\n\n❌ *DAFTAR LEMBAGA BELUM MENGISI DATA (" + list.length + " LEMBAGA):*\n━━━━━━━━━━━━━━━━━━━━\n";
+      for (var i = 0; i < list.length; i++) {
+        text += (i + 1) + ". *" + list[i].nama + "* (" + list[i].jenjang + " - Kec. " + list[i].kecamatan + ") [NSM: " + (list[i].nsm || '-') + "]\n";
+      }
+      text += "━━━━━━━━━━━━━━━━━━━━\nMohon segera melakukan pengisian data. Terima kasih.";
+      window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+    }
+
+    function cetakDaftarBelumLengkap() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM LENGKAP'; });
+      var printBody = document.getElementById('print-document-body');
+      var rowsHtml = '';
+      for (var i = 0; i < list.length; i++) {
+        rowsHtml += '<tr><td style="text-align:center;">' + (i + 1) + '</td><td style="text-align:center; font-weight:bold;">' + (list[i].jenjang || '-') + '</td><td>' + (list[i].nsm || '-') + '</td><td style="font-weight:bold;">' + (list[i].nama || '-') + '</td><td>' + (list[i].kecamatan || '-') + '</td><td style="text-align:center;">' + (list[i].hasKelembagaan ? '✅ Lengkap' : '❌ Belum') + '</td><td style="text-align:center;">' + (list[i].hasSiswa ? '✅ Lengkap' : '❌ Belum') + '</td><td style="text-align:center;">' + (list[i].hasSarpras ? '✅ Lengkap' : '❌ Belum') + '</td></tr>';
+      }
+      printBody.innerHTML = '<div class="print-kop-header"><h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4><h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4><h3>SEKSI PENDIDIKAN MADRASAH</h3></div><div class="print-title">DAFTAR LEMBAGA BELUM LENGKAP INPUT DATA (TP ' + currentTahunPelajaran + ')</div><table class="print-table"><thead><tr><th>NO</th><th>JENJANG</th><th>NSM</th><th>NAMA LEMBAGA</th><th>KECAMATAN</th><th>KELEMBAGAAN</th><th>SISWA</th><th>SARPRAS</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+      setTimeout(function() { window.print(); }, 200);
+    }
+
+    function cetakDaftarBelumMengisi() {
+      var list = fullRekapData.filter(function(x) { return x.kelengkapan === 'BELUM MENGISI'; });
+      var printBody = document.getElementById('print-document-body');
+      var rowsHtml = '';
+      for (var i = 0; i < list.length; i++) {
+        rowsHtml += '<tr><td style="text-align:center;">' + (i + 1) + '</td><td style="text-align:center; font-weight:bold;">' + (list[i].jenjang || '-') + '</td><td>' + (list[i].nsm || '-') + '</td><td style="font-weight:bold;">' + (list[i].nama || '-') + '</td><td>' + (list[i].statusLembaga || '-') + '</td><td>' + (list[i].kecamatan || '-') + '</td></tr>';
+      }
+      printBody.innerHTML = '<div class="print-kop-header"><h4>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4><h4>KANTOR KEMENTERIAN AGAMA KABUPATEN MUSI RAWAS</h4><h3>SEKSI PENDIDIKAN MADRASAH</h3></div><div class="print-title">DAFTAR LEMBAGA BELUM MENGISI DATA (TP ' + currentTahunPelajaran + ')</div><table class="print-table"><thead><tr><th>NO</th><th>JENJANG</th><th>NSM</th><th>NAMA LEMBAGA</th><th>STATUS</th><th>KECAMATAN</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+      setTimeout(function() { window.print(); }, 200);
+    }
+
+    function applyPeriodeStatusUI() {
+      var isClosed = (currentStatusPeriode === 'DITUTUP');
+      document.getElementById('dashboard-periode-alert').style.display = isClosed ? 'flex' : 'none';
+      document.getElementById('form-lbg-closed-alert').style.display = isClosed ? 'flex' : 'none';
+      document.getElementById('form-siswa-closed-alert').style.display = isClosed ? 'flex' : 'none';
+      document.getElementById('form-spr-closed-alert').style.display = isClosed ? 'flex' : 'none';
+
+      document.getElementById('btn-submit-lbg').disabled = isClosed;
+      document.getElementById('btn-submit-siswa').disabled = isClosed;
+      document.getElementById('btn-submit-spr').disabled = isClosed;
+
+      var badge = document.getElementById('admin-periode-status-badge');
+      var btnToggle = document.getElementById('btn-toggle-tutup-periode');
+      var progressInfo = document.getElementById('admin-progress-info');
+
+      if (isClosed) {
+        badge.innerText = "DITUTUP (Pengisian Dikunci)";
+        badge.style.background = "rgba(239, 68, 68, 0.15)";
+        badge.style.color = "#EF4444";
+        btnToggle.innerText = "🔓 Buka Kembali Periode Pengisian";
+        btnToggle.style.background = "var(--primary-solid)";
+      } else {
+        badge.innerText = "DIBUKA (Bebas Input)";
+        badge.style.background = "rgba(0, 192, 90, 0.15)";
+        badge.style.color = "var(--primary-solid)";
+        btnToggle.innerText = "🔒 Tutup Periode Pengisian";
+        btnToggle.style.background = "#EF4444";
+      }
+
+      if (isAllInstitutionsCompleted) {
+        progressInfo.innerHTML = "✅ <strong>100% Selesai!</strong> Seluruh lembaga telah mengisi data secara lengkap.";
+        progressInfo.style.color = "var(--primary-solid)";
+      } else {
+        progressInfo.innerHTML = "⏳ Masih ada lembaga yang belum mengisi atau belum lengkap.";
+        progressInfo.style.color = "var(--text-muted)";
+      }
+    }
+
+    function togglePeriodeAction() {
+      var targetStatus = (currentStatusPeriode === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
+      var btn = document.getElementById('btn-toggle-tutup-periode');
+      btn.innerText = "Memproses...";
+      btn.disabled = true;
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus })
+      })
+      .then(function() {
+        btn.disabled = false;
+        currentStatusPeriode = targetStatus;
+        applyPeriodeStatusUI();
+        showToast("Status periode diatur ke: " + targetStatus, "success");
+      })
+      .catch(function() {
+        btn.disabled = false;
+        currentStatusPeriode = targetStatus;
+        applyPeriodeStatusUI();
+        showToast("Status periode diatur ke: " + targetStatus, "success");
+      });
+    }
+
     function verifyPinSubmit() {
       var pin = document.getElementById('pin-input').value;
       if(!pin) { showToast("PIN tidak boleh kosong", "error"); return; }
@@ -1484,21 +1907,16 @@
         if((response && response.status === 'success') || pin === '1234') {
           var targetAction = pinModalTarget;
           closePinModal();
-          if (targetAction === 'rekapitulasi') {
-            navigate('rekapitulasi');
-          } else if (targetAction === 'modal-belum-lengkap') {
-            openModalBelumLengkap();
-          } else if (targetAction === 'modal-belum-mengisi') {
-            openModalBelumMengisi();
-          } else {
-            navigate('admin-emis');
-          }
+          if (targetAction === 'rekapitulasi') navigate('rekapitulasi');
+          else if (targetAction === 'modal-belum-lengkap') openModalBelumLengkap();
+          else if (targetAction === 'modal-belum-mengisi') openModalBelumMengisi();
+          else navigate('admin-emis');
           showToast("Akses Diberikan", "success");
         } else {
           showToast(response ? response.message : "PIN Salah!", "error");
         }
       })
-      .catch(function(err) {
+      .catch(function() {
         if (pin === '1234') {
           closePinModal();
           navigate(pinModalTarget);
@@ -1506,6 +1924,20 @@
         } else {
           showToast("PIN Salah!", "error");
         }
+      });
+    }
+
+    function updateAdminPin() {
+      var newPin = document.getElementById('admin-new-pin').value;
+      if (!newPin || newPin.length < 4) { showToast("PIN Admin baru minimal 4 digit!", "error"); return; }
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "setAdminPin", newPin: newPin })
+      })
+      .then(function() {
+        showToast("PIN Admin EMIS berhasil diperbarui!", "success");
+        document.getElementById('admin-new-pin').value = '';
       });
     }
 
@@ -1836,7 +2268,6 @@
 
     // ====================================================
     // EARLY WARNING SYSTEM (EWS): TERPISAH IZIN OP & AKREDITASI
-    // (TERPISAH STATUS SUDAH HABIS & AKAN HABIS < 6 BULAN)
     // ====================================================
     function checkAndRenderEwsAlerts() {
       var containerRekap = document.getElementById('rekap-ews-container');
@@ -1870,7 +2301,6 @@
       for (var i = 0; i < fullRekapData.length; i++) {
         var row = fullRekapData[i];
 
-        // 1. Cek Izin Operasional
         if (row.akhirIzin) {
           var dtIzin = parseDateClean(row.akhirIzin);
           if (dtIzin) {
@@ -1891,7 +2321,6 @@
           }
         }
 
-        // 2. Cek Akreditasi
         if (row.akhirAkred) {
           var dtAkred = parseDateClean(row.akhirAkred);
           if (dtAkred) {
@@ -2052,7 +2481,6 @@
       
       if (statusSel) {
         if (jg === 'RA') {
-          // Khusus jenjang RA di data kelembagaan berstatus SWASTA
           statusSel.value = 'SWASTA';
           statusSel.disabled = true;
         } else {
@@ -2172,9 +2600,6 @@
       tbody.innerHTML = html;
     }
 
-    // ====================================================
-    // CETAK KHUSUS LEMBARAN ISI REKAPITULASI (PRINT & PDF)
-    // ====================================================
     function preparePrintDocumentTable(titleSuffix) {
       var printBody = document.getElementById('print-document-body');
       var filtered = (currentFilteredData && currentFilteredData.length > 0) ? currentFilteredData : fullRekapData;
@@ -2262,7 +2687,7 @@
 
     function exportPdfRekapitulasi() {
       preparePrintDocumentTable("Export Dokumen PDF");
-      showToast("Menyiapkan lembaran PDF... Pilih 'Save as PDF' / 'Simpan sebagai PDF' pada jendela cetak", "info");
+      showToast("Menyiapkan lembaran PDF... Pilih 'Save as PDF' pada jendela cetak", "info");
       setTimeout(function() { window.print(); }, 300);
     }
 
