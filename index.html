@@ -1236,7 +1236,7 @@
   <div class="modal-overlay" id="pin-modal">
     <div class="modal-content">
       <h3 id="pin-modal-title" style="margin-bottom:8px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3>
-      <p id="pin-modal-desc" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Silakan masukkan PIN untuk melanjutkan.</p>
+      <p id="pin-modal-desc" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Masukkan Password</p>
       <input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing: 12px; font-weight:700; font-size:1.5rem; background: var(--bg-body);" onkeydown="handlePinKeydown(event)">
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button>
@@ -1365,7 +1365,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxXJj4Avuc5nOHF9c9x5nhVmV92nmEt0bCc9cnDjK4jML4lIJEMyngIvbX3pp0KYE0/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYZ3dooGnguA3xmzjNHFzjmCsL1ZfWJcz3U1J-FawZ5OAa35pzvLeLzt4CjUXBirJb/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
 
     var globalInstitutions = [];
@@ -1469,16 +1469,16 @@
       var descEl = document.getElementById('pin-modal-desc');
       if (pinModalTarget === 'rekapitulasi') {
         titleEl.innerText = "🔒 Akses Menu Rekapitulasi";
-        descEl.innerText = "Menu Rekapitulasi diproteksi. Masukkan PIN untuk membuka.";
+        descEl.innerText = "Masukkan Password";
       } else if (pinModalTarget === 'modal-belum-lengkap') {
-        titleEl.innerText = "🔒 Rincian Belum Lengkap";
-        descEl.innerText = "Masukkan PIN Rekapitulasi / Fitur Terbatas untuk melihat rincian.";
+        titleEl.innerText = "🔒 Otorisasi: Data Belum Lengkap";
+        descEl.innerText = "Masukkan Password";
       } else if (pinModalTarget === 'modal-belum-mengisi') {
-        titleEl.innerText = "🔒 Rincian Belum Mengisi";
-        descEl.innerText = "Masukkan PIN Rekapitulasi / Fitur Terbatas untuk melihat rincian.";
+        titleEl.innerText = "🔒 Otorisasi: Data Belum Mengisi";
+        descEl.innerText = "Masukkan Password";
       } else {
         titleEl.innerText = "⚙️ Otorisasi Admin EMIS";
-        descEl.innerText = "Masukkan PIN khusus Admin EMIS untuk membuka menu kontrol.";
+        descEl.innerText = "Masukkan Password";
       }
       document.getElementById('pin-input').value = '';
       document.getElementById('pin-modal').classList.add('active');
@@ -1926,7 +1926,7 @@
 
     function verifyPinSubmit() {
       var pin = document.getElementById('pin-input').value;
-      if(!pin) { showToast("PIN tidak boleh kosong", "error"); return; }
+      if(!pin) { showToast("Password tidak boleh kosong", "error"); return; }
       
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
@@ -1945,7 +1945,7 @@
           else navigate('admin-emis');
           showToast("Akses Diberikan", "success");
         } else {
-          showToast(response ? response.message : "PIN Salah!", "error");
+          showToast(response ? response.message : "Password Salah!", "error");
         }
       })
       .catch(function() {
@@ -1954,7 +1954,7 @@
           navigate(pinModalTarget);
           showToast("Akses Diberikan", "success");
         } else {
-          showToast("PIN Salah!", "error");
+          showToast("Password Salah!", "error");
         }
       });
     }
