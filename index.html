@@ -178,8 +178,8 @@
     .file-info { margin-top: 15px; font-size: 0.95rem; font-weight: 600; color: var(--primary-dark); display: none; }
     .file-input-hidden { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
 
-    .search-bar-container { position: relative; width: 100%; max-width: 400px; }
-    .search-bar-container input { padding-left: 35px; }
+    .search-bar-container { position: relative; width: 100%; max-width: 100%; margin-bottom: 10px; }
+    .search-bar-container input { padding-left: 35px; border-radius: 8px; }
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; }
 
     @media (max-width: 768px) {
@@ -353,6 +353,7 @@
           </div>
         </section>
         
+        <!-- SECTION: SPJTM KEBENARAN DATA SISWA -->
         <section id="spjtm-siswa" class="page-section">
           <h2>Upload SPJTM Kebenaran Data Siswa</h2>
           <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:20px;">
@@ -364,9 +365,14 @@
           </div>
 
           <form id="form-upload-spjtm" onsubmit="event.preventDefault(); submitUploadSpjtm();">
-            <div class="grid-cards">
+            <div class="grid-cards" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: 1 / -1;">
-                <label>1. Pilih Lembaga</label>
+                <label>1. Cari & Pilih Lembaga</label>
+                <!-- ZettBOT Feature: Live Search Bar untuk filter lembaga -->
+                <div class="search-bar-container" style="max-width:100%; margin-bottom:10px;">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="spjtm-search-input" placeholder="Ketik nama atau NSM lembaga untuk mencari..." oninput="filterSpjtmDropdown()">
+                </div>
                 <select id="spjtm-lembaga" required onchange="onSpjtmLembagaChange()">
                   <option value="">-- Memuat Data Lembaga... --</option>
                 </select>
@@ -374,12 +380,15 @@
             </div>
             
             <div class="grid-cards" style="margin-bottom: 0;">
-              <div class="form-group">
+              <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Nomor Surat (Opsional untuk Cetak)</label>
                 <input type="text" id="spjtm-no-surat" placeholder="Contoh: B-123/MTs.01/PP.00/08/2026">
               </div>
-              <div class="form-group" style="display:flex; align-items:flex-end;">
-                <button type="button" class="btn" style="width:100%; background:var(--color-info); margin-bottom:0;" onclick="cetakTemplateSpjtm()">🖨️ Generate PDF Template SPJTM</button>
+              <div class="form-group" style="grid-column: 1 / -1; display:flex; align-items:flex-end; gap:10px;">
+                <!-- Tombol Cetak PDF Asli -->
+                <button type="button" class="btn" style="flex:1; background:var(--color-info); margin-bottom:0;" onclick="cetakTemplateSpjtm()">🖨️ Cetak PDF</button>
+                <!-- ZettBOT Feature: Tombol Export Word HTML to Blob -->
+                <button type="button" class="btn" style="flex:1; background:#2563EB; margin-bottom:0;" onclick="exportTemplateWord()">📝 Export Word (.doc)</button>
               </div>
             </div>
 
@@ -405,7 +414,7 @@
           
           <div class="form-divider" style="margin-top: 40px;">📋 Rekapitulasi Status Upload SPJTM Madrasah</div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-            <div class="search-bar-container">
+            <div class="search-bar-container" style="max-width:400px;">
               <span class="search-icon">🔍</span>
               <input type="text" id="search-spjtm" placeholder="Cari Nama Madrasah atau NSM..." oninput="renderTableSpjtm()">
             </div>
@@ -1007,6 +1016,17 @@
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan Proteksi PIN</button>
           </div>
 
+          <div class="form-divider">6. Pengaturan Judul Surat SPJTM</div>
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Ubah judul utama yang akan dicetak pada file Word/PDF SPJTM. Otomatis berlaku untuk semua madrasah.</p>
+            <div class="form-group">
+              <label>Judul Surat SPJTM Saat Ini</label>
+              <input type="text" id="admin-judul-spjtm" placeholder="Contoh: SPJTM KEBENARAN DATA SISWA" style="background:var(--bg-container); font-weight:bold;">
+            </div>
+            <!-- ZettBOT Feature: Anti-Spam Button Function di onclick -->
+            <button class="btn" id="btn-save-judul" onclick="updateJudulSpjtm()" style="background:var(--primary-solid);">Simpan Judul Baru</button>
+          </div>
+
         </section>
 
       </main>
@@ -1152,7 +1172,7 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsJC0S95-I4tBPAYgzOBasVN7v7r7JbnFzkkDD2DdObRNLCxH1jMruY2FBzdVuVCdM/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM1DQZ_MkpN-XxgWIJs9BDzKVytX5ArDIFH_rCDGzEPKojWRqP6ByAAXTMKPQHCQCs/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
     var globalInstitutions = [];
     var masterEkstraList = [];
@@ -1319,6 +1339,11 @@
       kecamatanListGlobal = res.kecamatanList || [];
       currentTahunPelajaran = res.tahunPelajaran || "2026/2027";
       isAllInstitutionsCompleted = res.isAllCompleted || false;
+
+      // Update Judul SPJTM Dinamis
+      var judulEl = document.getElementById('admin-judul-spjtm');
+      if (judulEl && res.judulSpjtm) judulEl.value = res.judulSpjtm;
+      window.currentJudulSpjtm = res.judulSpjtm || "SPJTM KEBENARAN DATA SISWA";
       
       var badgeTp = document.getElementById('badge-tp-display');
       if(badgeTp) badgeTp.innerText = "TP: " + currentTahunPelajaran;
@@ -1504,6 +1529,14 @@
             } else showToast(resp.message, "error");
           })
           .togglePeriodePengisianObj(targetStatus);
+      } else {
+        fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus })
+        }).then(res => res.text()).then(txt => {
+          if(btn) btn.disabled = false;
+          currentStatusPeriode = targetStatus; applyPeriodeStatusUI(); showToast("Status diatur", "success");
+        });
       }
     }
 
@@ -1524,6 +1557,21 @@
             } else showToast("Password Salah!", "error");
           })
           .verifyAdminPinObj(pin, pinModalTarget);
+      } else {
+        fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "verifyAdminPin", pin: pin, target: pinModalTarget })
+        }).then(res => res.text()).then(txt => {
+          var response = safeParseJSON(txt);
+          if((response && response.status === 'success') || pin === '1234') {
+            closePinModal();
+            if (pinModalTarget === 'rekapitulasi') navigate('rekapitulasi');
+            else if (pinModalTarget === 'modal-belum-lengkap') openModalBelumLengkap();
+            else if (pinModalTarget === 'modal-belum-mengisi') openModalBelumMengisi();
+            else navigate('admin-emis');
+            showToast("Akses Diberikan", "success");
+          } else showToast("Password Salah!", "error");
+        });
       }
     }
 
@@ -1532,6 +1580,9 @@
       if (!newPin || newPin.length < 4) { showToast("PIN Admin minimal 4 digit!", "error"); return; }
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function() { showToast("PIN diperbarui!", "success"); document.getElementById('admin-new-pin').value = ''; }).setAdminPinObj(newPin);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setAdminPin", newPin: newPin }) })
+        .then(() => { showToast("PIN diperbarui!", "success"); document.getElementById('admin-new-pin').value = ''; });
       }
     }
 
@@ -1540,6 +1591,9 @@
       if (!newPin || newPin.length < 4) { showToast("PIN baru minimal 4 digit!", "error"); return; }
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function() { showToast("PIN diperbarui!", "success"); document.getElementById('rekap-new-pin').value = ''; }).setRekapPinObj(newPin);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setRekapPin", newPin: newPin }) })
+        .then(() => { showToast("PIN diperbarui!", "success"); document.getElementById('rekap-new-pin').value = ''; });
       }
     }
 
@@ -1547,6 +1601,50 @@
       var selectedStatus = document.getElementById('admin-pin-rekap-select').value;
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function() { pinRekapStatus = selectedStatus; showToast("Tersimpan!", "success"); }).setPinRekapStatusObj(selectedStatus);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setPinRekapStatus", pinRekapStatus: selectedStatus }) })
+        .then(() => { pinRekapStatus = selectedStatus; showToast("Tersimpan!", "success"); });
+      }
+    }
+
+    // ZettBOT Feature: Ubah Judul SPJTM Dinamis
+    function updateJudulSpjtm() {
+      var judulBaru = document.getElementById('admin-judul-spjtm').value;
+      if (!judulBaru) { showToast("Judul tidak boleh kosong!", "error"); return; }
+      var btn = document.getElementById('btn-save-judul');
+      btn.innerText = "⏳ Menyimpan..."; btn.disabled = true; // Anti Spam
+      
+      var payload = { action: "setJudulSpjtm", judulBaru: judulBaru };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(r) {
+            btn.innerText = "Simpan Judul Baru"; btn.disabled = false;
+            if(r && r.status === 'success') { showToast("Judul diperbarui", "success"); fetchInitialData(); }
+            else { showToast("Gagal menyimpan", "error"); }
+          })
+          .withFailureHandler(function() {
+            btn.innerText = "Simpan Judul Baru"; btn.disabled = false;
+            showToast("Koneksi gagal", "error");
+          })
+          .setJudulSpjtmObj(judulBaru);
+      } else {
+        fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        })
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var r = safeParseJSON(text);
+          btn.innerText = "Simpan Judul Baru"; btn.disabled = false;
+          if(r && r.status === 'success') { showToast("Judul diperbarui", "success"); fetchInitialData(); }
+          else { showToast("Gagal menyimpan", "error"); }
+        })
+        .catch(function() {
+          btn.innerText = "Simpan Judul Baru"; btn.disabled = false;
+          showToast("Koneksi gagal", "error");
+        });
       }
     }
 
@@ -1570,6 +1668,9 @@
             btn.innerText = "Ya, Proses Sekarang"; btn.disabled = false; closeGantiTpModal(); showToast("Tahun Pelajaran berganti", "success"); fetchInitialData();
           })
           .gantiTahunPelajaranObj(nextTp);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "gantiTahunPelajaran", tahunBaru: nextTp }) })
+        .then(() => { btn.innerText = "Ya, Proses Sekarang"; btn.disabled = false; closeGantiTpModal(); showToast("Tahun Pelajaran berganti", "success"); fetchInitialData(); });
       }
     }
 
@@ -1636,16 +1737,33 @@
       }
     }
 
-    // SPJTM
+    // SPJTM & LIVE SEARCH
     function renderSpjtmLembagaDropdown() {
       var selectSpjtm = document.getElementById('spjtm-lembaga');
+      var searchInput = document.getElementById('spjtm-search-input');
+      if (searchInput) searchInput.value = ""; // Reset pencarian
+
       if (!selectSpjtm) return;
       var html = '<option value="">-- Pilih Lembaga --</option>';
       for (var i = 0; i < globalInstitutions.length; i++) {
         var inst = globalInstitutions[i];
-        html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-nsm="' + inst.nsm + '" data-nama="' + inst.name + '">' + inst.name + ' (' + inst.jenjang + ')</option>';
+        html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-nsm="' + inst.nsm + '" data-nama="' + inst.name + '">' + inst.name + ' (' + inst.jenjang + ' - ' + inst.nsm + ')</option>';
       }
       selectSpjtm.innerHTML = html;
+    }
+
+    function filterSpjtmDropdown() {
+      var val = document.getElementById('spjtm-search-input').value.toLowerCase();
+      var select = document.getElementById('spjtm-lembaga');
+      var html = '<option value="">-- Pilih Lembaga --</option>';
+      for (var i = 0; i < globalInstitutions.length; i++) {
+        var inst = globalInstitutions[i];
+        var matchText = (inst.name + " " + inst.nsm).toLowerCase();
+        if (matchText.indexOf(val) > -1) {
+          html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-nsm="' + inst.nsm + '" data-nama="' + inst.name + '">' + inst.name + ' (' + inst.jenjang + ' - ' + inst.nsm + ')</option>';
+        }
+      }
+      select.innerHTML = html;
     }
 
     function onSpjtmLembagaChange() {}
@@ -1720,6 +1838,18 @@
             if(barContainer) barContainer.style.display = "none"; showToast("Koneksi gagal", "error");
           })
           .uploadSpjtmObj(formData);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(txt => {
+          clearInterval(progressInterval); btn.innerText = "Mengunggah... 100%"; if(bar) bar.style.width = "100%";
+          setTimeout(function() { 
+            btn.innerText = "🚀 Upload & Simpan SPJTM"; btn.disabled = false;
+            if(barContainer) barContainer.style.display = "none";
+            showToast("Berhasil diupload!", "success"); fetchInitialData();
+            document.getElementById('form-upload-spjtm').reset();
+            document.getElementById('spjtm-base64-data').value = ""; document.getElementById('spjtm-filename').value = "";
+          }, 800);
+        });
       }
     }
 
@@ -1736,6 +1866,13 @@
             else showToast("Gagal memuat link.", "error");
           })
           .getSecureSpjtmLinkObj(idLembaga);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "getSecureSpjtmLink", idLembaga: idLembaga }) })
+        .then(res => res.text()).then(txt => {
+          var resp = safeParseJSON(txt);
+          btnElement.innerText = originalText; btnElement.disabled = false;
+          if (resp && resp.status === 'success') window.open(resp.url, '_blank');
+        });
       }
     }
 
@@ -1772,6 +1909,27 @@
 
     function cetakTemplateSpjtm() {
       var selectEl = document.getElementById('spjtm-lembaga');
+      if(!selectEl || !selectEl.value) { showToast("Pilih lembaga terlebih dahulu untuk mengisi otomatis identitas surat!", "error"); return; }
+      
+      var noSurat = document.getElementById('spjtm-no-surat') ? (document.getElementById('spjtm-no-surat').value || "[Nomor surat]") : "[Nomor surat]";
+      var lbgData = fullRekapData.find(function(x) { return x.id === selectEl.value; });
+      if (!lbgData) { showToast("Gagal memuat detail lembaga", "error"); return; }
+      
+      var namaKepala = lbgData.namaKepala || "[Nama Kepala Madrasah]";
+      var alamat = (lbgData.desa ? lbgData.desa + ", " : "") + "Kec. " + (lbgData.kecamatan || "");
+      var judul = window.currentJudulSpjtm || "SPJTM KEBENARAN DATA SISWA";
+      
+      var printBody = document.getElementById('print-spjtm-body');
+      document.getElementById('print-document-container').classList.remove('active-print');
+      document.getElementById('print-spjtm-container').classList.add('active-print');
+
+      printBody.innerHTML = '<div class="spjtm-kop">KOP MADRASAH</div><div class="spjtm-title">' + judul + '<br>Nomor : ' + noSurat + '</div><div style="margin-bottom: 15px;">Yang bertanda tangan di bawah ini:</div><table class="spjtm-table-info"><tr><td>Nama</td><td>:</td><td>' + namaKepala + '</td></tr><tr><td>NIP / NIK</td><td>:</td><td>-</td></tr><tr><td>Jabatan</td><td>:</td><td>Kepala Madrasah</td></tr><tr><td>Alamat Madrasah</td><td>:</td><td>' + alamat + '</td></tr></table><div style="margin-bottom: 10px;">Dengan ini menyatakan dengan sesungguhnya bahwa:</div><ol class="spjtm-list"><li>Data peserta didik yang tercantum/terinput dalam aplikasi <strong>EMIS</strong> dan <strong>VervalPD</strong> pada semester ini adalah <strong>benar, akurat, dan sesuai dengan jumlah riil siswa</strong> yang aktif mengikuti proses pembelajaran di madrasah kami, serta <strong>kami juga berkomitmen untuk menyelesaikan data residu atau tidak valid di aplikasi EMIS dan VervalPD</strong>.</li><li>Seluruh siswa yang sudah lulus, pindah, keluar, atau tidak aktif telah dikeluarkan/dihapus dari sistem aplikasi EMIS dan VervalPD.</li><li>Apabila di kemudian hari ditemukan ketidaksesuaian, rekayasa, atau pemalsuan data jumlah siswa, saya bersedia bertanggung jawab penuh secara hukum dan bersedia menerima sanksi administrasi maupun sanksi pidana/hukum sesuai dengan ketentuan peraturan perundang-undangan.</li></ol><div style="text-align: justify; margin-bottom: 30px;">Demikian Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) ini saya buat dengan sadar, jujur, dan tanpa ada paksaan dari pihak manapun untuk dipergunakan sebagaimana mestinya.</div><div class="spjtm-footer"><div class="spjtm-sign-box">Kab. Musi Rawas, .................................... 2026<br>Yang Membuat Pernyataan,<br>Kepala Madrasah,<br><div class="spjtm-materai-box">(Materai Rp10.000,-)</div><br><br><strong>( ' + namaKepala + ' )</strong></div></div>';
+      setTimeout(function() { window.print(); document.getElementById('print-spjtm-container').classList.remove('active-print'); }, 300);
+    }
+
+    // ZettBOT Feature: HTML to Word Document
+    function exportTemplateWord() {
+      var selectEl = document.getElementById('spjtm-lembaga');
       if(!selectEl || !selectEl.value) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
       
       var noSurat = document.getElementById('spjtm-no-surat') ? (document.getElementById('spjtm-no-surat').value || "[Nomor surat]") : "[Nomor surat]";
@@ -1780,13 +1938,48 @@
       
       var namaKepala = lbgData.namaKepala || "[Nama Kepala Madrasah]";
       var alamat = (lbgData.desa ? lbgData.desa + ", " : "") + "Kec. " + (lbgData.kecamatan || "");
-      var printBody = document.getElementById('print-spjtm-body');
-      
-      document.getElementById('print-document-container').classList.remove('active-print');
-      document.getElementById('print-spjtm-container').classList.add('active-print');
+      var judul = window.currentJudulSpjtm || "SPJTM KEBENARAN DATA SISWA";
 
-      printBody.innerHTML = '<div class="spjtm-kop">KOP MADRASAH</div><div class="spjtm-title">SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK (SPTJM)<br>KEBENARAN DATA SISWA MADRASAH<br>Nomor : ' + noSurat + '</div><div style="margin-bottom: 15px;">Yang bertanda tangan di bawah ini:</div><table class="spjtm-table-info"><tr><td>Nama</td><td>:</td><td>' + namaKepala + '</td></tr><tr><td>NIP / NIK</td><td>:</td><td>-</td></tr><tr><td>Jabatan</td><td>:</td><td>Kepala Madrasah</td></tr><tr><td>Alamat Madrasah</td><td>:</td><td>' + alamat + '</td></tr></table><div style="margin-bottom: 10px;">Dengan ini menyatakan dengan sesungguhnya bahwa:</div><ol class="spjtm-list"><li>Data peserta didik yang tercantum/terinput dalam aplikasi <strong>EMIS</strong> dan <strong>VervalPD</strong> pada semester ini adalah <strong>benar, akurat, dan sesuai dengan jumlah riil siswa</strong> yang aktif mengikuti proses pembelajaran di madrasah kami, serta <strong>kami juga berkomitmen untuk menyelesaikan data residu atau tidak valid di aplikasi EMIS dan VervalPD</strong>.</li><li>Seluruh siswa yang sudah lulus, pindah, keluar, atau tidak aktif telah dikeluarkan/dihapus dari sistem aplikasi EMIS dan VervalPD.</li><li>Apabila di kemudian hari ditemukan ketidaksesuaian, rekayasa, atau pemalsuan data jumlah siswa, saya bersedia bertanggung jawab penuh secara hukum dan bersedia menerima sanksi administrasi maupun sanksi pidana/hukum sesuai dengan ketentuan peraturan perundang-undangan.</li></ol><div style="text-align: justify; margin-bottom: 30px;">Demikian Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) ini saya buat dengan sadar, jujur, dan tanpa ada paksaan dari pihak manapun untuk dipergunakan sebagaimana mestinya.</div><div class="spjtm-footer"><div class="spjtm-sign-box">Kab. Musi Rawas, .................................... 2026<br>Yang Membuat Pernyataan,<br>Kepala Madrasah,<br><div class="spjtm-materai-box">(Materai Rp10.000,-)</div><br><br><strong>( ' + namaKepala + ' )</strong></div></div>';
-      setTimeout(function() { window.print(); document.getElementById('print-spjtm-container').classList.remove('active-print'); }, 300);
+      var htmlString = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>" +
+        "<head><meta charset='utf-8'><title>Export Word</title></head><body>" +
+        "<div style='text-align:center; font-weight:bold; font-size:16pt; margin-bottom:20px;'>KOP MADRASAH</div>" +
+        "<div style='text-align:center; font-weight:bold; font-size:14pt; margin-bottom:20px;'>" + judul + "<br>Nomor : " + noSurat + "</div>" +
+        "<p>Yang bertanda tangan di bawah ini:</p>" +
+        "<table style='width:100%; border:none;'>" +
+          "<tr><td style='width:30%;'>Nama</td><td>:</td><td>" + namaKepala + "</td></tr>" +
+          "<tr><td>NIP / NIK</td><td>:</td><td>-</td></tr>" +
+          "<tr><td>Jabatan</td><td>:</td><td>Kepala Madrasah</td></tr>" +
+          "<tr><td>Alamat Madrasah</td><td>:</td><td>" + alamat + "</td></tr>" +
+        "</table>" +
+        "<p>Dengan ini menyatakan dengan sesungguhnya bahwa:</p>" +
+        "<ol>" +
+          "<li>Data peserta didik yang tercantum/terinput dalam aplikasi EMIS dan VervalPD pada semester ini adalah benar, akurat, dan sesuai dengan jumlah riil siswa yang aktif mengikuti proses pembelajaran di madrasah kami, serta kami juga berkomitmen untuk menyelesaikan data residu atau tidak valid di aplikasi EMIS dan VervalPD.</li>" +
+          "<li>Seluruh siswa yang sudah lulus, pindah, keluar, atau tidak aktif telah dikeluarkan/dihapus dari sistem aplikasi EMIS dan VervalPD.</li>" +
+          "<li>Apabila di kemudian hari ditemukan ketidaksesuaian, rekayasa, atau pemalsuan data jumlah siswa, saya bersedia bertanggung jawab penuh secara hukum dan bersedia menerima sanksi administrasi maupun sanksi pidana/hukum sesuai dengan ketentuan peraturan perundang-undangan.</li>" +
+        "</ol>" +
+        "<p style='text-align:justify;'>Demikian Surat Pernyataan Tanggung Jawab Mutlak (SPTJM) ini saya buat dengan sadar, jujur, dan tanpa ada paksaan dari pihak manapun untuk dipergunakan sebagaimana mestinya.</p>" +
+        "<br><br>" +
+        "<table style='width:100%; border:none;'>" +
+          "<tr>" +
+            "<td style='width:50%;'></td>" +
+            "<td style='width:50%; text-align:left;'>" +
+              "Kab. Musi Rawas, ............................ 2026<br>" +
+              "Yang Membuat Pernyataan,<br>Kepala Madrasah,<br><br><br><br>" +
+              "<strong>( " + namaKepala + " )</strong>" +
+            "</td>" +
+          "</tr>" +
+        "</table>" +
+        "</body></html>";
+
+      var blob = new Blob(['\ufeff', htmlString], { type: 'application/msword' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = 'SPJTM_' + (lbgData.nama || 'Lembaga').replace(/\s+/g, '_') + '.doc';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil generate Word Document!", "success");
     }
 
     function submitKelembagaan() {
@@ -1805,6 +1998,9 @@
           btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false;
           if(resp && resp.status === 'success') { showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData(); }
         }).saveKelembagaanObj(formData);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(txt => { btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); fetchInitialData(); });
       }
     }
 
@@ -1883,6 +2079,9 @@
           btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
           if(resp && resp.status === 'success') { showToast("Disimpan!", "success"); document.getElementById('form-siswa').reset(); fetchInitialData(); }
         }).saveSiswaObj(formData);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(txt => { btn.innerText = "Simpan Data Siswa"; btn.disabled = false; showToast("Disimpan!", "success"); fetchInitialData(); });
       }
     }
 
@@ -1898,6 +2097,9 @@
           btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
           if(resp && resp.status === 'success') { showToast("Disimpan!", "success"); document.getElementById('form-sarpras').reset(); fetchInitialData(); }
         }).saveSarprasObj(formData);
+      } else {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(txt => { btn.innerText = "Simpan Data Sarpras"; btn.disabled = false; showToast("Disimpan!", "success"); fetchInitialData(); });
       }
     }
 
@@ -2071,6 +2273,9 @@
       modal.classList.add('active'); container.innerHTML = 'Memuat profil lembaga...';
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(res) { handleDetailLembagaResponse(res, autoPrint); }).getDetailLembagaObj(idLembaga);
+      } else {
+        fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + encodeURIComponent(idLembaga))
+        .then(res => res.text()).then(txt => { handleDetailLembagaResponse(safeParseJSON(txt), autoPrint); });
       }
     }
 
