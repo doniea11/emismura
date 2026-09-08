@@ -353,7 +353,6 @@
           </div>
         </section>
         
-        <!-- SECTION: SPJTM KEBENARAN DATA SISWA -->
         <section id="spjtm-siswa" class="page-section">
           <h2>Upload SPJTM Kebenaran Data Siswa</h2>
           <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:20px;">
@@ -368,7 +367,7 @@
             <div class="grid-cards" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>1. Cari & Pilih Lembaga</label>
-                <!-- ZettBOT Feature: Live Search Bar untuk filter lembaga -->
+                <!-- Live Search Bar -->
                 <div class="search-bar-container" style="max-width:100%; margin-bottom:10px;">
                   <span class="search-icon">🔍</span>
                   <input type="text" id="spjtm-search-input" placeholder="Ketik nama atau NSM lembaga untuk mencari..." oninput="filterSpjtmDropdown()">
@@ -385,9 +384,8 @@
                 <input type="text" id="spjtm-no-surat" placeholder="Contoh: B-123/MTs.01/PP.00/08/2026">
               </div>
               <div class="form-group" style="grid-column: 1 / -1; display:flex; align-items:flex-end; gap:10px;">
-                <!-- Tombol Cetak PDF Asli -->
                 <button type="button" class="btn" style="flex:1; background:var(--color-info); margin-bottom:0;" onclick="cetakTemplateSpjtm()">🖨️ Cetak PDF</button>
-                <!-- ZettBOT Feature: Tombol Export Word HTML to Blob -->
+                <!-- ZettBOT Feature: Export Word Dinamis -->
                 <button type="button" class="btn" style="flex:1; background:#2563EB; margin-bottom:0;" onclick="exportTemplateWord()">📝 Export Word (.doc)</button>
               </div>
             </div>
@@ -1016,6 +1014,7 @@
             <button class="btn" onclick="savePinRekapSetting()" style="background:var(--primary-solid);">Simpan Pengaturan Proteksi PIN</button>
           </div>
 
+          <!-- ZettBOT Feature: Ubah Judul SPJTM Dinamis -->
           <div class="form-divider">6. Pengaturan Judul Surat SPJTM</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;">
             <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Ubah judul utama yang akan dicetak pada file Word/PDF SPJTM. Otomatis berlaku untuk semua madrasah.</p>
@@ -1023,7 +1022,6 @@
               <label>Judul Surat SPJTM Saat Ini</label>
               <input type="text" id="admin-judul-spjtm" placeholder="Contoh: SPJTM KEBENARAN DATA SISWA" style="background:var(--bg-container); font-weight:bold;">
             </div>
-            <!-- ZettBOT Feature: Anti-Spam Button Function di onclick -->
             <button class="btn" id="btn-save-judul" onclick="updateJudulSpjtm()" style="background:var(--primary-solid);">Simpan Judul Baru</button>
           </div>
 
@@ -1172,8 +1170,9 @@
   </div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM1DQZ_MkpN-XxgWIJs9BDzKVytX5ArDIFH_rCDGzEPKojWRqP6ByAAXTMKPQHCQCs/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyl_UozrOMqkyl5OZoCkoDmFK5Py8RBRRiYZm-V8KJXquKzQ6cNKErjKOALgosLoapv/exec"; // Ganti bagian ini dengan URL API Anda jika menggunakan Vercel
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
+
     var globalInstitutions = [];
     var masterEkstraList = [];
     var masterLabList = [];
@@ -1607,12 +1606,12 @@
       }
     }
 
-    // ZettBOT Feature: Ubah Judul SPJTM Dinamis
+    // UPDATE JUDUL SPJTM (Admin EMIS)
     function updateJudulSpjtm() {
       var judulBaru = document.getElementById('admin-judul-spjtm').value;
       if (!judulBaru) { showToast("Judul tidak boleh kosong!", "error"); return; }
       var btn = document.getElementById('btn-save-judul');
-      btn.innerText = "⏳ Menyimpan..."; btn.disabled = true; // Anti Spam
+      btn.innerText = "⏳ Menyimpan..."; btn.disabled = true;
       
       var payload = { action: "setJudulSpjtm", judulBaru: judulBaru };
 
@@ -1741,7 +1740,7 @@
     function renderSpjtmLembagaDropdown() {
       var selectSpjtm = document.getElementById('spjtm-lembaga');
       var searchInput = document.getElementById('spjtm-search-input');
-      if (searchInput) searchInput.value = ""; // Reset pencarian
+      if (searchInput) searchInput.value = ""; // Reset form cari
 
       if (!selectSpjtm) return;
       var html = '<option value="">-- Pilih Lembaga --</option>';
@@ -1752,10 +1751,12 @@
       selectSpjtm.innerHTML = html;
     }
 
+    // Fungsi Filter Dinamis (Live Search)
     function filterSpjtmDropdown() {
       var val = document.getElementById('spjtm-search-input').value.toLowerCase();
       var select = document.getElementById('spjtm-lembaga');
       var html = '<option value="">-- Pilih Lembaga --</option>';
+      
       for (var i = 0; i < globalInstitutions.length; i++) {
         var inst = globalInstitutions[i];
         var matchText = (inst.name + " " + inst.nsm).toLowerCase();
@@ -1927,7 +1928,7 @@
       setTimeout(function() { window.print(); document.getElementById('print-spjtm-container').classList.remove('active-print'); }, 300);
     }
 
-    // ZettBOT Feature: HTML to Word Document
+    // EKSPORT WORD (Client-side HTML to Blob DOCX)
     function exportTemplateWord() {
       var selectEl = document.getElementById('spjtm-lembaga');
       if(!selectEl || !selectEl.value) { showToast("Pilih lembaga terlebih dahulu!", "error"); return; }
@@ -1975,7 +1976,11 @@
       var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
       link.href = url;
-      link.download = 'SPJTM_' + (lbgData.nama || 'Lembaga').replace(/\s+/g, '_') + '.doc';
+      
+      // ZettBOT Feature: Nama File Dinamis sesuai Nama Madrasah
+      var safeName = (lbgData.nama || 'Lembaga').replace(/[^a-zA-Z0-9]/g, '_');
+      link.download = 'SPJTM_' + safeName + '.doc';
+      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
