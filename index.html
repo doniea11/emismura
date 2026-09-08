@@ -372,7 +372,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBb_amnDEdoZTkwxCu28WvswQf-rUx5R9BE97Bbv22ABWYFBfGVzWFxLZOk4WMcIfi/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQNxb60bZReMCKvjEEzomManEFEfqQVIFvq3kJjRR-m45ziWzvCwmLHsoWWgd_y-v/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
     var globalInstitutions = [], masterEkstraList = [], masterLabList = [], fullRekapData = [], currentFilteredData = [];
     var kecamatanListGlobal = [], existingSiswaMap = {}, existingSarprasMap = {};
@@ -680,56 +680,38 @@
 
     function togglePeriodeUtamaAction() {
       var targetStatus = (currentStatusPeriodeUtama === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          if (resp && resp.status === 'success') {
-            currentStatusPeriodeUtama = targetStatus;
-            applyPeriodeStatusUI();
-            showToast("Status Pendataan Utama diubah!", "success");
-            fetchInitialData();
-          }
-        }).withFailureHandler(function(err) {
-          showToast("Gagal mengubah status: " + err.message, "error");
-        }).togglePeriodePengisianObj(targetStatus, "utama");
-      } else {
-        fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "utama" }) })
-        .then(function(res) { return res.text(); }).then(function(txt) {
-          var resp = safeParseJSON(txt);
-          if (resp && resp.status === 'success') {
-            currentStatusPeriodeUtama = targetStatus;
-            applyPeriodeStatusUI();
-            showToast("Status Pendataan Utama diubah!", "success");
-            fetchInitialData();
-          }
-        });
-      }
+      fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "utama" }) })
+      .then(function(res) { return res.text(); }).then(function(txt) {
+        var resp = safeParseJSON(txt);
+        if (resp && resp.status === 'success') {
+          currentStatusPeriodeUtama = targetStatus;
+          applyPeriodeStatusUI();
+          showToast("Status Pendataan Utama diubah!", "success");
+          fetchInitialData();
+        } else {
+          showToast("Gagal mengubah status", "error");
+        }
+      }).catch(function(err) {
+        showToast("Kesalahan jaringan: " + err.message, "error");
+      });
     }
 
     function togglePeriodeSekunderAction() {
       var targetStatus = (currentStatusPeriodeSekunder === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          if (resp && resp.status === 'success') {
-            currentStatusPeriodeSekunder = targetStatus;
-            applyPeriodeStatusUI();
-            showToast("Status Pendataan Sekunder (SPJTM) diubah!", "success");
-            fetchInitialData();
-          }
-        }).withFailureHandler(function(err) {
-          showToast("Gagal mengubah status: " + err.message, "error");
-        }).togglePeriodePengisianObj(targetStatus, "sekunder");
-      } else {
-        fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "sekunder" }) })
-        .then(function(res) { return res.text(); }).then(function(txt) {
-          var resp = safeParseJSON(txt);
-          if (resp && resp.status === 'success') {
-            currentStatusPeriodeSekunder = targetStatus;
-            applyPeriodeStatusUI();
-            showToast("Status Pendataan Sekunder (SPJTM) diubah!", "success");
-            fetchInitialData();
-          }
-        });
-      }
+      fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "sekunder" }) })
+      .then(function(res) { return res.text(); }).then(function(txt) {
+        var resp = safeParseJSON(txt);
+        if (resp && resp.status === 'success') {
+          currentStatusPeriodeSekunder = targetStatus;
+          applyPeriodeStatusUI();
+          showToast("Status Pendataan Sekunder (SPJTM) diubah!", "success");
+          fetchInitialData();
+        } else {
+          showToast("Gagal mengubah status", "error");
+        }
+      }).catch(function(err) {
+        showToast("Kesalahan jaringan: " + err.message, "error");
+      });
     }
 
     function verifyPinSubmit() {
