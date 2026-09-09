@@ -374,7 +374,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzb4sPYbWv3BOpz8I7b9bsu2_nNN_31v8NX6p4Pw2UszAS3NenFRQ4jY_dAebmf5l7/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpqYUltw2SIu2E7uzR-v7xOKEN6fmwpIBCrt-ojHYATdw3fGR6DjX5ttZssJQKX_Iq/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
     var globalInstitutions = [], masterEkstraList = [], masterLabList = [], fullRekapData = [], currentFilteredData = [];
     var kecamatanListGlobal = [], existingSiswaMap = {}, existingSarprasMap = {};
@@ -845,59 +845,61 @@
       }
 
       showToast("Memuat data kelembagaan...", "info");
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) {
-          if (res && res.status === 'success' && res.kelembagaan) {
-            var k = res.kelembagaan;
-            document.getElementById('k-jenjang').value = k.jenjang || '';
-            document.getElementById('k-status').value = k.statusLembaga || '';
-            document.getElementById('k-nama').value = k.nama || '';
-            document.getElementById('k-nsm').value = k.nsm || '';
-            document.getElementById('k-npsn').value = k.npsn || '';
-            document.getElementById('k-desa').value = k.desa || '';
-            document.getElementById('k-kecamatan').value = k.kecamatan || '';
-            document.getElementById('k-no-izin').value = k.noIzin || '';
-            document.getElementById('k-tgl-izin').value = k.tglIzin || '';
-            document.getElementById('k-akhir-izin').value = k.akhirIzin || '';
-            document.getElementById('k-akreditasi').value = k.akreditasi || '';
-            document.getElementById('k-tgl-akred').value = k.tglAkred || '';
-            document.getElementById('k-akhir-akred').value = k.akhirAkred || '';
-            document.getElementById('k-npwp').value = k.npwp || '';
-            document.getElementById('k-kepala').value = k.namaKepala || '';
-            document.getElementById('k-wa-kepala').value = k.waKepala || '';
-            document.getElementById('k-operator').value = k.namaOp || '';
-            document.getElementById('k-wa-operator').value = k.waOp || '';
-            document.getElementById('k-lat').value = k.lat || '';
-            document.getElementById('k-lng').value = k.lng || '';
-            
-            if (k.timestamp) {
-              document.getElementById('lbg-timestamp-notice').style.display = 'flex';
-              document.getElementById('lbg-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + k.timestamp;
-            } else {
-              document.getElementById('lbg-timestamp-notice').style.display = 'none';
-            }
+      var fetchFunc = (typeof google !== 'undefined' && google.script && google.script.run) ? 
+        function(cb) { google.script.run.withSuccessHandler(cb).getDetailLembagaObj(idLbg); } :
+        function(cb) { fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + idLbg).then(res => res.json()).then(cb).catch(() => cb(null)); };
+
+      fetchFunc(function(res) {
+        if (res && res.status === 'success' && res.kelembagaan) {
+          var k = res.kelembagaan;
+          document.getElementById('k-jenjang').value = k.jenjang || '';
+          document.getElementById('k-status').value = k.statusLembaga || '';
+          document.getElementById('k-nama').value = k.nama || '';
+          document.getElementById('k-nsm').value = k.nsm || '';
+          document.getElementById('k-npsn').value = k.npsn || '';
+          document.getElementById('k-desa').value = k.desa || '';
+          document.getElementById('k-kecamatan').value = k.kecamatan || '';
+          document.getElementById('k-no-izin').value = k.noIzin || '';
+          document.getElementById('k-tgl-izin').value = k.tglIzin || '';
+          document.getElementById('k-akhir-izin').value = k.akhirIzin || '';
+          document.getElementById('k-akreditasi').value = k.akreditasi || '';
+          document.getElementById('k-tgl-akred').value = k.tglAkred || '';
+          document.getElementById('k-akhir-akred').value = k.akhirAkred || '';
+          document.getElementById('k-npwp').value = k.npwp || '';
+          document.getElementById('k-kepala').value = k.namaKepala || '';
+          document.getElementById('k-wa-kepala').value = k.waKepala || '';
+          document.getElementById('k-operator').value = k.namaOp || '';
+          document.getElementById('k-wa-operator').value = k.waOp || '';
+          document.getElementById('k-lat').value = k.lat || '';
+          document.getElementById('k-lng').value = k.lng || '';
+          
+          if (k.timestamp) {
+            document.getElementById('lbg-timestamp-notice').style.display = 'flex';
+            document.getElementById('lbg-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + k.timestamp;
           } else {
-            for (var i = 0; i < globalInstitutions.length; i++) {
-              var inst = globalInstitutions[i];
-              if (inst.id === idLbg || inst.nsm === idLbg) {
-                document.getElementById('k-nama').value = inst.name;
-                document.getElementById('k-nsm').value = inst.nsm;
-                document.getElementById('k-npsn').value = inst.npsn;
-                document.getElementById('k-jenjang').value = inst.jenjang || '';
-                document.getElementById('k-status').value = inst.statusLembaga || '';
-                document.getElementById('k-desa').value = inst.desa || '';
-                document.getElementById('k-kecamatan').value = inst.kecamatan || '';
-                break;
-              }
-            }
             document.getElementById('lbg-timestamp-notice').style.display = 'none';
           }
-          document.querySelectorAll('#form-kelembagaan input, #form-kelembagaan select, #form-kelembagaan button').forEach(function(el){
-            if(el.id !== 'k-nama' && el.id !== 'k-nsm' && el.id !== 'k-npsn') el.disabled = false;
-          });
-          showToast("Data siap diedit", "success");
-        }).getDetailLembagaObj(idLembaga);
-      }
+        } else {
+          for (var i = 0; i < globalInstitutions.length; i++) {
+            var inst = globalInstitutions[i];
+            if (inst.id === idLbg || inst.nsm === idLbg) {
+              document.getElementById('k-nama').value = inst.name;
+              document.getElementById('k-nsm').value = inst.nsm;
+              document.getElementById('k-npsn').value = inst.npsn;
+              document.getElementById('k-jenjang').value = inst.jenjang || '';
+              document.getElementById('k-status').value = inst.statusLembaga || '';
+              document.getElementById('k-desa').value = inst.desa || '';
+              document.getElementById('k-kecamatan').value = inst.kecamatan || '';
+              break;
+            }
+          }
+          document.getElementById('lbg-timestamp-notice').style.display = 'none';
+        }
+        document.querySelectorAll('#form-kelembagaan input, #form-kelembagaan select, #form-kelembagaan button').forEach(function(el){
+          if(el.id !== 'k-nama' && el.id !== 'k-nsm' && el.id !== 'k-npsn') el.disabled = false;
+        });
+        showToast("Data siap diedit", "success");
+      });
     }
 
     function onLembagaChange() {
@@ -916,30 +918,32 @@
       }
 
       showToast("Memuat data siswa...", "info");
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) {
-          sswInputs.forEach(function(el){ el.disabled = false; });
-          var jg = "";
-          if (res && res.status === 'success' && res.kelembagaan && res.kelembagaan.jenjang) {
-            jg = res.kelembagaan.jenjang;
-          } else if (selectedOption) {
-            jg = selectedOption.getAttribute('data-jenjang');
-          }
-          document.getElementById('s-jenjang').value = jg;
-          document.getElementById('s-jenjang-display').value = jg;
-          
-          renderKelasInputs(res && res.status === 'success' ? res.siswa : null);
-          
-          if (res && res.status === 'success' && res.siswa && res.siswa.timestamp) {
-            document.getElementById('ssw-timestamp-notice').style.display = 'flex';
-            document.getElementById('ssw-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + res.siswa.timestamp;
-          } else {
-            document.getElementById('ssw-timestamp-notice').style.display = 'none';
-          }
-          
-          showToast("Data dimuat", "success");
-        }).getDetailLembagaObj(idLbg);
-      }
+      var fetchFunc = (typeof google !== 'undefined' && google.script && google.script.run) ? 
+        function(cb) { google.script.run.withSuccessHandler(cb).getDetailLembagaObj(idLbg); } :
+        function(cb) { fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + idLbg).then(res => res.json()).then(cb).catch(() => cb(null)); };
+
+      fetchFunc(function(res) {
+        sswInputs.forEach(function(el){ el.disabled = false; });
+        var jg = "";
+        if (res && res.status === 'success' && res.kelembagaan && res.kelembagaan.jenjang) {
+          jg = res.kelembagaan.jenjang;
+        } else if (selectedOption) {
+          jg = selectedOption.getAttribute('data-jenjang');
+        }
+        document.getElementById('s-jenjang').value = jg;
+        document.getElementById('s-jenjang-display').value = jg;
+        
+        renderKelasInputs(res && res.status === 'success' ? res.siswa : null);
+        
+        if (res && res.status === 'success' && res.siswa && res.siswa.timestamp) {
+          document.getElementById('ssw-timestamp-notice').style.display = 'flex';
+          document.getElementById('ssw-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + res.siswa.timestamp;
+        } else {
+          document.getElementById('ssw-timestamp-notice').style.display = 'none';
+        }
+        
+        showToast("Data dimuat", "success");
+      });
     }
 
     function onSarprasLembagaChange() {
@@ -956,35 +960,37 @@
       }
 
       showToast("Memuat data sarpras...", "info");
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) {
-          sprInputs.forEach(function(el){ el.disabled = false; });
-          if (res && res.status === 'success' && res.sarpras) {
-            var spr = res.sarpras;
-            document.getElementById('spr-gedung').value = spr.jumlahGedung || 0;
-            document.getElementById('spr-kepala').value = spr.ruangKepala || 0;
-            document.getElementById('spr-wakapu').value = spr.ruangWakapu || 0;
-            document.getElementById('spr-guru').value = spr.ruangGuru || 0;
-            document.getElementById('spr-kelas').value = spr.ruangKelas || 0;
-            document.getElementById('spr-toilet-guru').value = spr.toiletGuru || 0;
-            document.getElementById('spr-toilet-siswa').value = spr.toiletSiswa || 0;
-            document.getElementById('spr-ekstra').value = spr.listEkstrakurikuler || 'TIDAK ADA';
-            document.getElementById('spr-lab').value = spr.listLaboratorium || 'TIDAK ADA';
-            
-            if (spr.timestamp) {
-              document.getElementById('spr-timestamp-notice').style.display = 'flex';
-              document.getElementById('spr-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + spr.timestamp;
-            } else {
-              document.getElementById('spr-timestamp-notice').style.display = 'none';
-            }
+      var fetchFunc = (typeof google !== 'undefined' && google.script && google.script.run) ? 
+        function(cb) { google.script.run.withSuccessHandler(cb).getDetailLembagaObj(idLbg); } :
+        function(cb) { fetch(APPS_SCRIPT_URL + "?action=getDetailLembaga&idLembaga=" + idLbg).then(res => res.json()).then(cb).catch(() => cb(null)); };
+
+      fetchFunc(function(res) {
+        sprInputs.forEach(function(el){ el.disabled = false; });
+        if (res && res.status === 'success' && res.sarpras) {
+          var spr = res.sarpras;
+          document.getElementById('spr-gedung').value = spr.jumlahGedung || 0;
+          document.getElementById('spr-kepala').value = spr.ruangKepala || 0;
+          document.getElementById('spr-wakapu').value = spr.ruangWakapu || 0;
+          document.getElementById('spr-guru').value = spr.ruangGuru || 0;
+          document.getElementById('spr-kelas').value = spr.ruangKelas || 0;
+          document.getElementById('spr-toilet-guru').value = spr.toiletGuru || 0;
+          document.getElementById('spr-toilet-siswa').value = spr.toiletSiswa || 0;
+          document.getElementById('spr-ekstra').value = spr.listEkstrakurikuler || 'TIDAK ADA';
+          document.getElementById('spr-lab').value = spr.listLaboratorium || 'TIDAK ADA';
+          
+          if (spr.timestamp) {
+            document.getElementById('spr-timestamp-notice').style.display = 'flex';
+            document.getElementById('spr-timestamp-notice').querySelector('span').innerText = 'Terakhir disimpan: ' + spr.timestamp;
           } else {
-            document.getElementById('form-sarpras').reset();
-            document.getElementById('spr-lembaga').value = idLbg;
             document.getElementById('spr-timestamp-notice').style.display = 'none';
           }
-          showToast("Data dimuat", "success");
-        }).getDetailLembagaObj(idLbg);
-      }
+        } else {
+          document.getElementById('form-sarpras').reset();
+          document.getElementById('spr-lembaga').value = idLbg;
+          document.getElementById('spr-timestamp-notice').style.display = 'none';
+        }
+        showToast("Data dimuat", "success");
+      });
     }
 
     function renderKelasInputs(existingSiswaData) {
@@ -1115,8 +1121,15 @@
           fetchInitialData();
         }).saveSiswaObj(formData);
       } else {
-        btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
-        showToast("Data Siswa disimpan (simulasi)", "success");
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(() => {
+          btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
+          showToast("Data Siswa berhasil disimpan!", "success");
+          fetchInitialData();
+        }).catch(() => {
+          btn.innerText = "Simpan Data Siswa"; btn.disabled = false;
+          showToast("Gagal menyimpan data siswa", "error");
+        });
       }
     }
 
@@ -1148,8 +1161,15 @@
           fetchInitialData();
         }).saveSarprasObj(formData);
       } else {
-        btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
-        showToast("Data Sarpras disimpan (simulasi)", "success");
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(() => {
+          btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
+          showToast("Data Sarpras berhasil disimpan!", "success");
+          fetchInitialData();
+        }).catch(() => {
+          btn.innerText = "Simpan Data Sarpras"; btn.disabled = false;
+          showToast("Gagal menyimpan data sarpras", "error");
+        });
       }
     }
 
@@ -1194,11 +1214,22 @@
           })
           .uploadSpjtmObj(formData);
       } else {
-        setTimeout(function() {
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(() => {
+          document.getElementById('spjtm-progress-bar').style.width = "100%";
+          setTimeout(function() { 
+            btn.innerText = "🚀 Upload & Simpan SPJTM"; btn.disabled = false; 
+            document.getElementById('spjtm-progress-container').style.display = "none"; 
+            showToast("Berhasil diupload!", "success"); 
+            fetchInitialData(); 
+            document.getElementById('form-upload-spjtm').reset(); 
+            document.getElementById('spjtm-file-info').style.display = "none"; 
+          }, 800);
+        }).catch(() => {
           btn.innerText = "🚀 Upload & Simpan SPJTM"; btn.disabled = false;
           document.getElementById('spjtm-progress-container').style.display = "none";
-          showToast("Berhasil diupload (Simulasi)", "success");
-        }, 800);
+          showToast("Gagal upload file", "error");
+        });
       }
     }
 
@@ -1209,7 +1240,11 @@
           btnElement.innerText = "Lihat PDF"; btnElement.disabled = false; if (resp && resp.status === 'success') window.open(resp.url, '_blank');
         }).getSecureSpjtmLinkObj(idLembaga);
       } else {
-        btnElement.innerText = "Lihat PDF"; btnElement.disabled = false;
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "getSecureSpjtmLink", idLembaga: idLembaga }) })
+        .then(res => res.json()).then(resp => {
+          btnElement.innerText = "Lihat PDF"; btnElement.disabled = false; if (resp && resp.status === 'success') window.open(resp.url, '_blank');
+          else showToast("Gagal membuka PDF", "error");
+        }).catch(() => { btnElement.innerText = "Lihat PDF"; btnElement.disabled = false; showToast("Gagal koneksi", "error"); });
       }
     }
 
@@ -1259,13 +1294,8 @@
       document.getElementById('download-zip-pin-modal').classList.remove('active');
       showToast("Merangkum seluruh arsip PDF ke dalam ZIP (Folder per Jenjang)...", "info");
 
-      if (typeof google !== 'undefined' && google.script && google.script.url) {
-        google.script.url.withSuccessHandler(function(url) {
-          window.location.href = url + "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
-        }).getScriptUrl();
-      } else {
-        window.location.href = APPS_SCRIPT_URL + "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
-      }
+      var downloadUrl = APPS_SCRIPT_URL + "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
+      window.location.href = downloadUrl;
     }
 
     function openPeringatanSpjtmModal() {
@@ -1333,7 +1363,12 @@
           btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
         }).saveKelembagaanObj(formData);
       } else {
-        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan (simulasi)", "success");
+        fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) })
+        .then(res => res.text()).then(() => {
+          btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
+        }).catch(() => {
+          btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Gagal menyimpan data kelembagaan", "error");
+        });
       }
     }
 
