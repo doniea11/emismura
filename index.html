@@ -374,7 +374,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiz8DQSHtI4B_CfxJdC3cnTOqRkJEZ9NQ6NzeCaLczPOJY7Zco11P61bE96GnOlGwR/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzb4sPYbWv3BOpz8I7b9bsu2_nNN_31v8NX6p4Pw2UszAS3NenFRQ4jY_dAebmf5l7/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
     var globalInstitutions = [], masterEkstraList = [], masterLabList = [], fullRekapData = [], currentFilteredData = [];
     var kecamatanListGlobal = [], existingSiswaMap = {}, existingSarprasMap = {};
@@ -446,7 +446,9 @@
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(function(res) { handleInitialDataResponse(res, false); }).withFailureHandler(function(err) { showToast("Gagal memuat data", "error"); }).getInitialDataObj();
       } else {
-        showToast("Lingkungan Apps Script tidak terdeteksi", "error");
+        fetch(APPS_SCRIPT_URL + "?action=getInitialData").then(function(res) { return res.text(); }).then(function(text) {
+          var res = safeParseJSON(text); if (res) handleInitialDataResponse(res, false);
+        }).catch(function(err) { showToast("Gagal memuat data API", "error"); });
       }
     }
 
@@ -894,7 +896,7 @@
             if(el.id !== 'k-nama' && el.id !== 'k-nsm' && el.id !== 'k-npsn') el.disabled = false;
           });
           showToast("Data siap diedit", "success");
-        }).getDetailLembagaObj(idLbg);
+        }).getDetailLembagaObj(idLembaga);
       }
     }
 
@@ -1262,7 +1264,7 @@
           window.location.href = url + "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
         }).getScriptUrl();
       } else {
-        window.location.href = "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
+        window.location.href = APPS_SCRIPT_URL + "?action=downloadAllSpjtmZip&pin=" + encodeURIComponent(pinVal);
       }
     }
 
