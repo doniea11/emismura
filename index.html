@@ -374,7 +374,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpqYUltw2SIu2E7uzR-v7xOKEN6fmwpIBCrt-ojHYATdw3fGR6DjX5ttZssJQKX_Iq/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNdUkaDcUSuoR4LNPWisCVuUgTjaSWi2cquIM4uIfwB3KpHfQgsPYrS13YyPpWCJFv/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V1";
     var globalInstitutions = [], masterEkstraList = [], masterLabList = [], fullRekapData = [], currentFilteredData = [];
     var kecamatanListGlobal = [], existingSiswaMap = {}, existingSarprasMap = {};
@@ -513,6 +513,7 @@
         }
       }
       select.innerHTML = html;
+      if (selectId === 's-lembaga' && select.onchange) select.onchange();
     }
 
     function renderDashboardCompletedList() {
@@ -903,7 +904,8 @@
     }
 
     function onLembagaChange() {
-      var select = document.getElementById('s-lembaga'), selectedOption = select.options[select.selectedIndex];
+      var select = document.getElementById('s-lembaga');
+      var selectedOption = select.options[select.selectedIndex];
       var idLbg = select.value;
       var sswInputs = document.querySelectorAll('#form-siswa input:not(#s-search-input), #form-siswa select:not(#s-lembaga), #form-siswa button');
       
@@ -917,6 +919,13 @@
         return;
       }
 
+      var immediateJenjang = selectedOption ? selectedOption.getAttribute('data-jenjang') : "";
+      if (immediateJenjang) {
+        document.getElementById('s-jenjang').value = immediateJenjang;
+        document.getElementById('s-jenjang-display').value = immediateJenjang;
+        renderKelasInputs(null);
+      }
+
       showToast("Memuat data siswa...", "info");
       var fetchFunc = (typeof google !== 'undefined' && google.script && google.script.run) ? 
         function(cb) { google.script.run.withSuccessHandler(cb).getDetailLembagaObj(idLbg); } :
@@ -924,14 +933,14 @@
 
       fetchFunc(function(res) {
         sswInputs.forEach(function(el){ el.disabled = false; });
-        var jg = "";
+        var jg = immediateJenjang;
         if (res && res.status === 'success' && res.kelembagaan && res.kelembagaan.jenjang) {
           jg = res.kelembagaan.jenjang;
-        } else if (selectedOption) {
-          jg = selectedOption.getAttribute('data-jenjang');
         }
-        document.getElementById('s-jenjang').value = jg;
-        document.getElementById('s-jenjang-display').value = jg;
+        if (jg) {
+          document.getElementById('s-jenjang').value = jg;
+          document.getElementById('s-jenjang-display').value = jg;
+        }
         
         renderKelasInputs(res && res.status === 'success' ? res.siswa : null);
         
@@ -994,8 +1003,11 @@
     }
 
     function renderKelasInputs(existingSiswaData) {
-      var jenjang = document.getElementById('s-jenjang').value.toUpperCase();
+      var jenjangEl = document.getElementById('s-jenjang');
+      var jenjang = jenjangEl ? jenjangEl.value.toUpperCase() : "";
       var container = document.getElementById('kelas-container');
+      if (!container) return;
+
       var tingkatList = [];
       if (jenjang === 'RA') tingkatList = ['KELAS 1 (TKA)', 'KELAS 2 (TKB)'];
       else if (jenjang === 'MI') tingkatList = ['KELAS 1', 'KELAS 2', 'KELAS 3', 'KELAS 4', 'KELAS 5', 'KELAS 6'];
