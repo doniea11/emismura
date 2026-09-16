@@ -29,6 +29,7 @@
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)"><span>🏛️</span> Input Kelembagaan <span id="nav-badge-utama" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BKA</span></div>
           <div class="nav-item" onclick="navigate('input-siswa', this)"><span>👤</span> Input Siswa</div>
           <div class="nav-item" onclick="navigate('input-sarpras', this)"><span>🛠️</span> Input Sarpras</div>
+          <div class="nav-item" onclick="navigate('rekapitulasi', this)"><span>📊</span> Rekapitulasi</div>
           <div class="nav-item" onclick="openPinModal('admin-emis')"><span>⚙️</span> Admin EMIS</div>
         </div>
         <div class="sidebar-bottom"><div class="watermark-donie"><span>꧁</span> @2026 by masdonie <span>꧂</span></div></div>
@@ -259,7 +260,7 @@
           <div class="form-divider" style="margin-top:0;">0. Menu Akses Cepat, Google Drive & Download Rekap</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:35px; display:flex; gap:15px; flex-wrap:wrap;">
             <button type="button" class="btn" onclick="navigate('rekapitulasi', null)" style="background:#2563EB; font-weight:700; flex:1;">📊 Buka Halaman Rekapitulasi Data</button>
-            <button type="button" class="btn" onclick="openGoogleDriveFolder(this)" style="background:#F59E0B; font-weight:700; flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px;">📁 Buka Folder Google Drive Penyimpanan</button>
+            <button type="button" class="btn" onclick="openGoogleDriveFolder(this)" style="background:#F59E0B; font-weight:700; flex:1;">📁 Buka Folder Google Drive Penyimpanan</button>
             <button type="button" class="btn" onclick="openDownloadModal()" style="background:#10B981; font-weight:700; flex:1;">📦 Download Rekap (ZIP Arsip Drive)</button>
           </div>
 
@@ -314,13 +315,13 @@
   <!-- MODALS -->
   <div class="modal-overlay" id="pin-modal"><div class="modal-content"><h3 id="pin-modal-title" style="margin-bottom:8px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3><p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Masukkan Password</p><input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing:12px; font-weight:700; font-size:1.5rem; background:var(--bg-body);" onkeydown="handlePinKeydown(event)"><div style="display:flex; gap:15px;"><button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button><button class="btn" style="flex:1;" onclick="verifyPinSubmit()">Masuk</button></div></div></div>
 
-  <!-- ZETTBOT FEATURE: MODAL PERINGATAN PERIODE DITUTUP -->
-  <div class="modal-overlay" id="modal-periode-closed">
-    <div class="modal-content" style="max-width:420px; border-top: 5px solid #EF4444;">
-      <div style="font-size: 3rem; margin-bottom: 12px;">🔒</div>
-      <h3 style="margin-bottom:10px; color:#EF4444; font-weight:700;">Akses Pendataan Ditutup</h3>
-      <p id="modal-closed-desc" style="font-size:0.95rem; color:var(--text-muted); margin-bottom:25px; line-height:1.6;">Periode pengisian data pendataan utama saat ini telah ditutup oleh Administrator Kantor Kementerian Agama Kabupaten Musi Rawas.</p>
-      <button class="btn" style="width: 100%; background:var(--primary-solid);" onclick="document.getElementById('modal-periode-closed').classList.remove('active')">Mengerti</button>
+  <!-- MODAL PERINGATAN PERIODE DITUTUP (ZETTBOT FEATURE) -->
+  <div class="modal-overlay" id="modal-period-warning">
+    <div class="modal-content" style="max-width: 425px; border: 2px solid #EF4444;">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">🔒</div>
+      <h3 style="color: #EF4444; font-weight: 700; margin-bottom: 10px;">Akses Pendataan Ditutup</h3>
+      <p id="period-warning-desc" style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 25px; line-height: 1.6;">Periode pengisian data utama telah ditutup oleh Administrator Seksi Pendidikan Madrasah.</p>
+      <button class="btn" style="width: 100%; background: #EF4444;" onclick="document.getElementById('modal-period-warning').classList.remove('active')">Mengerti / Kembali</button>
     </div>
   </div>
 
@@ -342,7 +343,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAw8Zl_pA0_lu7DmOSOPU5yesiX2ervUqDWQx6w9ioKxx87-jwFLY4eiU2kt5RzgKX/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTfnowi11blzJvTqVS-W3uOGPKalGaSjFCddxaGP_MUTWdP34ygVlUGISVnTzP2VM/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -352,20 +353,42 @@
 
     function toggleTheme() { var body = document.body; body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
 
+    function openGoogleDriveFolder(btnEl) {
+      btnEl.innerText = "Membuka Drive... ⏳";
+      btnEl.disabled = true;
+      callBackendApi("getDriveFolderUrlObj", {}, function(resp) {
+        btnEl.innerText = "📁 Buka Folder Google Drive Penyimpanan";
+        btnEl.disabled = false;
+        if (resp && resp.status === 'success' && resp.url) {
+          window.open(resp.url, '_blank');
+        } else {
+          window.open("https://drive.google.com", "_blank");
+        }
+      });
+    }
+
     function navigate(sectionId, navElement) {
       if ((sectionId === 'input-kelembagaan' || sectionId === 'input-siswa' || sectionId === 'input-sarpras') && currentStatusPeriodeUtama === 'DITUTUP') {
-        document.getElementById('modal-closed-desc').innerText = "Periode pengisian data utama (Kelembagaan, Siswa, Sarpras) saat ini telah ditutup oleh Administrator Kantor Kementerian Agama Kabupaten Musi Rawas.";
-        document.getElementById('modal-periode-closed').classList.add('active');
+        document.getElementById('period-warning-desc').innerText = "Periode pengisian data utama (Kelembagaan, Siswa, Sarpras) telah ditutup oleh Administrator Seksi Pendidikan Madrasah.";
+        document.getElementById('modal-period-warning').classList.add('active');
         return;
       }
       if (sectionId === 'spjtm-siswa' && currentStatusPeriodeSekunder === 'DITUTUP') {
-        document.getElementById('modal-closed-desc').innerText = "Periode pengisian Laporan Dana BOS Tahap 2 Tahun 2026 saat ini telah ditutup oleh Administrator Kantor Kementerian Agama Kabupaten Musi Rawas.";
-        document.getElementById('modal-periode-closed').classList.add('active');
+        document.getElementById('period-warning-desc').innerText = "Pendataan Laporan Dana BOS Tahap 2 Tahun 2026 sedang ditutup oleh Admin.";
+        document.getElementById('modal-period-warning').classList.add('active');
         return;
       }
       document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.remove('active'); });
       document.querySelectorAll('.page-section').forEach(function(s){ s.classList.remove('active'); });
       if (navElement) navElement.classList.add('active');
+      else {
+        var navs = document.querySelectorAll('.nav-item');
+        for (var n = 0; n < navs.length; n++) {
+          if (navs[n].getAttribute('onclick') && navs[n].getAttribute('onclick').indexOf(sectionId) > -1) {
+            navs[n].classList.add('active');
+          }
+        }
+      }
       var targetSection = document.getElementById(sectionId);
       if (targetSection) targetSection.classList.add('active');
       if (sectionId === 'rekapitulasi') { renderRekapTable(); }
@@ -400,14 +423,54 @@
     function handlePinKeydown(event) { if (event.key === 'Enter') verifyPinSubmit(); }
     function safeParseJSON(text) { try { return JSON.parse(text); } catch (err) { return null; } }
 
-    function fetchInitialData() {
+    function callBackendApi(actionName, payload, successCallback, failureCallback) {
+      payload = payload || {};
+      payload.action = actionName;
       if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(res) { handleInitialDataResponse(res, false); }).withFailureHandler(function(err) { showToast("Gagal memuat data", "error"); }).getInitialDataObj();
+        var runner = google.script.run.withSuccessHandler(function(res) {
+          if (successCallback) successCallback(res);
+        }).withFailureHandler(function(err) {
+          if (failureCallback) failureCallback(err);
+          else showToast("Gagal memproses ke server", "error");
+        });
+        if (actionName === "getInitialDataObj") runner.getInitialDataObj();
+        else if (actionName === "getDetailLembagaObj") runner.getDetailLembagaObj(payload.idLembaga);
+        else if (actionName === "deleteSpjtmFileObj") runner.deleteSpjtmFileObj(payload.idLembaga);
+        else if (actionName === "uploadSpjtmObj") runner.uploadSpjtmObj(payload);
+        else if (actionName === "getSecureSpjtmLinkObj") runner.getSecureSpjtmLinkObj(payload.idLembaga);
+        else if (actionName === "togglePeriodePengisianObj") runner.togglePeriodePengisianObj(payload.statusPeriode, payload.tipePeriode);
+        else if (actionName === "getDriveFolderUrlObj") runner.getDriveFolderUrlObj();
+        else runner.doPost ? runner.doPost({ postData: { contents: JSON.stringify(payload) } }) : runner.getInitialDataObj();
       } else {
-        fetch(APPS_SCRIPT_URL + "?action=getInitialData").then(function(res) { return res.text(); }).then(function(text) {
-          var res = safeParseJSON(text); if (res) handleInitialDataResponse(res, false);
-        }).catch(function(err) { showToast("Gagal memuat data API", "error"); });
+        var fetchUrl = APPS_SCRIPT_URL;
+        var options = { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) };
+        if (actionName === "getInitialDataObj") {
+          fetchUrl = APPS_SCRIPT_URL + "?action=getInitialData";
+          options = { method: "GET" };
+        }
+        fetch(fetchUrl, options)
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+          var res = safeParseJSON(text);
+          if (res) {
+            if (successCallback) successCallback(res);
+          } else {
+            if (failureCallback) failureCallback(new Error("Invalid JSON"));
+          }
+        })
+        .catch(function(err) {
+          if (failureCallback) failureCallback(err);
+          else showToast("Gagal memuat data API: " + err.message, "error");
+        });
       }
+    }
+
+    function fetchInitialData() {
+      callBackendApi("getInitialDataObj", {}, function(res) {
+        handleInitialDataResponse(res, false);
+      }, function(err) {
+        showToast("Gagal memuat data API: " + err.message, "error");
+      });
     }
 
     function handleInitialDataResponse(res, isFromCache) {
@@ -444,26 +507,6 @@
       renderRekapTable();
       renderTableSpjtm();
       renderMonitoringTable();
-    }
-
-    function openGoogleDriveFolder(btnElement) {
-      btnElement.innerText = "Membuka Drive... ⏳";
-      btnElement.disabled = true;
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          btnElement.innerText = "📁 Buka Folder Google Drive Penyimpanan";
-          btnElement.disabled = false;
-          if (resp && resp.status === 'success') {
-            window.open(resp.url, '_blank');
-          } else {
-            showToast(resp ? resp.message : "Gagal membuka folder Drive", "error");
-          }
-        }).getDriveFolderUrlObj();
-      } else {
-        btnElement.innerText = "📁 Buka Folder Google Drive Penyimpanan";
-        btnElement.disabled = false;
-        window.open("https://drive.google.com", "_blank");
-      }
     }
 
     function filterDropdown(inputId, selectId) {
@@ -506,19 +549,12 @@
       if (!idLembaga) { showToast("Pilih lembaga yang ingin direset filenya!", "error"); return; }
       if (!confirm("Apakah Anda yakin ingin menghapus file upload Laporan BOS lembaga ini dari Google Drive dan mereset statusnya?")) return;
 
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          if (resp && resp.status === 'success') { showToast(resp.message, "success"); fetchInitialData(); }
-          else { showToast(resp ? resp.message : "Gagal menghapus file", "error"); }
-        }).deleteSpjtmFileObj(idLembaga);
-      } else {
-        fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "deleteSpjtmFile", idLembaga: idLembaga }) })
-        .then(function(res) { return res.text(); }).then(function(txt) {
-          var resp = safeParseJSON(txt);
-          if (resp && resp.status === 'success') { showToast(resp.message, "success"); fetchInitialData(); }
-          else { showToast(resp ? resp.message : "Gagal", "error"); }
-        });
-      }
+      callBackendApi("deleteSpjtmFileObj", { idLembaga: idLembaga }, function(resp) {
+        if (resp && resp.status === 'success') { showToast(resp.message, "success"); fetchInitialData(); }
+        else { showToast(resp ? resp.message : "Gagal menghapus file", "error"); }
+      }, function(err) {
+        showToast("Gagal menghapus file: " + err.message, "error");
+      });
     }
 
     function renderMonitoringTable() {
@@ -609,13 +645,6 @@
       document.getElementById('form-siswa-closed-alert').style.display = isUtamaClosed ? 'flex' : 'none';
       document.getElementById('form-spr-closed-alert').style.display = isUtamaClosed ? 'flex' : 'none';
       document.getElementById('form-spjtm-closed-alert').style.display = isSekunderClosed ? 'flex' : 'none';
-
-      var disableUtama = isUtamaClosed;
-      document.querySelectorAll('#input-kelembagaan input, #input-kelembagaan select, #input-kelembagaan button, #input-siswa input, #input-siswa select, #input-siswa button, #input-sarpras input, #input-sarpras select, #input-sarpras button').forEach(function(el) {
-        if(el.id !== 'k-search-input' && el.id !== 's-search-input' && el.id !== 'spr-search-input' && el.id !== 'k-select-master-lbg' && el.id !== 's-lembaga' && el.id !== 'spr-lembaga') {
-          el.disabled = disableUtama;
-        }
-      });
       
       var badgeUtama = document.getElementById('admin-periode-utama-badge');
       var btnToggleUtama = document.getElementById('btn-toggle-tutup-utama');
@@ -630,69 +659,71 @@
         if (isSekunderClosed) { badgeSekunder.innerText = "DITUTUP"; badgeSekunder.style.color = "#EF4444"; btnToggleSekunder.innerText = "🔓 Buka Pendataan Sekunder"; document.getElementById('nav-badge-sekunder').innerText = "TUTUP"; document.getElementById('nav-badge-sekunder').style.background = "rgba(239,68,68,0.3)"; } 
         else { badgeSekunder.innerText = "DIBUKA"; badgeSekunder.style.color = "var(--primary-solid)"; btnToggleSekunder.innerText = "🔒 Tutup Pendataan Sekunder"; document.getElementById('nav-badge-sekunder').innerText = "BKA"; document.getElementById('nav-badge-sekunder').style.background = "rgba(0,192,90,0.3)"; }
       }
+
+      var formLbgInputs = document.querySelectorAll('#form-kelembagaan input, #form-kelembagaan select, #form-kelembagaan button');
+      var formSswInputs = document.querySelectorAll('#form-siswa input, #form-siswa select, #form-siswa button');
+      var formSprInputs = document.querySelectorAll('#form-sarpras input, #form-sarpras select, #form-sarpras button');
+      
+      for (var f = 0; f < formLbgInputs.length; f++) { formLbgInputs[f].disabled = isUtamaClosed; }
+      for (var s = 0; s < formSswInputs.length; s++) { formSswInputs[s].disabled = isUtamaClosed; }
+      for (var p = 0; p < formSprInputs.length; p++) { formSprInputs[p].disabled = isUtamaClosed; }
     }
 
     function togglePeriodeUtamaAction() {
       var targetStatus = (currentStatusPeriodeUtama === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          if (resp && resp.status === 'success') { currentStatusPeriodeUtama = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Utama diubah!", "success"); fetchInitialData(); }
-          else { showToast(resp ? resp.message : "Gagal", "error"); }
-        }).togglePeriodePengisianObj(targetStatus, "utama");
-      } else {
-        fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "utama" }) })
-        .then(function(res) { return res.text(); }).then(function(txt) {
-          var resp = safeParseJSON(txt);
-          if (resp && resp.status === 'success') { currentStatusPeriodeUtama = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Utama diubah!", "success"); fetchInitialData(); }
-          else { showToast("Gagal mengubah status", "error"); }
-        });
-      }
+      callBackendApi("togglePeriodePengisianObj", { statusPeriode: targetStatus, tipePeriode: "utama" }, function(resp) {
+        if (resp && resp.status === 'success') { currentStatusPeriodeUtama = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Utama diubah!", "success"); fetchInitialData(); }
+        else { showToast("Gagal mengubah status", "error"); }
+      }, function(err) {
+        showToast("Gagal mengubah status: " + err.message, "error");
+      });
     }
 
     function togglePeriodeSekunderAction() {
       var targetStatus = (currentStatusPeriodeSekunder === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          if (resp && resp.status === 'success') { currentStatusPeriodeSekunder = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Sekunder diubah!", "success"); fetchInitialData(); }
-          else { showToast(resp ? resp.message : "Gagal", "error"); }
-        }).togglePeriodePengisianObj(targetStatus, "sekunder");
-      } else {
-        fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "togglePeriodePengisian", statusPeriode: targetStatus, tipePeriode: "sekunder" }) })
-        .then(function(res) { return res.text(); }).then(function(txt) {
-          var resp = safeParseJSON(txt);
-          if (resp && resp.status === 'success') { currentStatusPeriodeSekunder = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Sekunder diubah!", "success"); fetchInitialData(); }
-          else { showToast("Gagal mengubah status", "error"); }
-        });
-      }
+      callBackendApi("togglePeriodePengisianObj", { statusPeriode: targetStatus, tipePeriode: "sekunder" }, function(resp) {
+        if (resp && resp.status === 'success') { currentStatusPeriodeSekunder = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Sekunder diubah!", "success"); fetchInitialData(); }
+        else { showToast("Gagal mengubah status", "error"); }
+      }, function(err) {
+        showToast("Gagal mengubah status: " + err.message, "error");
+      });
     }
 
     function verifyPinSubmit() {
       var pin = document.getElementById('pin-input').value;
       if(!pin) { showToast("Password tidak boleh kosong", "error"); return; }
-      fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "verifyAdminPin", pin: pin, target: pinModalTarget }) })
-      .then(function(res) { return res.text(); }).then(function(text) {
-        var response = safeParseJSON(text);
+      callBackendApi("verifyAdminPinObj", { pin: pin, target: pinModalTarget }, function(response) {
         if((response && response.status === 'success') || pin === '122009') {
           closePinModal(); navigate('admin-emis'); showToast("Akses Diberikan", "success");
         } else { showToast("Password Salah!", "error"); }
-      }).catch(function() { if (pin === '122009') { closePinModal(); navigate('admin-emis'); showToast("Akses Diberikan", "success"); }});
+      }, function() {
+        if (pin === '122009') { closePinModal(); navigate('admin-emis'); showToast("Akses Diberikan", "success"); }
+        else { showToast("Password Salah!", "error"); }
+      });
     }
 
-    function updateAdminPin() { fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setAdminPin", newPin: document.getElementById('admin-new-pin').value }) }).then(function() { showToast("PIN diperbarui!", "success"); }); }
-    function updateRekapPin() { fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setRekapPin", newPin: document.getElementById('rekap-new-pin').value }) }).then(function() { showToast("PIN diperbarui!", "success"); }); }
-    function savePinRekapSetting() { fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setPinRekapStatus", pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }) }).then(function() { showToast("Tersimpan!", "success"); }); }
+    function updateAdminPin() {
+      callBackendApi("setAdminPinObj", { newPin: document.getElementById('admin-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
+    }
+    function updateRekapPin() {
+      callBackendApi("setRekapPinObj", { newPin: document.getElementById('rekap-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
+    }
+    function savePinRekapSetting() {
+      callBackendApi("setPinRekapStatusObj", { pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }, function() { showToast("Tersimpan!", "success"); });
+    }
     
     function updateJudulSpjtm() {
       var judulBaru = document.getElementById('admin-judul-spjtm').value;
       if (!judulBaru) { showToast("Judul tidak boleh kosong!", "error"); return; }
-      fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "setJudulSpjtm", judulBaru: judulBaru }) }).then(function() { showToast("Judul diperbarui", "success"); fetchInitialData(); });
+      callBackendApi("setJudulSpjtmObj", { judulBaru: judulBaru }, function() { showToast("Judul diperbarui", "success"); fetchInitialData(); });
     }
 
     function openGantiTpModal() { document.getElementById('modal-ganti-tp').classList.add('active'); }
     function closeGantiTpModal() { document.getElementById('modal-ganti-tp').classList.remove('active'); }
     function executeGantiTahunPelajaran() {
       var nextTp = document.getElementById('admin-next-tp-input').value.trim();
-      closeGantiTpModal(); fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "gantiTahunPelajaran", tahunBaru: nextTp }) }).then(function() { showToast("TP berganti!", "success"); fetchInitialData(); });
+      closeGantiTpModal();
+      callBackendApi("gantiTahunPelajaranObj", { tahunBaru: nextTp }, function() { showToast("TP berganti!", "success"); fetchInitialData(); });
     }
 
     function submitAdminAddLembaga() {
@@ -713,9 +744,7 @@
         namaOp: document.getElementById('adm-k-operator').value, waOp: document.getElementById('adm-k-wa-operator').value,
         lat: document.getElementById('adm-k-lat').value, lng: document.getElementById('adm-k-lng').value
       };
-      fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(formData) })
-      .then(function(res) { return res.text(); }).then(function(txt) {
-        var resp = safeParseJSON(txt);
+      callBackendApi("addNewInstitutionsByAdmin", formData, function(resp) {
         if (resp && resp.status === 'success') { showToast(resp.message, "success"); document.getElementById('form-admin-add-lbg').reset(); fetchInitialData(); }
         else { showToast(resp ? resp.message : "Gagal", "error"); }
       });
@@ -765,7 +794,7 @@
       var selectEl = document.getElementById('spjtm-lembaga');
       var optionEl = selectEl.options[selectEl.selectedIndex];
       var btn = document.getElementById('btn-submit-spjtm'); 
-      btn.disabled = true; btn.innerText = "Mengunggah ke Drive... ⏳";
+      btn.disabled = true; btn.innerText = "Proses Upload ke Database Penmad ⏳";
       document.getElementById('spjtm-progress-container').style.display = "block";
       document.getElementById('spjtm-progress-bar').style.width = "50%";
 
@@ -777,38 +806,31 @@
         fileBase64: base64Data
       };
 
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          document.getElementById('spjtm-progress-bar').style.width = "100%";
-          setTimeout(function() { 
-            btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false; 
-            document.getElementById('spjtm-progress-container').style.display = "none"; 
-            if (resp && resp.status === 'success') { showToast(resp.message, "success"); fetchInitialData(); document.getElementById('form-upload-spjtm').reset(); document.getElementById('spjtm-file-info').style.display = "none"; }
-            else { showToast(resp ? resp.message : "Gagal", "error"); }
-          }, 400);
-        }).uploadSpjtmObj(payload);
-      } else {
-        setTimeout(function() {
-          document.getElementById('spjtm-progress-bar').style.width = "100%";
-          btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false;
-          document.getElementById('spjtm-progress-container').style.display = "none";
-          showToast("Berhasil simulasi upload file laporan (Maks 50 MB)!", "success");
-        }, 1000);
-      }
+      callBackendApi("uploadSpjtmObj", payload, function(resp) {
+        document.getElementById('spjtm-progress-bar').style.width = "100%";
+        setTimeout(function() { 
+          btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false; 
+          document.getElementById('spjtm-progress-container').style.display = "none"; 
+          if (resp && resp.status === 'success') { showToast(resp.message, "success"); fetchInitialData(); document.getElementById('form-upload-spjtm').reset(); document.getElementById('spjtm-file-info').style.display = "none"; }
+          else { showToast(resp ? resp.message : "Gagal", "error"); }
+        }, 400);
+      }, function(err) {
+        btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false;
+        document.getElementById('spjtm-progress-container').style.display = "none";
+        showToast("Gagal upload: " + err.message, "error");
+      });
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
       btnElement.innerText = "Membuka..."; btnElement.disabled = true;
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(resp) {
-          btnElement.innerText = "Lihat PDF"; btnElement.disabled = false;
-          if (resp && resp.status === 'success') window.open(resp.url, '_blank');
-          else showToast(resp.message, "error");
-        }).getSecureSpjtmLinkObj(idLembaga);
-      } else {
+      callBackendApi("getSecureSpjtmLinkObj", { idLembaga: idLembaga }, function(resp) {
+        btnElement.innerText = "Lihat PDF"; btnElement.disabled = false;
+        if (resp && resp.status === 'success') window.open(resp.url, '_blank');
+        else showToast(resp.message, "error");
+      }, function() {
         btnElement.innerText = "Lihat PDF"; btnElement.disabled = false;
         window.open("https://drive.google.com", "_blank");
-      }
+      });
     }
 
     function renderTableSpjtm() {
@@ -853,8 +875,9 @@
     function renderRekapTable() {
       var tbody = document.getElementById('table-rekap');
       var thead = document.getElementById('rekap-table-head');
-      if (!tbody) return;
+      if (!tbody || !thead) return;
       if (!fullRekapData || fullRekapData.length === 0) {
+        thead.innerHTML = '<tr><th style="width:40px; text-align:center;">NO</th><th>NSM</th><th>NPSN</th><th>NAMA LEMBAGA</th><th>JENJANG</th><th>STATUS</th><th>KECAMATAN</th><th style="text-align:right;">L</th><th style="text-align:right;">P</th><th style="text-align:right;">TOTAL SISWA</th><th>KELENGKAPAN</th><th style="text-align:center; width:90px;">AKSI</th></tr>';
         tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data rekapitulasi.</td></tr>';
         return;
       }
@@ -863,42 +886,43 @@
       var filterType = document.getElementById('rekap-filter-type') ? document.getElementById('rekap-filter-type').value : "KESELURUHAN";
 
       if (filterType === 'REKAP_JK') {
+        thead.innerHTML = '<tr><th style="width:40px; text-align:center;">NO</th><th>KATEGORI / PENGELOMPOKAN</th><th style="text-align:right;">LAKI-LAKI (L)</th><th style="text-align:right;">PEREMPUAN (P)</th><th style="text-align:right;">TOTAL SISWA</th></tr>';
         var jkType = document.getElementById('sub-jk-type-select') ? document.getElementById('sub-jk-type-select').value : "JK_JENJANG";
-        thead.innerHTML = '<tr><th style="width:40px; text-align:center;">NO</th><th>KATEGORI / KELOMPOK</th><th style="text-align:right;">SISWA LAKI-LAKI (L)</th><th style="text-align:right;">SISWA PEREMPUAN (P)</th><th style="text-align:right;">TOTAL KESELURUHAN</th></tr>';
-        
         var groupMap = {};
-        for (var i = 0; i < fullRekapData.length; i++) {
-          var r = fullRekapData[i];
+        for (var k = 0; k < fullRekapData.length; k++) {
+          var item = fullRekapData[k];
           var key = "SEMUA";
-          if (jkType === 'JK_JENJANG') key = r.jenjang || "LAINNYA";
-          else if (jkType === 'JK_STATUS') key = r.statusLembaga || "LAINNYA";
-          else if (jkType === 'JK_STATUS_JENJANG') key = (r.statusLembaga || "-") + " - " + (r.jenjang || "-");
-          else if (jkType === 'JK_ALL') key = "KABUPATEN MUSI RAWAS";
-          
+          if (jkType === 'JK_JENJANG') key = String(item.jenjang || "LAINNYA").toUpperCase();
+          else if (jkType === 'JK_STATUS') key = String(item.statusLembaga || "SWASTA").toUpperCase();
+          else if (jkType === 'JK_STATUS_JENJANG') key = String(item.statusLembaga || "SWASTA").toUpperCase() + " - " + String(item.jenjang || "").toUpperCase();
+          else key = "GABUNGAN KESELURUHAN";
+
           if (!groupMap[key]) groupMap[key] = { l: 0, p: 0, total: 0 };
-          groupMap[key].l += (parseInt(r.jmlL, 10) || 0);
-          groupMap[key].p += (parseInt(r.jmlP, 10) || 0);
-          groupMap[key].total += (parseInt(r.jmlTotal, 10) || 0);
+          groupMap[key].l += (parseInt(item.jmlL, 10) || 0);
+          groupMap[key].p += (parseInt(item.jmlP, 10) || 0);
+          groupMap[key].total += (parseInt(item.jmlTotal, 10) || 0);
         }
 
-        var htmlJk = '', idxJk = 1, sumL = 0, sumP = 0, sumTot = 0;
-        for (var k in groupMap) {
-          if (groupMap.hasOwnProperty(k)) {
-            var d = groupMap[k];
-            sumL += d.l; sumP += d.p; sumTot += d.total;
-            htmlJk += '<tr><td style="text-align:center;">' + (idxJk++) + '</td><td style="font-weight:700;">' + k + '</td><td style="text-align:right;">' + d.l + '</td><td style="text-align:right;">' + d.p + '</td><td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + d.total + '</td></tr>';
+        var jkHtml = '', jkIdx = 1, gTotL = 0, gTotP = 0, gTotAll = 0;
+        for (var gKey in groupMap) {
+          if (groupMap.hasOwnProperty(gKey)) {
+            var gObj = groupMap[gKey];
+            gTotL += gObj.l; gTotP += gObj.p; gTotAll += gObj.total;
+            jkHtml += '<tr><td style="text-align:center;">' + jkIdx + '</td><td style="font-weight:600;">' + gKey + '</td><td style="text-align:right;">' + gObj.l + '</td><td style="text-align:right;">' + gObj.p + '</td><td style="text-align:right; font-weight:700; color:var(--primary-solid);">' + gObj.total + '</td></tr>';
+            jkIdx++;
           }
         }
-        tbody.innerHTML = htmlJk === '' ? '<tr><td colspan="5" style="text-align:center; padding:30px;">Tidak ada data jenis kelamin.</td></tr>' : htmlJk;
+        jkHtml += '<tr style="background:var(--bg-body); font-weight:700;"><td colspan="2" style="text-align:right;">TOTAL KESELURUHAN:</td><td style="text-align:right;">' + gTotL + '</td><td style="text-align:right;">' + gTotP + '</td><td style="text-align:right; color:var(--primary-solid);">' + gTotAll + '</td></tr>';
+        tbody.innerHTML = jkHtml;
         document.getElementById('stat-tot-lbg').innerText = Object.keys(groupMap).length;
-        document.getElementById('stat-tot-laki').innerText = sumL;
-        document.getElementById('stat-tot-perempuan').innerText = sumP;
-        document.getElementById('stat-tot-siswa').innerText = sumTot;
+        document.getElementById('stat-tot-laki').innerText = gTotL;
+        document.getElementById('stat-tot-perempuan').innerText = gTotP;
+        document.getElementById('stat-tot-siswa').innerText = gTotAll;
         return;
       }
 
       thead.innerHTML = '<tr><th style="width:40px; text-align:center;">NO</th><th>NSM</th><th>NPSN</th><th>NAMA LEMBAGA</th><th>JENJANG</th><th>STATUS</th><th>KECAMATAN</th><th style="text-align:right;">L</th><th style="text-align:right;">P</th><th style="text-align:right;">TOTAL SISWA</th><th>KELENGKAPAN</th><th style="text-align:center; width:90px;">AKSI</th></tr>';
-      
+
       var subStatus = document.getElementById('sub-status-select') ? document.getElementById('sub-status-select').value.toUpperCase() : "";
       var subJenjang = document.getElementById('sub-jenjang-select') ? document.getElementById('sub-jenjang-select').value.toUpperCase() : "";
       var subKelengkapan = document.getElementById('sub-jenjang-kelengkapan-select') ? document.getElementById('sub-jenjang-kelengkapan-select').value.toUpperCase() : "";
@@ -955,22 +979,20 @@
     }
 
     function bukaDetailProfilLembaga(idLembaga) {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        showToast("Memuat detail...", "info");
-        google.script.run.withSuccessHandler(function(res) {
-          if (res && res.status === 'success') {
-            renderPreviewProfilHtml(res);
-            document.getElementById('modal-preview-profil').classList.add('active');
-          } else { showToast("Gagal memuat profil lembaga", "error"); }
-        }).getDetailLembagaObj(idLembaga);
-      } else {
+      showToast("Memuat detail...", "info");
+      callBackendApi("getDetailLembagaObj", { idLembaga: idLembaga }, function(res) {
+        if (res && res.status === 'success') {
+          renderPreviewProfilHtml(res);
+          document.getElementById('modal-preview-profil').classList.add('active');
+        } else { showToast("Gagal memuat profil lembaga", "error"); }
+      }, function() {
         var found = fullRekapData.find(function(x) { return x.id === idLembaga; });
         if (found) {
           var h = '<h4>' + found.nama + '</h4><p>NSM: ' + found.nsm + '<br>Kecamatan: ' + found.kecamatan + '<br>Total Siswa: ' + found.jmlTotal + '</p>';
           document.getElementById('profil-preview-content').innerHTML = h;
           document.getElementById('modal-preview-profil').classList.add('active');
         }
-      }
+      });
     }
 
     function renderPreviewProfilHtml(res) {
@@ -997,7 +1019,9 @@
     function submitKelembagaan() {
       var btn = document.getElementById('btn-submit-lbg'); btn.innerText = "Menyimpan Data..."; btn.disabled = true;
       var formData = { action: "saveKelembagaan", jenjang: document.getElementById('k-jenjang').value, statusLembaga: document.getElementById('k-status').value, nama: document.getElementById('k-nama').value, nsm: document.getElementById('k-nsm').value, npsn: document.getElementById('k-npsn').value, desa: document.getElementById('k-desa').value, kecamatan: document.getElementById('k-kecamatan').value, noIzin: document.getElementById('k-no-izin').value, tglIzin: document.getElementById('k-tgl-izin').value, akhirIzin: document.getElementById('k-akhir-izin').value, akreditasi: document.getElementById('k-akreditasi').value, tglAkred: document.getElementById('k-tgl-akred').value, akhirAkred: document.getElementById('k-akhir-akred').value, npwp: document.getElementById('k-npwp').value, namaKepala: document.getElementById('k-kepala').value, waKepala: document.getElementById('k-wa-kepala').value, namaOp: document.getElementById('k-operator').value, waOp: document.getElementById('k-wa-operator').value, lat: document.getElementById('k-lat').value, lng: document.getElementById('k-lng').value };
-      fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(formData) }).then(function(res) { return res.text(); }).then(function() { btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData(); });
+      callBackendApi("saveKelembagaanObj", formData, function() {
+        btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
+      });
     }
   </script>
 </body>
