@@ -25,7 +25,7 @@
       <nav class="sidebar">
         <div class="sidebar-menu">
           <div class="nav-item active" onclick="navigate('dashboard', this)"><span>⊞</span> DASHBOARD</div>
-          <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> UPLOAD LAPORAN DANA BOS TAHAP 2 TAHUN 2026 <span id="nav-badge-sekunder" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
+          <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> Upload Laporan Dana BOP/BOS Tahap 2 Tahun 2026 <span id="nav-badge-sekunder" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)"><span>🏛️</span> Input Kelembagaan <span id="nav-badge-utama" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-siswa', this)"><span>👤</span> Input Siswa <span id="nav-badge-siswa" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-sarpras', this)"><span>🛠️</span> Input Sarpras <span id="nav-badge-sarpras" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
@@ -56,8 +56,8 @@
 
         <!-- UPLOAD LAPORAN DANA BOS TAHAP 2 TAHUN 2026 -->
         <section id="spjtm-siswa" class="page-section">
-          <h2>Upload Laporan Dana BOS Tahap 2 Tahun 2026 & Monitoring</h2>
-          <div id="form-spjtm-closed-alert" style="display:none;" class="period-closed-banner"><span>🔒</span> Periode pengisian Laporan Dana BOS Tahap 2 Tahun 2026 telah ditutup oleh Administrator.</div>
+          <h2>Upload Laporan Penggunaan Dana BOP/BOS Tahap 2 Tahun 2026</h2>
+          <div id="form-spjtm-closed-alert" style="display:none;" class="period-closed-banner"><span>🔒</span> Periode pengisian Laporan Penggunaan Dana BOP/BOS Tahap 2 Tahun 2026 telah ditutup oleh Administrator.</div>
           
           <form id="form-upload-spjtm" onsubmit="event.preventDefault(); submitUploadSpjtm();">
             <div class="grid-cards" style="margin-bottom: 0;">
@@ -342,7 +342,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI9SU4kn_xf56K1bCiTlCFLmzKTugscLJ2j4eBlCDqSV8f-V3JEdCwe4H2RSBriBYy/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeYRkf-03CoxEYn5nk9RfLWGzP8v_p9AUHOXD6mZO2ikxN6ykMQU84DyIc-Bav_qEt/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -637,7 +637,7 @@
         '<div class="print-section-title">A. LEMBAGA YANG SUDAH UPLOAD (' + sudahUpload.length + ' Lembaga)</div>' +
         '<table class="print-table"><thead><tr><th style="width:40px; text-align:center;">NO</th><th>NSM</th><th>NAMA LEMBAGA</th><th>KECAMATAN</th><th style="text-align:center; width:110px;">STATUS</th></tr></thead><tbody>' + rowsSudah + '</tbody></table>' +
         '<div class="print-section-title" style="margin-top:20px;">B. LEMBAGA YANG BELUM UPLOAD (' + belumUpload.length + ' Lembaga)</div>' +
-        '<table class="print-table"><thead><tr><th style="width:40px; text-align:center;">NO</th><th>NSM</th><th>NAMA LEMBAGA</th><th>KECAMATAN</th><th style="text-align:center; width:110px;">STATUS</th></tr></thead><tbody>' + rowsBelum + '</tbody></table>' +
+        '<table class="print-table"><thead><tr><th style="width:40px; text-align:center;">NO</th><th>NAMA LEMBAGA</th><th>KECAMATAN</th><th style="text-align:center; width:110px;">STATUS</th></tr></thead><tbody>' + rowsBelum + '</tbody></table>' +
         '<div class="print-signature-box"><div class="print-sign-col">Mengetahui,<br>Kepala Seksi Pendidikan Madrasah<br><br><br><br><u>__________________________</u></div><div class="print-sign-col">Muara Beliti, ' + currentDateStr + '<br>Admin EMIS<br><br><br><br><u>__________________________</u></div></div>';
 
       printBody.innerHTML = docHtml;
@@ -697,9 +697,9 @@
 
     function togglePeriodeUtamaAction() {
       var targetStatus = (currentStatusPeriodeUtama === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      callBackendApi("togglePeriodePengisianObj", { statusPeriode: targetStatus, tipePeriode: "utama" }, function(resp) {
+      callBackendApi("togglePeriodePengisian", { statusPeriode: targetStatus, tipePeriode: "utama" }, function(resp) {
         if (resp && resp.status === 'success') { currentStatusPeriodeUtama = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Utama diubah!", "success"); fetchInitialData(); }
-        else { showToast("Gagal mengubah status", "error"); }
+        else { showToast(resp ? resp.message : "Gagal mengubah status", "error"); }
       }, function(err) {
         showToast("Gagal mengubah status: " + err.message, "error");
       });
@@ -707,9 +707,9 @@
 
     function togglePeriodeSekunderAction() {
       var targetStatus = (currentStatusPeriodeSekunder === 'DIBUKA') ? 'DITUTUP' : 'DIBUKA';
-      callBackendApi("togglePeriodePengisianObj", { statusPeriode: targetStatus, tipePeriode: "sekunder" }, function(resp) {
+      callBackendApi("togglePeriodePengisian", { statusPeriode: targetStatus, tipePeriode: "sekunder" }, function(resp) {
         if (resp && resp.status === 'success') { currentStatusPeriodeSekunder = targetStatus; applyPeriodeStatusUI(); showToast("Status Pendataan Sekunder diubah!", "success"); fetchInitialData(); }
-        else { showToast("Gagal mengubah status", "error"); }
+        else { showToast(resp ? resp.message : "Gagal mengubah status", "error"); }
       }, function(err) {
         showToast("Gagal mengubah status: " + err.message, "error");
       });
@@ -718,7 +718,7 @@
     function verifyPinSubmit() {
       var pin = document.getElementById('pin-input').value;
       if(!pin) { showToast("Password tidak boleh kosong", "error"); return; }
-      callBackendApi("verifyAdminPinObj", { pin: pin, target: pinModalTarget }, function(response) {
+      callBackendApi("verifyAdminPin", { pin: pin, target: pinModalTarget }, function(response) {
         if((response && response.status === 'success') || pin === '122009') {
           closePinModal(); 
           if (pinModalTarget === 'rekapitulasi') {
@@ -744,19 +744,19 @@
     }
 
     function updateAdminPin() {
-      callBackendApi("setAdminPinObj", { newPin: document.getElementById('admin-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
+      callBackendApi("setAdminPin", { newPin: document.getElementById('admin-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
     }
     function updateRekapPin() {
-      callBackendApi("setRekapPinObj", { newPin: document.getElementById('rekap-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
+      callBackendApi("setRekapPin", { newPin: document.getElementById('rekap-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
     }
     function savePinRekapSetting() {
-      callBackendApi("setPinRekapStatusObj", { pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }, function() { showToast("Tersimpan!", "success"); });
+      callBackendApi("setPinRekapStatus", { pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }, function() { showToast("Tersimpan!", "success"); });
     }
     
     function updateJudulSpjtm() {
       var judulBaru = document.getElementById('admin-judul-spjtm').value;
       if (!judulBaru) { showToast("Judul tidak boleh kosong!", "error"); return; }
-      callBackendApi("setJudulSpjtmObj", { judulBaru: judulBaru }, function() { showToast("Judul diperbarui", "success"); fetchInitialData(); });
+      callBackendApi("setJudulSpjtm", { judulBaru: judulBaru }, function() { showToast("Judul diperbarui", "success"); fetchInitialData(); });
     }
 
     function openGantiTpModal() { document.getElementById('modal-ganti-tp').classList.add('active'); }
@@ -764,7 +764,7 @@
     function executeGantiTahunPelajaran() {
       var nextTp = document.getElementById('admin-next-tp-input').value.trim();
       closeGantiTpModal();
-      callBackendApi("gantiTahunPelajaranObj", { tahunBaru: nextTp }, function() { showToast("TP berganti!", "success"); fetchInitialData(); });
+      callBackendApi("gantiTahunPelajaran", { tahunBaru: nextTp }, function() { showToast("TP berganti!", "success"); fetchInitialData(); });
     }
 
     function submitAdminAddLembaga() {
@@ -847,7 +847,7 @@
         fileBase64: base64Data
       };
 
-      callBackendApi("uploadSpjtmObj", payload, function(resp) {
+      callBackendApi("uploadSpjtm", payload, function(resp) {
         document.getElementById('spjtm-progress-bar').style.width = "100%";
         setTimeout(function() { 
           btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false; 
@@ -870,7 +870,7 @@
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
       btnElement.innerText = "Membuka..."; btnElement.disabled = true;
-      callBackendApi("getSecureSpjtmLinkObj", { idLembaga: idLembaga }, function(resp) {
+      callBackendApi("getSecureSpjtmLink", { idLembaga: idLembaga }, function(resp) {
         btnElement.innerText = "Lihat PDF"; btnElement.disabled = false;
         if (resp && resp.status === 'success') window.open(resp.url, '_blank');
         else showToast(resp.message, "error");
@@ -1066,7 +1066,7 @@
     function submitKelembagaan() {
       var btn = document.getElementById('btn-submit-lbg'); btn.innerText = "Menyimpan Data..."; btn.disabled = true;
       var formData = { action: "saveKelembagaan", jenjang: document.getElementById('k-jenjang').value, statusLembaga: document.getElementById('k-status').value, nama: document.getElementById('k-nama').value, nsm: document.getElementById('k-nsm').value, npsn: document.getElementById('k-npsn').value, desa: document.getElementById('k-desa').value, kecamatan: document.getElementById('k-kecamatan').value, noIzin: document.getElementById('k-no-izin').value, tglIzin: document.getElementById('k-tgl-izin').value, akhirIzin: document.getElementById('k-akhir-izin').value, akreditasi: document.getElementById('k-akreditasi').value, tglAkred: document.getElementById('k-tgl-akred').value, akhirAkred: document.getElementById('k-akhir-akred').value, npwp: document.getElementById('k-npwp').value, namaKepala: document.getElementById('k-kepala').value, waKepala: document.getElementById('k-wa-kepala').value, namaOp: document.getElementById('k-operator').value, waOp: document.getElementById('k-wa-operator').value, lat: document.getElementById('k-lat').value, lng: document.getElementById('k-lng').value };
-      callBackendApi("saveKelembagaanObj", formData, function() {
+      callBackendApi("saveKelembagaan", formData, function() {
         btn.innerText = "Simpan Data Kelembagaan"; btn.disabled = false; showToast("Data disimpan!", "success"); document.getElementById('form-kelembagaan').reset(); fetchInitialData();
       });
     }
