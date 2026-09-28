@@ -75,7 +75,7 @@
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Cari & Pilih Lembaga</label>
                 <div class="search-bar-container"><span class="search-icon">🔍</span><input type="text" id="izop-search-input" placeholder="Ketik nama atau NSM lembaga..." oninput="filterDropdown('izop-search-input', 'izop-lembaga')"></div>
-                <select id="izop-lembaga" required><option value="">-- Memuat Data Lembaga... --</option></select>
+                <select id="izop-lembaga" required onchange="onIzopLembagaChange()"><option value="">-- Memuat Data Lembaga... --</option></select>
               </div>
             </div>
             <div class="form-group" style="margin-top: 15px;">
@@ -402,7 +402,7 @@
       <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; line-height: 1.6;">APAKAH BERKAS SUDAH DI TANDA TANGANI SEMUA DAN DI BERI METERAI PADA SPTJM?</p>
       <div style="display:flex; gap:15px;">
         <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 2px solid var(--border-color); box-shadow:none;" onclick="cancelUploadIzop()">Batal</button>
-        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="proceedUploadIzop()">YA, Lanjutkan</button>
+        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="proceedUploadIzop()">YA</button>
       </div>
     </div>
   </div>
@@ -435,7 +435,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt_Bh3Dt5RWID2_LjppAjs6x3uAm6C0K1QFLWe-09vpiQ6WXx3hny6xXwwq2JNuStq/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcvIJPM9Ln10Dhy60OOmN4nN8qh5VVokLxhfVAxnLhZL82KFYZ0_MuqcQKEI1F5-G0/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -653,6 +653,22 @@
         }
       }
       select.innerHTML = html;
+    }
+
+    // DINAMISASI NAMA FILE DOWNLOAD TEMPLATE IZOP
+    function onIzopLembagaChange() {
+      var sel = document.getElementById('izop-lembaga');
+      if (sel.selectedIndex > 0) {
+          var opt = sel.options[sel.selectedIndex];
+          var nama = (opt.getAttribute('data-nama') || "").replace(/[^a-zA-Z0-9]/g, "_");
+          document.getElementById('btn-dl-permohonan').setAttribute('download', 'Surat_Permohonan_' + nama);
+          document.getElementById('btn-dl-spjtm').setAttribute('download', 'SPJTM_' + nama);
+          document.getElementById('btn-dl-rekomendasi').setAttribute('download', 'Rekomendasi_' + nama);
+      } else {
+          document.getElementById('btn-dl-permohonan').setAttribute('download', 'Template_Surat_Permohonan');
+          document.getElementById('btn-dl-spjtm').setAttribute('download', 'Template_SPJTM_Satuan_Pendidikan');
+          document.getElementById('btn-dl-rekomendasi').setAttribute('download', 'Template_Rekomendasi_Pengawas');
+      }
     }
 
     function renderResetSpjtmDropdown() {
@@ -1045,7 +1061,7 @@
       }
     }
 
-    // Menampilkan Modal Konfirmasi sebelum Upload
+    // Menampilkan Modal Konfirmasi sebelum Upload Izop
     function showConfirmIzopModal() {
       var idLembaga = document.getElementById('izop-lembaga').value;
       var base64Data = document.getElementById('izop-base64-data').value;
@@ -1053,6 +1069,18 @@
         showToast("Silakan pilih lembaga dan file ZIP/RAR terlebih dahulu!", "error");
         return;
       }
+
+      // Cek apakah lembaga ini sudah upload sebelumnya
+      var lembagaRecord = fullRekapData.find(function(x) { return x.id === idLembaga; });
+      if (lembagaRecord && lembagaRecord.hasIzop) {
+        var isReplace = confirm("⚠️ PERINGATAN: LEMBAGA SUDAH UPLOAD BERKAS!\n\nLembaga ini sudah memiliki berkas pengajuan di database. Apakah Anda ingin MENGGANTI file yang lama dengan yang baru ini?\n\n(Jika YA, file lama akan dihapus permanen dari sistem & Google Drive)");
+        if (!isReplace) {
+          cancelUploadIzop();
+          return;
+        }
+      }
+
+      // Tampilkan popup konfirmasi tanda tangan & meterai
       document.getElementById('modal-confirm-izop').classList.add('active');
     }
 
@@ -1149,9 +1177,9 @@
         izopData.push(r);
       }
 
-      // Filter: Hanya tampilkan lembaga yang sudah Kadaluarsa ATAU yang sudah Upload
+      // Filter: Hanya tampilkan lembaga yang sisa masa izinnya <= 365 hari (1 Tahun) ATAU yang Sudah Upload
       var filteredData = izopData.filter(function(r) {
-        return r.hasIzop || (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays < 0);
+        return r.hasIzop || (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays <= 365);
       });
 
       // Sorting Logic
@@ -1180,7 +1208,7 @@
         idx++;
       }
       
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang izinnya kadaluarsa.</td></tr>' : html;
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang masa izinnya kadaluarsa atau segera habis.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
