@@ -69,7 +69,6 @@
           </div>
 
           <div class="form-divider">2. Upload Berkas Pengajuan</div>
-          <!-- INTERCEPT FORM SUBMIT UNTUK MEMUNCULKAN NOTIFIKASI -->
           <form id="form-upload-izop" onsubmit="event.preventDefault(); showConfirmIzopModal();">
             <div class="grid-cards" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: 1 / -1;">
@@ -421,7 +420,7 @@
   <div class="modal-overlay" id="download-zip-pin-modal">
     <div class="modal-content" style="max-width: 420px; text-align: left;">
       <h3 style="margin-bottom:8px; color:var(--primary-solid); font-weight:700; text-align: center;">📦 Download Arsip Laporan BOS</h3>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; text-align: center;">Pilih Jenjang atau unduh seluruh arsip laporan dalam format ZIP.</p>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; text-align: center;">Pilih Jenjang atau unduh seluruh Arsip laporan dalam format ZIP.</p>
       <div class="form-group"><label>Pilih Jenjang / Kategori</label><select id="download-jenjang-select" style="font-weight: 600;"><option value="ALL">🌟 Semua Jenjang (Gabungan ZIP)</option><option value="RA">RA (Raudhatul Athfal)</option><option value="MI">MI (Madrasah Ibtidaiyah)</option><option value="MTS">MTs (Madrasah Tsanawiyah)</option><option value="MA">MA (Madrasah Aliyah)</option></select></div>
       <div class="form-group"><label>Password Otorisasi</label><input type="password" id="zip-pin-input" placeholder="••••" style="text-align:center; letter-spacing:8px; font-weight:700; font-size:1.2rem; background:var(--bg-body);" onkeydown="if(event.key==='Enter') executeDownloadAllSpjtmZip()"></div>
       <div style="display:flex; gap:15px; margin-top: 25px;"><button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="document.getElementById('download-zip-pin-modal').classList.remove('active')">Batal</button><button class="btn" style="flex:1; background:var(--primary-solid);" onclick="executeDownloadAllSpjtmZip()">Download</button></div>
@@ -436,7 +435,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh6D_EjuQYwU5eQFjeMaCywekda04ZyuKHwyVGd9SMlQpIpCiGh9rg5UU79TtkURM5/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhCZ8RBXWaxqJHVu421FxdbxJV_2jSFRGdVraubjmWDTAuaFqWMdIeGeAuHeZi4Z92/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -681,7 +680,7 @@
       select.innerHTML = html;
     }
 
-    // FILTER KHUSUS IZOP (HANYA MENAMPILKAN LEMBAGA KADALUARSA)
+    // --- MODIFIKASI: FILTER KHUSUS IZOP (HANYA MENAMPILKAN LEMBAGA KADALUARSA + MENGHILANGKAN MADRASAH NEGERI) ---
     function filterDropdownIzop() {
       var val = document.getElementById('izop-search-input').value.toLowerCase();
       var select = document.getElementById('izop-lembaga');
@@ -693,6 +692,18 @@
 
       for (var i = 0; i < sortedData.length; i++) {
         var inst = sortedData[i];
+        
+        // Cek apakah lembaga tersebut adalah Madrasah Negeri (Berdasarkan Status Kelembagaan maupun Nama)
+        var isNegeri = (String(inst.statusLembaga).toUpperCase() === 'NEGERI') || 
+                       (String(inst.nama).toUpperCase().indexOf('MIN ') > -1) || 
+                       (String(inst.nama).toUpperCase().match(/^MIN$/)) ||
+                       (String(inst.nama).toUpperCase().indexOf('MTS NEGERI') > -1) || 
+                       (String(inst.nama).toUpperCase().indexOf('MTSN ') > -1) || 
+                       (String(inst.nama).toUpperCase().indexOf('MAN ') > -1) ||
+                       (String(inst.nama).toUpperCase().match(/^MAN$/));
+                       
+        if (isNegeri) continue;
+
         var diffDays = getSisaMasaIzinDays(inst.akhirIzin);
         
         // HANYA yang sudah kadaluarsa (< 0)
@@ -1210,6 +1221,7 @@
       return '<span style="color:#10B981; font-weight:600;">Aktif (Sisa ' + diffDays + ' hari)</span>';
     }
 
+    // --- MODIFIKASI: FILTER KHUSUS IZOP MONITORING (MENGHILANGKAN MADRASAH NEGERI) ---
     function renderTableIzop() {
       var tbody = document.getElementById('table-izop-monitoring');
       if (!tbody) return;
@@ -1219,6 +1231,18 @@
       var izopData = [];
       for (var i = 0; i < fullRekapData.length; i++) {
         var r = fullRekapData[i];
+        
+        // Cek apakah lembaga tersebut adalah Madrasah Negeri
+        var isNegeri = (String(r.statusLembaga).toUpperCase() === 'NEGERI') || 
+                       (String(r.nama).toUpperCase().indexOf('MIN ') > -1) || 
+                       (String(r.nama).toUpperCase().match(/^MIN$/)) ||
+                       (String(r.nama).toUpperCase().indexOf('MTS NEGERI') > -1) || 
+                       (String(r.nama).toUpperCase().indexOf('MTSN ') > -1) || 
+                       (String(r.nama).toUpperCase().indexOf('MAN ') > -1) ||
+                       (String(r.nama).toUpperCase().match(/^MAN$/));
+                       
+        if (isNegeri) continue;
+        
         var jg = String(r.jenjang || "").toUpperCase();
         if (filterJj !== "ALL" && filterJj !== "MTS") { if (jg !== filterJj) continue; }
         if (filterJj === "MTS") { if (jg !== "MTS" && jg.indexOf("MT") === -1) continue; }
@@ -1258,7 +1282,7 @@
         idx++;
       }
       
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Alhamdulillah, tidak ada lembaga yang izinnya kadaluarsa.</td></tr>' : html;
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Alhamdulillah, tidak ada lembaga swasta yang izinnya kadaluarsa.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
