@@ -74,7 +74,8 @@
             <div class="grid-cards" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Cari & Pilih Lembaga</label>
-                <div class="search-bar-container"><span class="search-icon">🔍</span><input type="text" id="izop-search-input" placeholder="Ketik nama atau NSM lembaga..." oninput="filterDropdown('izop-search-input', 'izop-lembaga')"></div>
+                <!-- MEMANGGIL FILTER KHUSUS IZOP -->
+                <div class="search-bar-container"><span class="search-icon">🔍</span><input type="text" id="izop-search-input" placeholder="Ketik nama atau NSM lembaga..." oninput="filterDropdownIzop()"></div>
                 <select id="izop-lembaga" required onchange="onIzopLembagaChange()"><option value="">-- Memuat Data Lembaga... --</option></select>
               </div>
             </div>
@@ -435,7 +436,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHH2PSgq6YarXX6LhDc6NDaTmEIbUeXBUQ0JeWUQ1E4xiWHbrwIyLYZBDDbBwzxxtC/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh6D_EjuQYwU5eQFjeMaCywekda04ZyuKHwyVGd9SMlQpIpCiGh9rg5UU79TtkURM5/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -663,7 +664,7 @@
       renderTableSpjtm();
       renderMonitoringTable();
       
-      filterDropdown('izop-search-input', 'izop-lembaga');
+      filterDropdownIzop();
       renderTableIzop();
     }
 
@@ -675,6 +676,30 @@
         var inst = globalInstitutions[i];
         if ((inst.name + " " + inst.nsm).toLowerCase().indexOf(val) > -1) {
           html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-nsm="' + inst.nsm + '" data-nama="' + inst.name + '">' + inst.name + ' (' + inst.jenjang + ' - ' + inst.nsm + ')</option>';
+        }
+      }
+      select.innerHTML = html;
+    }
+
+    // FILTER KHUSUS IZOP (HANYA MENAMPILKAN LEMBAGA KADALUARSA)
+    function filterDropdownIzop() {
+      var val = document.getElementById('izop-search-input').value.toLowerCase();
+      var select = document.getElementById('izop-lembaga');
+      var html = '<option value="">-- Pilih Lembaga --</option>';
+
+      var sortedData = [].concat(fullRekapData).sort(function(a, b) {
+        return String(a.nsm || "").localeCompare(String(b.nsm || ""), undefined, { numeric: true });
+      });
+
+      for (var i = 0; i < sortedData.length; i++) {
+        var inst = sortedData[i];
+        var diffDays = getSisaMasaIzinDays(inst.akhirIzin);
+        
+        // HANYA yang sudah kadaluarsa (< 0)
+        if (diffDays !== Infinity && diffDays < 0) {
+          if ((inst.nama + " " + inst.nsm).toLowerCase().indexOf(val) > -1) {
+            html += '<option value="' + inst.id + '" data-jenjang="' + inst.jenjang + '" data-nsm="' + inst.nsm + '" data-nama="' + inst.nama + '">' + inst.nama + ' (' + inst.jenjang + ' - ' + inst.nsm + ')</option>';
+          }
         }
       }
       select.innerHTML = html;
@@ -1202,14 +1227,18 @@
         izopData.push(r);
       }
 
-      // Filter: Hanya tampilkan lembaga yang sisa masa izinnya <= 365 hari (1 Tahun) ATAU yang Sudah Kadaluarsa (< 0)
+      // Filter: Hanya tampilkan lembaga yang masa izinnya SUDAH KADALUARSA (diffDays < 0)
       var filteredData = izopData.filter(function(r) {
-        return (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays <= 365);
+        return (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays < 0);
       });
 
       // Sorting Logic
       filteredData.sort(function(a, b) {
-        // Prioritas: Urutkan berdasarkan NSM (Ascending/Terkecil ke Terbesar)
+        // Prioritas 1: Yang "Sudah Upload" taruh paling atas
+        if (a.hasIzop && !b.hasIzop) return -1;
+        if (!a.hasIzop && b.hasIzop) return 1;
+        
+        // Prioritas 2: Urutkan berdasarkan NSM (Ascending/Terkecil ke Terbesar)
         return String(a.nsm || "").localeCompare(String(b.nsm || ""), undefined, { numeric: true });
       });
 
