@@ -39,14 +39,8 @@
           
           <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> Upload Laporan Dana BOP/BOS Tahap 2 Tahun 2026 <span id="nav-badge-sekunder" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           
-          <!-- Master Data Menu (Dropdown) -->
-          <div class="nav-item" onclick="toggleSubmenu('submenu-master')"><span>🗂️</span> Master Data <span id="icon-submenu-master" style="margin-left:auto; font-size:0.8rem; transition:transform 0.3s ease;">▼</span></div>
-          
-          <div id="submenu-master" class="submenu-container">
-            <div class="nav-item" onclick="navigate('input-kelembagaan', this)"><span>🏛️</span> Input Kelembagaan <span id="nav-badge-utama" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
-            <div class="nav-item" onclick="navigate('input-siswa', this)"><span>👤</span> Input Siswa <span id="nav-badge-siswa" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
-            <div class="nav-item" onclick="navigate('input-sarpras', this)"><span>🛠️</span> Input Sarpras <span id="nav-badge-sarpras" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
-          </div>
+          <!-- Master Data Menu (Halaman Utama Tunggal) -->
+          <div class="nav-item" id="nav-master-data" onclick="navigate('master-data', this)"><span>🗂️</span> Master Data</div>
 
           <div class="nav-item" onclick="openPinModal('admin-emis')"><span>⚙️</span> Admin EMIS</div>
         </div>
@@ -96,7 +90,7 @@
                   <input type="text" id="izop-lembaga-input" list="izop-lembaga-list" placeholder="-- Ketik Nama atau NSM Lembaga --" required onchange="onIzopLembagaChange()" autocomplete="off" style="width: 100%; border-radius:8px; padding-left:35px;">
                   <datalist id="izop-lembaga-list"></datalist>
                 </div>
-                <input type="hidden" id="izop-lembaga">
+                <select id="izop-lembaga" style="display:none;"></select>
               </div>
             </div>
             
@@ -114,12 +108,13 @@
               <!-- Upload Bukti Ajuan (Kanan) -->
               <div class="form-group" style="margin-bottom: 0;">
                 <label>2. Upload Bukti Ajuan</label>
-                <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; cursor: pointer;">
+                <!-- Menghilangkan area paste, hanya fokus pada klik untuk upload -->
+                <div class="upload-area" id="izop-drop-area" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
                   <span class="upload-icon" style="font-size: 2.5rem; margin-bottom: 10px;">📸</span>
                   <p style="font-weight:700; color:var(--text-main); font-size: 1.05rem; text-align: center; margin-bottom: 15px;">Laporan Selesai Ajuan Berupa Screenshot</p>
                   
                   <div style="display:flex; flex-direction:column; gap:10px; width:100%; align-items:center;">
-                    <button type="button" class="btn" style="padding: 8px 20px; font-size: 0.9rem; border-radius: 20px; background: var(--primary-solid); color: #fff; pointer-events: none;">📁 Klik Pilih File Gambar</button>
+                    <button type="button" class="btn" onclick="document.getElementById('izop-file-input').click()" style="padding: 8px 20px; font-size: 0.9rem; border-radius: 20px; background: var(--primary-solid); color: #fff;">📁 Klik Pilih File Gambar</button>
                   </div>
 
                   <input type="file" id="izop-file-input" style="display:none;" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onchange="handleFileIzopSelect(this)">
@@ -196,6 +191,36 @@
             <div style="font-size:0.9rem; font-weight:600;"><span style="color:var(--primary-solid);" id="spjtm-count-ok">0 Sudah Upload</span> | <span style="color:#EF4444;" id="spjtm-count-no">0 Belum</span></div>
           </div>
           <div style="overflow-x:auto; border-radius: var(--radius-sm); border: 1px solid var(--border-color); max-height: 500px;"><table style="min-width: 800px;"><thead><tr style="background:var(--bg-body); position:sticky; top:0; z-index:2;"><th style="width:50px;">NO</th><th>JENJANG</th><th>NSM</th><th>NAMA LEMBAGA</th><th>STATUS UPLOAD</th><th>FILE</th></tr></thead><tbody id="table-spjtm-rekap"><tr><td colspan="6" style="text-align:center; padding:30px;">Memuat rekapitulasi Laporan...</td></tr></tbody></table></div>
+        </section>
+
+        <!-- MASTER DATA MAIN PAGE -->
+        <section id="master-data" class="page-section">
+          <h2>Master Data Madrasah</h2>
+          <p style="color:var(--text-muted); margin-top:-15px; margin-bottom:25px;">Silakan pilih modul pendataan di bawah ini untuk memperbarui data lembaga, siswa, dan sarana prasarana.</p>
+          <div class="grid-cards" style="gap:25px;">
+            
+            <div class="card" style="cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="navigate('input-kelembagaan', document.getElementById('nav-master-data'))">
+              <div style="font-size: 3.5rem; margin-bottom: 15px;">🏛️</div>
+              <h3 style="color:var(--primary-dark); margin-bottom: 10px; font-size:1.2rem;">Input Kelembagaan</h3>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 20px;">Formulir identitas, kontak, alamat, izin operasional, dan status akreditasi madrasah.</p>
+              <div style="margin-top:auto;"><span id="nav-badge-utama" style="font-size:0.8rem; font-weight:700; padding:5px 14px; border-radius:20px; background:rgba(0,192,90,0.15); color:var(--primary-solid); display:inline-block;">BUKA</span></div>
+            </div>
+
+            <div class="card" style="cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="navigate('input-siswa', document.getElementById('nav-master-data'))">
+              <div style="font-size: 3.5rem; margin-bottom: 15px;">👤</div>
+              <h3 style="color:var(--primary-dark); margin-bottom: 10px; font-size:1.2rem;">Input Siswa</h3>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 20px;">Formulir rekapitulasi data jumlah siswa, kelas, siswa lulus, dan tidak lulus.</p>
+              <div style="margin-top:auto;"><span id="nav-badge-siswa" style="font-size:0.8rem; font-weight:700; padding:5px 14px; border-radius:20px; background:rgba(0,192,90,0.15); color:var(--primary-solid); display:inline-block;">BUKA</span></div>
+            </div>
+
+            <div class="card" style="cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center;" onclick="navigate('input-sarpras', document.getElementById('nav-master-data'))">
+              <div style="font-size: 3.5rem; margin-bottom: 15px;">🛠️</div>
+              <h3 style="color:var(--primary-dark); margin-bottom: 10px; font-size:1.2rem;">Input Sarpras</h3>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom: 20px;">Formulir pendataan jumlah ruangan, bangunan fisik, ekstrakurikuler, dan fasilitas lab.</p>
+              <div style="margin-top:auto;"><span id="nav-badge-sarpras" style="font-size:0.8rem; font-weight:700; padding:5px 14px; border-radius:20px; background:rgba(0,192,90,0.15); color:var(--primary-solid); display:inline-block;">BUKA</span></div>
+            </div>
+
+          </div>
         </section>
 
         <!-- INPUT KELEMBAGAAN -->
@@ -498,7 +523,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9n0p_r30QBZXJXj1ZJU-C4-cIoK2mEXcinopvSnU7QoBHI8AsmdKUholi1npJu2uW/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxK_VVexKNxWsdJ9-lHyXNHXoWWRMJZmsZiimOj_K87N6wopzT372sS74JWg9PEH3-F/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -557,8 +582,14 @@
       }
       document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.remove('active'); });
       document.querySelectorAll('.page-section').forEach(function(s){ s.classList.remove('active'); });
-      if (navElement) navElement.classList.add('active');
-      else {
+      
+      // Jika yang di klik adalah elemen di halaman Master Data, pastikan menu Master Data di sidebar tetap aktif
+      if(sectionId === 'input-kelembagaan' || sectionId === 'input-siswa' || sectionId === 'input-sarpras') {
+        var masterNav = document.getElementById('nav-master-data');
+        if(masterNav) masterNav.classList.add('active');
+      } else if (navElement) {
+        navElement.classList.add('active');
+      } else {
         var navs = document.querySelectorAll('.nav-item');
         for (var n = 0; n < navs.length; n++) {
           if (navs[n].getAttribute('onclick') && navs[n].getAttribute('onclick').indexOf(sectionId) > -1) {
@@ -566,27 +597,13 @@
           }
         }
       }
+      
       var targetSection = document.getElementById(sectionId);
       if (targetSection) targetSection.classList.add('active');
       
       if (sectionId === 'rekapitulasi') { renderRekapTable(); }
       if (sectionId === 'spjtm-siswa') { renderMonitoringTable(); renderTableSpjtm(); }
       if (sectionId === 'izop-perpanjangan') { renderTableIzop(); }
-    }
-    
-    // JS Function for Submenu Toggle
-    function toggleSubmenu(id) {
-      var el = document.getElementById(id);
-      var icon = document.getElementById('icon-' + id);
-      if (el) {
-        if (el.classList.contains('show-submenu')) {
-          el.classList.remove('show-submenu');
-          if (icon) icon.style.transform = 'rotate(0deg)';
-        } else {
-          el.classList.add('show-submenu');
-          if (icon) icon.style.transform = 'rotate(180deg)';
-        }
-      }
     }
 
     function showToast(message, type) {
@@ -970,6 +987,7 @@
       
       var badgeUtama = document.getElementById('admin-periode-utama-badge');
       var btnToggleUtama = document.getElementById('btn-toggle-tutup-utama');
+      
       var navBadgeUtama = document.getElementById('nav-badge-utama');
       var navBadgeSiswa = document.getElementById('nav-badge-siswa');
       var navBadgeSarpras = document.getElementById('nav-badge-sarpras');
@@ -977,14 +995,14 @@
       if (badgeUtama && btnToggleUtama) {
         if (isUtamaClosed) {
           badgeUtama.innerText = "DITUTUP"; badgeUtama.style.color = "#EF4444"; btnToggleUtama.innerText = "🔓 Buka Pendataan Utama";
-          if (navBadgeUtama) { navBadgeUtama.innerText = "TUTUP"; navBadgeUtama.style.background = "rgba(239,68,68,0.3)"; }
-          if (navBadgeSiswa) { navBadgeSiswa.innerText = "TUTUP"; navBadgeSiswa.style.background = "rgba(239,68,68,0.3)"; }
-          if (navBadgeSarpras) { navBadgeSarpras.innerText = "TUTUP"; navBadgeSarpras.style.background = "rgba(239,68,68,0.3)"; }
+          if (navBadgeUtama) { navBadgeUtama.innerText = "TUTUP"; navBadgeUtama.style.background = "rgba(239,68,68,0.15)"; navBadgeUtama.style.color = "#EF4444"; }
+          if (navBadgeSiswa) { navBadgeSiswa.innerText = "TUTUP"; navBadgeSiswa.style.background = "rgba(239,68,68,0.15)"; navBadgeSiswa.style.color = "#EF4444"; }
+          if (navBadgeSarpras) { navBadgeSarpras.innerText = "TUTUP"; navBadgeSarpras.style.background = "rgba(239,68,68,0.15)"; navBadgeSarpras.style.color = "#EF4444"; }
         } else {
           badgeUtama.innerText = "DIBUKA"; badgeUtama.style.color = "var(--primary-solid)"; btnToggleUtama.innerText = "🔒 Tutup Pendataan Utama";
-          if (navBadgeUtama) { navBadgeUtama.innerText = "BUKA"; navBadgeUtama.style.background = "rgba(0,192,90,0.3)"; }
-          if (navBadgeSiswa) { navBadgeSiswa.innerText = "BUKA"; navBadgeSiswa.style.background = "rgba(0,192,90,0.3)"; }
-          if (navBadgeSarpras) { navBadgeSarpras.innerText = "BUKA"; navBadgeSarpras.style.background = "rgba(0,192,90,0.3)"; }
+          if (navBadgeUtama) { navBadgeUtama.innerText = "BUKA"; navBadgeUtama.style.background = "rgba(0,192,90,0.15)"; navBadgeUtama.style.color = "var(--primary-solid)"; }
+          if (navBadgeSiswa) { navBadgeSiswa.innerText = "BUKA"; navBadgeSiswa.style.background = "rgba(0,192,90,0.15)"; navBadgeSiswa.style.color = "var(--primary-solid)"; }
+          if (navBadgeSarpras) { navBadgeSarpras.innerText = "BUKA"; navBadgeSarpras.style.background = "rgba(0,192,90,0.15)"; navBadgeSarpras.style.color = "var(--primary-solid)"; }
         }
       }
 
@@ -1215,7 +1233,6 @@
       });
     }
     
-    // === FITUR PENGAJUAN IZOP ===
     function handleFileIzopSelect(input) {
       if (input.files && input.files[0]) {
         var file = input.files[0];
