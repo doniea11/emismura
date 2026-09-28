@@ -29,6 +29,7 @@
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)"><span>🏛️</span> Input Kelembagaan <span id="nav-badge-utama" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-siswa', this)"><span>👤</span> Input Siswa <span id="nav-badge-siswa" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-sarpras', this)"><span>🛠️</span> Input Sarpras <span id="nav-badge-sarpras" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
+          <div class="nav-item" onclick="navigate('izop-perpanjangan', this)"><span>📑</span> Pengajuan Perpanjangan Izop</div>
           <div class="nav-item" onclick="openPinModal('admin-emis')"><span>⚙️</span> Admin EMIS</div>
         </div>
         <div class="sidebar-bottom"><div class="watermark-donie"><span>꧁</span> @2026 by masdonie <span>꧂</span></div></div>
@@ -51,6 +52,55 @@
             <p style="font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 18px; text-align: justify; color: var(--text-main);">Ingatlah selalu, setiap validasi data yang Anda lakukan bernilai ibadah. Setiap kesabaran menghadapi sistem yang lambat atau kendala teknis yang pelik adalah ladang pahala yang mengalirkan keberkahan bagi masa depan generasi muda madrasah.</p>
             <p style="font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 18px; text-align: justify; color: var(--text-main);">Teruslah melangkah dengan kepala tegak dan hati yang ikhlas. Karena di balik setiap prestasi hebat sebuah madrasah, selalu ada ketulusan tangan seorang operator yang bekerja dengan cinta dan tanggung jawab.</p>
             <p style="font-family: 'Playfair Display', serif; font-size: 1.05rem; text-align: center; font-weight: 600; color: var(--primary-solid); font-style: italic;">Terima kasih atas dedikasi dan keringat baktimu untuk madrasah tercinta. Teruslah menginspirasi, teruslah menerangi.</p>
+          </div>
+        </section>
+
+        <!-- PENGAJUAN PERPANJANGAN IZOP -->
+        <section id="izop-perpanjangan" class="page-section">
+          <h2>Pengajuan Perpanjangan Izin Operasional (Izop)</h2>
+          
+          <div class="form-divider" style="margin-top:0;">1. Download Format Berkas Persyaratan</div>
+          <div class="grid-cards" style="margin-bottom: 25px;">
+            <a href="#" class="btn" style="background:#2563EB; text-decoration:none; text-align:center;">📄 Surat Permohonan</a>
+            <a href="#" class="btn" style="background:#F59E0B; text-decoration:none; text-align:center;">📄 SPJTM Satuan Pendidikan</a>
+            <a href="#" class="btn" style="background:#10B981; text-decoration:none; text-align:center;">📄 Rekomendasi Pengawas</a>
+          </div>
+
+          <div class="form-divider">2. Upload Berkas Pengajuan</div>
+          <form id="form-upload-izop" onsubmit="event.preventDefault(); submitUploadIzop();">
+            <div class="grid-cards" style="margin-bottom: 0;">
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Cari & Pilih Lembaga</label>
+                <div class="search-bar-container"><span class="search-icon">🔍</span><input type="text" id="izop-search-input" placeholder="Ketik nama atau NSM lembaga..." oninput="filterDropdown('izop-search-input', 'izop-lembaga')"></div>
+                <select id="izop-lembaga" required><option value="">-- Memuat Data Lembaga... --</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+              <label>Upload File Berkas (Hanya .ZIP / .RAR)</label>
+              <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()">
+                <span class="upload-icon">📦</span>
+                <p style="font-weight:600; color:var(--text-main);">Klik di sini untuk memilih file ZIP/RAR</p>
+                <input type="file" id="izop-file-input" class="file-input-hidden" accept=".zip,.rar,application/zip,application/x-rar-compressed,application/vnd.rar" onchange="handleFileIzopSelect(this)">
+                <div id="izop-file-info" class="file-info"></div>
+              </div>
+              <input type="hidden" id="izop-base64-data"><input type="hidden" id="izop-filename">
+              <div id="izop-progress-container" style="display:none; margin-top:15px; height:10px; background:var(--border-color); border-radius:20px;"><div id="izop-progress-bar" style="width:0%; height:100%; background:var(--primary-solid); transition:width 0.4s ease; border-radius:20px;"></div></div>
+            </div>
+            <button type="submit" class="btn" id="btn-submit-izop" style="width: 100%; font-size: 1.1rem; padding: 15px;">🚀 Upload Berkas Pengajuan</button>
+          </form>
+
+          <div class="form-divider" style="margin-top: 40px;">3. Monitoring Status Pengajuan & Sisa Masa Izin Operasional</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap:10px;">
+            <select id="izop-jenjang-filter" onchange="renderTableIzop()" style="padding:6px 12px; font-weight:600; max-width:250px;">
+              <option value="ALL">Semua Jenjang</option>
+              <option value="MA">MA</option><option value="MTS">MTs</option><option value="MI">MI</option><option value="RA">RA</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-height:500px;">
+            <table style="min-width: 800px;">
+              <thead><tr style="background:var(--bg-body); position:sticky; top:0; z-index:2;"><th style="width:40px;">NO</th><th>NSM</th><th>NAMA LEMBAGA</th><th>JENJANG</th><th>SISA MASA IZIN</th><th style="text-align:center;">STATUS UPLOAD</th></tr></thead>
+              <tbody id="table-izop-monitoring"><tr><td colspan="6" style="text-align:center; padding:15px;">Memuat data...</td></tr></tbody>
+            </table>
           </div>
         </section>
 
@@ -314,7 +364,7 @@
   <!-- MODALS -->
   <div class="modal-overlay" id="pin-modal"><div class="modal-content"><h3 id="pin-modal-title" style="margin-bottom:8px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3><p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Masukkan Password</p><input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing:12px; font-weight:700; font-size:1.5rem; background:var(--bg-body);" onkeydown="handlePinKeydown(event)"><div style="display:flex; gap:15px;"><button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button><button class="btn" style="flex:1;" onclick="verifyPinSubmit()">Masuk</button></div></div></div>
 
-  <!-- MODAL PERINGATAN PERIODE DITUTUP (ZETTBOT FEATURE) -->
+  <!-- MODAL PERINGATAN PERIODE DITUTUP -->
   <div class="modal-overlay" id="modal-period-warning">
     <div class="modal-content" style="max-width: 425px; border: 2px solid #EF4444;">
       <div style="font-size: 3.5rem; margin-bottom: 10px;">🔒</div>
@@ -342,7 +392,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeYRkf-03CoxEYn5nk9RfLWGzP8v_p9AUHOXD6mZO2ikxN6ykMQU84DyIc-Bav_qEt/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwSBPAkckV5noW-_Bky-8ZvNWazAT0hT05lMkk-ZqNXM3pTY3RYGUWoLOG4kv2qZz6-yA/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -399,8 +449,10 @@
       }
       var targetSection = document.getElementById(sectionId);
       if (targetSection) targetSection.classList.add('active');
+      
       if (sectionId === 'rekapitulasi') { renderRekapTable(); }
       if (sectionId === 'spjtm-siswa') { renderMonitoringTable(); renderTableSpjtm(); }
+      if (sectionId === 'izop-perpanjangan') { renderTableIzop(); }
     }
 
     function showToast(message, type) {
@@ -445,6 +497,7 @@
         else if (actionName === "getDetailLembagaObj") runner.getDetailLembagaObj(payload.idLembaga);
         else if (actionName === "deleteSpjtmFileObj") runner.deleteSpjtmFileObj(payload.idLembaga);
         else if (actionName === "uploadSpjtmObj") runner.uploadSpjtmObj(payload);
+        else if (actionName === "uploadIzopObj") runner.uploadIzopObj(payload);
         else if (actionName === "getSecureSpjtmLinkObj") runner.getSecureSpjtmLinkObj(payload.idLembaga);
         else if (actionName === "togglePeriodePengisianObj") runner.togglePeriodePengisianObj(payload.statusPeriode, payload.tipePeriode);
         else if (actionName === "getDriveFolderUrlObj") runner.getDriveFolderUrlObj();
@@ -515,6 +568,10 @@
       renderRekapTable();
       renderTableSpjtm();
       renderMonitoringTable();
+      
+      // INISIALISASI DROPDOWN IZOP DAN TABEL
+      filterDropdown('izop-search-input', 'izop-lembaga');
+      renderTableIzop();
     }
 
     function filterDropdown(inputId, selectId) {
@@ -743,15 +800,9 @@
       });
     }
 
-    function updateAdminPin() {
-      callBackendApi("setAdminPin", { newPin: document.getElementById('admin-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
-    }
-    function updateRekapPin() {
-      callBackendApi("setRekapPin", { newPin: document.getElementById('rekap-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); });
-    }
-    function savePinRekapSetting() {
-      callBackendApi("setPinRekapStatus", { pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }, function() { showToast("Tersimpan!", "success"); });
-    }
+    function updateAdminPin() { callBackendApi("setAdminPin", { newPin: document.getElementById('admin-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); }); }
+    function updateRekapPin() { callBackendApi("setRekapPin", { newPin: document.getElementById('rekap-new-pin').value }, function() { showToast("PIN diperbarui!", "success"); }); }
+    function savePinRekapSetting() { callBackendApi("setPinRekapStatus", { pinRekapStatus: document.getElementById('admin-pin-rekap-select').value }, function() { showToast("Tersimpan!", "success"); }); }
     
     function updateJudulSpjtm() {
       var judulBaru = document.getElementById('admin-judul-spjtm').value;
@@ -853,19 +904,118 @@
           btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false; 
           document.getElementById('spjtm-progress-container').style.display = "none"; 
           if (resp && resp.status === 'success') {
-            showToast(resp.message, "success");
-            fetchInitialData();
-            document.getElementById('form-upload-spjtm').reset();
-            document.getElementById('spjtm-file-info').style.display = "none";
-          } else {
-            showToast(resp ? resp.message : "Gagal", "error");
-          }
+            showToast(resp.message, "success"); fetchInitialData();
+            document.getElementById('form-upload-spjtm').reset(); document.getElementById('spjtm-file-info').style.display = "none";
+          } else { showToast(resp ? resp.message : "Gagal", "error"); }
         }, 400);
       }, function(err) {
         btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false;
         document.getElementById('spjtm-progress-container').style.display = "none";
         showToast("Gagal upload: " + err.message, "error");
       });
+    }
+    
+    // === FITUR PENGAJUAN IZOP ===
+    function handleFileIzopSelect(input) {
+      if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== "zip" && ext !== "rar") { 
+          showToast("Hanya file berformat ZIP atau RAR!", "error"); 
+          input.value = ""; return; 
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) { 
+          document.getElementById('izop-base64-data').value = e.target.result; 
+          document.getElementById('izop-filename').value = file.name; 
+          document.getElementById('izop-file-info').innerHTML = "✅ File Terpilih: " + file.name; 
+          document.getElementById('izop-file-info').style.display = "block"; 
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitUploadIzop() {
+      var idLembaga = document.getElementById('izop-lembaga').value;
+      var base64Data = document.getElementById('izop-base64-data').value;
+      var fileName = document.getElementById('izop-filename').value;
+      if (!idLembaga || !base64Data) { showToast("Silakan pilih lembaga dan file ZIP/RAR terlebih dahulu!", "error"); return; }
+      
+      var selectEl = document.getElementById('izop-lembaga');
+      var optionEl = selectEl.options[selectEl.selectedIndex];
+      var btn = document.getElementById('btn-submit-izop'); 
+      btn.disabled = true; btn.innerText = "Proses Upload... ⏳";
+      document.getElementById('izop-progress-container').style.display = "block";
+      document.getElementById('izop-progress-bar').style.width = "50%";
+
+      var payload = {
+        action: "uploadIzop", idLembaga: idLembaga,
+        jenjang: optionEl.getAttribute('data-jenjang'), nsm: optionEl.getAttribute('data-nsm'),
+        namaLembaga: optionEl.getAttribute('data-nama'), fileName: optionEl.getAttribute('data-nsm') + "_IZOP_" + fileName, fileBase64: base64Data
+      };
+
+      callBackendApi("uploadIzop", payload, function(resp) {
+        document.getElementById('izop-progress-bar').style.width = "100%";
+        setTimeout(function() { 
+          btn.innerText = "🚀 Upload Berkas Pengajuan"; btn.disabled = false; 
+          document.getElementById('izop-progress-container').style.display = "none"; 
+          if (resp && resp.status === 'success') {
+            showToast(resp.message, "success");
+            fetchInitialData(); 
+            document.getElementById('form-upload-izop').reset();
+            document.getElementById('izop-file-info').style.display = "none";
+          } else { showToast(resp ? resp.message : "Gagal", "error"); }
+        }, 400);
+      }, function(err) {
+        btn.innerText = "🚀 Upload Berkas Pengajuan"; btn.disabled = false;
+        document.getElementById('izop-progress-container').style.display = "none";
+        showToast("Gagal upload: " + err.message, "error");
+      });
+    }
+
+    function hitungSisaMasaIzin(tglAkhirStr) {
+      if (!tglAkhirStr) return '<span style="color:#EF4444; font-weight:700;">Data Kosong</span>';
+      var tglAkhir;
+      if (tglAkhirStr.indexOf('/') !== -1) {
+        var parts = tglAkhirStr.split('/');
+        if (parts.length === 3) tglAkhir = new Date(parts[2], parts[1]-1, parts[0]);
+      } else {
+        tglAkhir = new Date(tglAkhirStr);
+      }
+      if (!tglAkhir || isNaN(tglAkhir.getTime())) return tglAkhirStr;
+      
+      var now = new Date();
+      var diffTime = tglAkhir - now;
+      var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) return '<span style="color:#EF4444; font-weight:700;">Kadaluarsa (' + Math.abs(diffDays) + ' hari lalu)</span>';
+      if (diffDays <= 90) return '<span style="color:#F59E0B; font-weight:700;">Segera Habis (Sisa ' + diffDays + ' hari)</span>';
+      return '<span style="color:#10B981; font-weight:600;">Aktif (Sisa ' + diffDays + ' hari)</span>';
+    }
+
+    function renderTableIzop() {
+      var tbody = document.getElementById('table-izop-monitoring');
+      if (!tbody) return;
+      var filterJj = document.getElementById('izop-jenjang-filter').value.toUpperCase();
+      var html = '', idx = 1;
+
+      for (var i = 0; i < fullRekapData.length; i++) {
+        var r = fullRekapData[i];
+        var jg = String(r.jenjang || "").toUpperCase();
+        if (filterJj !== "ALL" && filterJj !== "MTS") { if (jg !== filterJj) continue; }
+        if (filterJj === "MTS") { if (jg !== "MTS" && jg.indexOf("MT") === -1) continue; }
+
+        var statusUpload = r.hasIzop 
+          ? '<span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid);">✅ Sudah Upload</span>' 
+          : '<span class="summary-badge" style="background:rgba(239, 68, 68, 0.15); color:#EF4444;">❌ Belum Upload</span>';
+        var sisaMasa = hitungSisaMasaIzin(r.akhirIzin);
+        var jgBadgeBg = jg === 'MA' ? 'rgba(147, 51, 234, 0.15)' : (jg.indexOf('MTS') > -1 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(236, 72, 153, 0.15)');
+        var jgBadgeColor = jg === 'MA' ? '#9333EA' : (jg.indexOf('MTS') > -1 ? '#3B82F6' : '#EC4899');
+
+        html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600;">' + (r.nama || '-') + '</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
+        idx++;
+      }
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada data.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
