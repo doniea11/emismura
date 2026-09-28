@@ -63,9 +63,9 @@
           
           <div class="form-divider" style="margin-top:0;">1. Download Format Berkas Persyaratan</div>
           <div class="grid-cards" style="margin-bottom: 25px;">
-            <a href="#" id="btn-dl-permohonan" target="_blank" class="btn" style="background:#2563EB; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Surat Permohonan</a>
-            <a href="#" id="btn-dl-spjtm" target="_blank" class="btn" style="background:#F59E0B; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 SPJTM Satuan Pendidikan</a>
-            <a href="#" id="btn-dl-rekomendasi" target="_blank" class="btn" style="background:#10B981; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Rekomendasi Pengawas</a>
+            <a href="#" id="btn-dl-permohonan" download="Template_Surat_Permohonan" class="btn" style="background:#2563EB; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Surat Permohonan</a>
+            <a href="#" id="btn-dl-spjtm" download="Template_SPJTM_Satuan_Pendidikan" class="btn" style="background:#F59E0B; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 SPJTM Satuan Pendidikan</a>
+            <a href="#" id="btn-dl-rekomendasi" download="Template_Rekomendasi_Pengawas" class="btn" style="background:#10B981; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Rekomendasi Pengawas</a>
           </div>
 
           <div class="form-divider">2. Upload Berkas Pengajuan</div>
@@ -421,7 +421,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY8qO2zTWN0hZx_LhqbWES25Q8_0zR7TvJxcySrFOMcM7wL0KdTx9kH2eGmgDji4qP/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLDW0Cp0ZWatV3ZKFKY0SILBj6z9p2bEJ4BA1DqtOSlrZg3STXZBXwqxmw3gnbyEZu/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -563,6 +563,15 @@
       }
     }
 
+    function convertToDownloadUrl(url) {
+      if (!url) return "#";
+      var fileIdMatch = url.match(/\/d\/(.*?)\//) || url.match(/id=(.*?)(&|$)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        return "https://drive.google.com/uc?export=download&id=" + fileIdMatch[1];
+      }
+      return url;
+    }
+
     function fetchInitialData() {
       callBackendApi("getInitialDataObj", {}, function(res) {
         handleInitialDataResponse(res, false);
@@ -598,9 +607,9 @@
         var btnPermohonan = document.getElementById('btn-dl-permohonan');
         var btnSpjtm = document.getElementById('btn-dl-spjtm');
         var btnRekomendasi = document.getElementById('btn-dl-rekomendasi');
-        if (btnPermohonan && res.templates.permohonan) btnPermohonan.href = res.templates.permohonan;
-        if (btnSpjtm && res.templates.spjtm) btnSpjtm.href = res.templates.spjtm;
-        if (btnRekomendasi && res.templates.rekomendasi) btnRekomendasi.href = res.templates.rekomendasi;
+        if (btnPermohonan && res.templates.permohonan) btnPermohonan.href = convertToDownloadUrl(res.templates.permohonan);
+        if (btnSpjtm && res.templates.spjtm) btnSpjtm.href = convertToDownloadUrl(res.templates.spjtm);
+        if (btnRekomendasi && res.templates.rekomendasi) btnRekomendasi.href = convertToDownloadUrl(res.templates.rekomendasi);
       }
       
       applyPeriodeStatusUI();
@@ -1060,8 +1069,8 @@
       });
     }
 
-    function hitungSisaMasaIzin(tglAkhirStr) {
-      if (!tglAkhirStr) return '<span style="color:#EF4444; font-weight:700;">Data Kosong</span>';
+    function getSisaMasaIzinDays(tglAkhirStr) {
+      if (!tglAkhirStr) return Infinity;
       var tglAkhir;
       if (tglAkhirStr.indexOf('/') !== -1) {
         var parts = tglAkhirStr.split('/');
@@ -1069,12 +1078,17 @@
       } else {
         tglAkhir = new Date(tglAkhirStr);
       }
-      if (!tglAkhir || isNaN(tglAkhir.getTime())) return tglAkhirStr;
+      if (!tglAkhir || isNaN(tglAkhir.getTime())) return Infinity;
       
       var now = new Date();
+      now.setHours(0,0,0,0);
+      tglAkhir.setHours(0,0,0,0);
       var diffTime = tglAkhir - now;
-      var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function formatSisaMasaIzin(diffDays) {
+      if (diffDays === Infinity) return '<span style="color:#EF4444; font-weight:700;">Data Kosong</span>';
       if (diffDays < 0) return '<span style="color:#EF4444; font-weight:700;">Kadaluarsa (' + Math.abs(diffDays) + ' hari lalu)</span>';
       if (diffDays <= 90) return '<span style="color:#F59E0B; font-weight:700;">Segera Habis (Sisa ' + diffDays + ' hari)</span>';
       return '<span style="color:#10B981; font-weight:600;">Aktif (Sisa ' + diffDays + ' hari)</span>';
@@ -1086,16 +1100,30 @@
       var filterJj = document.getElementById('izop-jenjang-filter').value.toUpperCase();
       var html = '', idx = 1;
 
+      var izopData = [];
       for (var i = 0; i < fullRekapData.length; i++) {
         var r = fullRekapData[i];
         var jg = String(r.jenjang || "").toUpperCase();
         if (filterJj !== "ALL" && filterJj !== "MTS") { if (jg !== filterJj) continue; }
         if (filterJj === "MTS") { if (jg !== "MTS" && jg.indexOf("MT") === -1) continue; }
 
+        r.calculatedDiffDays = getSisaMasaIzinDays(r.akhirIzin);
+        izopData.push(r);
+      }
+
+      izopData.sort(function(a, b) {
+        return a.calculatedDiffDays - b.calculatedDiffDays;
+      });
+
+      for (var j = 0; j < izopData.length; j++) {
+        var r = izopData[j];
+        var jg = String(r.jenjang || "").toUpperCase();
+        
         var statusUpload = r.hasIzop 
           ? '<span class="summary-badge" style="background:rgba(0,192,90,0.15); color:var(--primary-solid);">✅ Sudah Upload</span>' 
           : '<span class="summary-badge" style="background:rgba(239, 68, 68, 0.15); color:#EF4444;">❌ Belum Upload</span>';
-        var sisaMasa = hitungSisaMasaIzin(r.akhirIzin);
+        
+        var sisaMasa = formatSisaMasaIzin(r.calculatedDiffDays);
         var jgBadgeBg = jg === 'MA' ? 'rgba(147, 51, 234, 0.15)' : (jg.indexOf('MTS') > -1 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(236, 72, 153, 0.15)');
         var jgBadgeColor = jg === 'MA' ? '#9333EA' : (jg.indexOf('MTS') > -1 ? '#3B82F6' : '#EC4899');
 
