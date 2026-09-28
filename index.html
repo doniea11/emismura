@@ -93,10 +93,11 @@
               <!-- Upload Bukti Ajuan (Kanan) -->
               <div class="form-group" style="margin-bottom: 0;">
                 <label>2. Upload Bukti Ajuan</label>
-                <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px 20px;">
+                <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px 20px;" tabindex="0" title="Klik atau cukup tekan Ctrl+V (Paste) gambar di halaman ini">
                   <span class="upload-icon" style="font-size: 2.5rem; margin-bottom: 10px;">📸</span>
-                  <p style="font-weight:600; color:var(--text-main); text-align: center;">Laporan Selesai Ajuan<br>(format JPG atau JPEG)</p>
-                  <input type="file" id="izop-file-input" class="file-input-hidden" accept=".jpg,.jpeg,image/jpeg" onchange="handleFileIzopSelect(this)">
+                  <p style="font-weight:600; color:var(--text-main); text-align: center; margin-bottom: 5px;">Laporan Selesai Ajuan Berupa Screenshot</p>
+                  <p style="font-size:0.85rem; color:var(--text-muted); text-align: center; font-weight:normal;">(Klik pilih file JPG/PNG atau tekan <strong>Ctrl+V / Paste</strong> gambar)</p>
+                  <input type="file" id="izop-file-input" class="file-input-hidden" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onchange="handleFileIzopSelect(this)">
                   <div id="izop-file-info" class="file-info"></div>
                 </div>
                 <input type="hidden" id="izop-base64-data"><input type="hidden" id="izop-filename">
@@ -468,7 +469,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm_p87exSySo-qLqVSarW6Cg5PUGIJJwLjnUMG_d0fgARLzevBfZJ0VSgEKVQZLVA1/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxmjkhahmc6DQqDFCAqKxsV6lF2Ph9umse-g9LVe_QF1hBq52p6K11p5bw9ZRNsTrD8/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -1136,12 +1137,47 @@
     }
     
     // === FITUR PENGAJUAN IZOP ===
+    
+    // Fitur Paste Screenshot khusus untuk Izop
+    document.addEventListener('paste', function(e) {
+      var izopSection = document.getElementById('izop-perpanjangan');
+      var izopModal = document.getElementById('modal-confirm-izop');
+      
+      // Hanya proses paste jika berada di tab Izop dan modal konfirmasi belum terbuka
+      if (izopSection && izopSection.classList.contains('active') && izopModal && !izopModal.classList.contains('active')) {
+        var clipboardData = e.clipboardData || window.clipboardData;
+        if (!clipboardData) return;
+        
+        for (var i = 0; i < clipboardData.items.length; i++) {
+          var item = clipboardData.items[i];
+          if (item.type.indexOf('image') !== -1) {
+            var blob = item.getAsFile();
+            var reader = new FileReader();
+            reader.onload = function(event) {
+              document.getElementById('izop-base64-data').value = event.target.result;
+              var ext = item.type.split('/')[1] || 'jpg';
+              var fileName = "Screenshot_Pasted_" + new Date().getTime() + "." + ext;
+              document.getElementById('izop-filename').value = fileName;
+              document.getElementById('izop-file-info').innerHTML = "✅ Bukti Terpilih (Paste): " + fileName;
+              document.getElementById('izop-file-info').style.display = "block";
+              
+              // Langsung konfirmasi
+              showConfirmIzopModal();
+            };
+            reader.readAsDataURL(blob);
+            e.preventDefault(); // Mencegah default action (misal scroll/loncat)
+            break; // Hanya ambil 1 gambar pertama
+          }
+        }
+      }
+    });
+
     function handleFileIzopSelect(input) {
       if (input.files && input.files[0]) {
         var file = input.files[0];
         var ext = file.name.split('.').pop().toLowerCase();
-        if (ext !== "jpg" && ext !== "jpeg") { 
-          showToast("Hanya file berformat JPG atau JPEG!", "error"); 
+        if (ext !== "jpg" && ext !== "jpeg" && ext !== "png") { 
+          showToast("Hanya file berformat JPG, JPEG, atau PNG!", "error"); 
           input.value = ""; return; 
         }
         var reader = new FileReader();
@@ -1178,7 +1214,7 @@
       var idLembaga = document.getElementById('izop-lembaga').value;
       var base64Data = document.getElementById('izop-base64-data').value;
       if (!idLembaga || !base64Data) {
-        showToast("Silakan pilih lembaga dan Bukti Screenshoot (JPG/JPEG) terlebih dahulu!", "error");
+        showToast("Silakan pilih lembaga dan Bukti Screenshoot terlebih dahulu!", "error");
         return;
       }
 
