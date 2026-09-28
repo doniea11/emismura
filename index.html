@@ -329,7 +329,7 @@
               <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>Nama Lembaga</label><input type="text" id="adm-k-nama" class="uppercase-input" required placeholder="CONTOH: MIS AL-IKHLAS"></div><div class="form-group"><label>NSM (Wajib Unik)</label><input type="text" id="adm-k-nsm" required placeholder="Contoh: 111216050001" maxlength="15" oninput="validateNumberOnlyInput(this)"></div><div class="form-group"><label>NPSN (Wajib Unik)</label><input type="text" id="adm-k-npsn" required placeholder="Contoh: 69812345" maxlength="10" oninput="validateNumberOnlyInput(this)"></div></div>
               <div class="grid-cards"><div class="form-group"><label>Desa / Kelurahan</label><input type="text" id="adm-k-desa" class="uppercase-input" required></div><div class="form-group"><label>Kecamatan</label><input type="text" id="adm-k-kecamatan" class="uppercase-input" required></div></div>
               <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>Nomor SK Izin Operasional</label><input type="text" id="adm-k-no-izin" class="uppercase-input" required></div><div class="form-group"><label>Tanggal SK Izin</label><input type="date" id="adm-k-tgl-izin" required></div><div class="form-group"><label>Akhir Berlaku Izin</label><input type="date" id="adm-k-akhir-izin" required></div><div class="form-group"><label>Status Akreditasi</label><select id="adm-k-akreditasi" required><option value="">Pilih Status</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="Belum Terakreditasi">Belum Terakreditasi</option></select></div><div class="form-group"><label>Tanggal SK Akreditasi</label><input type="date" id="adm-k-tgl-akred"></div><div class="form-group"><label>Akhir Berlaku Akreditasi</label><input type="date" id="adm-k-akhir-akred"></div></div>
-              <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>NPWP Lembaga</label><input type="text" id="adm-k-npwp" class="uppercase-input" required></div><div class="form-group"><label>Nama Kepala Lembaga</label><input type="text" id="adm-k-kepala" class="uppercase-input" required></div><div class="form-group"><label>No WA Kepala</label><input type="text" id="adm-k-wa-kepala" required maxlength="13" oninput="validateWaInput(this)"></div><div class="form-group"><label>Nama Operator</label><input type="text" id="adm-k-operator" class="uppercase-input" required></div><div class="form-group"><label>No WA Operator</label><input type="text" id="adm-k-wa-operator" required placeholder="081234567890" maxlength="13" oninput="validateWaInput(this)"></div></div>
+              <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>NPWP Lembaga</label><input type="text" id="adm-k-npwp" class="uppercase-input" required></div><div class="form-group"><label>Nama Kepala Lembaga</label><input type="text" id="adm-k-kepala" class="uppercase-input" required></div><div class="form-group"><label>No WA Kepala</label><input type="text" id="adm-k-wa-kepala" required maxlength="13" oninput="validateWaInput(this)"></div><div class="form-group"><label>Nama Operator</label><input type="text" id="adm-k-operator" class="uppercase-input" required></div><div class="form-group"><label>No WA Operator</label><input type="text" id="k-wa-operator" required placeholder="081234567890" maxlength="13" oninput="validateWaInput(this)"></div></div>
               <div class="grid-cards"><div class="form-group"><label>Latitude</label><input type="text" id="adm-k-lat" required></div><div class="form-group"><label>Longitude</label><input type="text" id="adm-k-lng" required></div></div>
               <button type="submit" class="btn" id="btn-submit-adm-lbg" style="width: 100%; margin-top: 15px; background:var(--primary-solid);">➕ Daftarkan Lembaga Baru ke Master</button>
             </form>
@@ -421,7 +421,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewCiHXVOHYDEYqS7IBzTG5uau40fGQc6TFu44XhzUjF5ajaYJSGY1e9zHCTOsceeQ/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdmg5AkxiFlU6cXIHjc2Bstfs3eNFF3xw2RB6lrBQRF14ka80yBPQv-usKPsIJig0/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -1109,16 +1109,17 @@
 
         r.calculatedDiffDays = getSisaMasaIzinDays(r.akhirIzin);
         
-        // Sembunyikan lembaga yang sisa izinnya lebih dari 365 hari atau datanya kosong
-        if (r.calculatedDiffDays === Infinity || r.calculatedDiffDays > 365) {
+        // HANYA tampilkan yang sudah habis masa berlakunya (Kadaluarsa = diffDays < 0)
+        if (r.calculatedDiffDays === Infinity || r.calculatedDiffDays >= 0) {
             continue;
         }
 
         izopData.push(r);
       }
 
+      // Urutkan berdasarkan NSM
       izopData.sort(function(a, b) {
-        return a.calculatedDiffDays - b.calculatedDiffDays;
+        return String(a.nsm || "").localeCompare(String(b.nsm || ""), undefined, { numeric: true });
       });
 
       for (var j = 0; j < izopData.length; j++) {
@@ -1133,10 +1134,10 @@
         var jgBadgeBg = jg === 'MA' ? 'rgba(147, 51, 234, 0.15)' : (jg.indexOf('MTS') > -1 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(236, 72, 153, 0.15)');
         var jgBadgeColor = jg === 'MA' ? '#9333EA' : (jg.indexOf('MTS') > -1 ? '#3B82F6' : '#EC4899');
 
-        html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600; color:var(--text-muted); filter:blur(4px); user-select:none;">TERSEMBUNYI</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
+        html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600;">' + (r.nama || '-') + '</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
         idx++;
       }
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang izinnya kadaluarsa atau segera habis.</td></tr>' : html;
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Alhamdulillah, tidak ada lembaga yang masa izinnya kadaluarsa.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
