@@ -421,7 +421,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLDW0Cp0ZWatV3ZKFKY0SILBj6z9p2bEJ4BA1DqtOSlrZg3STXZBXwqxmw3gnbyEZu/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewCiHXVOHYDEYqS7IBzTG5uau40fGQc6TFu44XhzUjF5ajaYJSGY1e9zHCTOsceeQ/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -1108,6 +1108,12 @@
         if (filterJj === "MTS") { if (jg !== "MTS" && jg.indexOf("MT") === -1) continue; }
 
         r.calculatedDiffDays = getSisaMasaIzinDays(r.akhirIzin);
+        
+        // Sembunyikan lembaga yang sisa izinnya lebih dari 365 hari atau datanya kosong
+        if (r.calculatedDiffDays === Infinity || r.calculatedDiffDays > 365) {
+            continue;
+        }
+
         izopData.push(r);
       }
 
@@ -1127,10 +1133,10 @@
         var jgBadgeBg = jg === 'MA' ? 'rgba(147, 51, 234, 0.15)' : (jg.indexOf('MTS') > -1 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(236, 72, 153, 0.15)');
         var jgBadgeColor = jg === 'MA' ? '#9333EA' : (jg.indexOf('MTS') > -1 ? '#3B82F6' : '#EC4899');
 
-        html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600;">' + (r.nama || '-') + '</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
+        html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600; color:var(--text-muted); filter:blur(4px); user-select:none;">TERSEMBUNYI</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
         idx++;
       }
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada data.</td></tr>' : html;
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang izinnya kadaluarsa atau segera habis.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
