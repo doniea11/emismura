@@ -435,13 +435,26 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcvIJPM9Ln10Dhy60OOmN4nN8qh5VVokLxhfVAxnLhZL82KFYZ0_MuqcQKEI1F5-G0/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHH2PSgq6YarXX6LhDc6NDaTmEIbUeXBUQ0JeWUQ1E4xiWHbrwIyLYZBDDbBwzxxtC/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
     var pinModalTarget = "admin-emis";
 
-    window.onload = function() { localStorage.removeItem(CACHE_KEY); fetchInitialData(); };
+    // Menerapkan Cache: Langsung ambil data jika cache ada, sambil memuat data baru diam-diam.
+    window.onload = function() { 
+      var cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          handleInitialDataResponse(JSON.parse(cached), true);
+          fetchInitialDataBackground();
+        } catch(e) {
+          fetchInitialData();
+        }
+      } else {
+        fetchInitialData(); 
+      }
+    };
 
     function toggleTheme() { var body = document.body; body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
 
@@ -588,9 +601,21 @@
 
     function fetchInitialData() {
       callBackendApi("getInitialDataObj", {}, function(res) {
+        if(res && res.status === 'success') {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+        }
         handleInitialDataResponse(res, false);
       }, function(err) {
         showToast("Gagal memuat data API: " + err.message, "error");
+      });
+    }
+
+    function fetchInitialDataBackground() {
+      callBackendApi("getInitialDataObj", {}, function(res) {
+        if(res && res.status === 'success') {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          handleInitialDataResponse(res, true);
+        }
       });
     }
 
@@ -1177,18 +1202,14 @@
         izopData.push(r);
       }
 
-      // Filter: Hanya tampilkan lembaga yang sisa masa izinnya <= 365 hari (1 Tahun) ATAU yang Sudah Upload
+      // Filter: Hanya tampilkan lembaga yang sisa masa izinnya <= 365 hari (1 Tahun) ATAU yang Sudah Kadaluarsa (< 0)
       var filteredData = izopData.filter(function(r) {
-        return r.hasIzop || (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays <= 365);
+        return (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays <= 365);
       });
 
       // Sorting Logic
       filteredData.sort(function(a, b) {
-        // Prioritas 1: Yang "Sudah Upload" taruh paling atas
-        if (a.hasIzop && !b.hasIzop) return -1;
-        if (!a.hasIzop && b.hasIzop) return 1;
-        
-        // Prioritas 2: Urutkan berdasarkan NSM (Ascending/Terkecil ke Terbesar)
+        // Prioritas: Urutkan berdasarkan NSM (Ascending/Terkecil ke Terbesar)
         return String(a.nsm || "").localeCompare(String(b.nsm || ""), undefined, { numeric: true });
       });
 
@@ -1208,7 +1229,7 @@
         idx++;
       }
       
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang masa izinnya kadaluarsa atau segera habis.</td></tr>' : html;
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Alhamdulillah, tidak ada lembaga yang izinnya kadaluarsa.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
