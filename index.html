@@ -25,11 +25,14 @@
       <nav class="sidebar">
         <div class="sidebar-menu">
           <div class="nav-item active" onclick="navigate('dashboard', this)"><span>⊞</span> DASHBOARD</div>
+          
+          <!-- MENU IZOP -->
+          <div class="nav-item" onclick="navigate('izop-perpanjangan', this)"><span>📑</span> Pengajuan Perpanjangan Izop</div>
+          
           <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> Upload Laporan Dana BOP/BOS Tahap 2 Tahun 2026 <span id="nav-badge-sekunder" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-kelembagaan', this)"><span>🏛️</span> Input Kelembagaan <span id="nav-badge-utama" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-siswa', this)"><span>👤</span> Input Siswa <span id="nav-badge-siswa" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
           <div class="nav-item" onclick="navigate('input-sarpras', this)"><span>🛠️</span> Input Sarpras <span id="nav-badge-sarpras" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
-          <div class="nav-item" onclick="navigate('izop-perpanjangan', this)"><span>📑</span> Pengajuan Perpanjangan Izop</div>
           <div class="nav-item" onclick="openPinModal('admin-emis')"><span>⚙️</span> Admin EMIS</div>
         </div>
         <div class="sidebar-bottom"><div class="watermark-donie"><span>꧁</span> @2026 by masdonie <span>꧂</span></div></div>
@@ -61,9 +64,9 @@
           
           <div class="form-divider" style="margin-top:0;">1. Download Format Berkas Persyaratan</div>
           <div class="grid-cards" style="margin-bottom: 25px;">
-            <a href="#" class="btn" style="background:#2563EB; text-decoration:none; text-align:center;">📄 Surat Permohonan</a>
-            <a href="#" class="btn" style="background:#F59E0B; text-decoration:none; text-align:center;">📄 SPJTM Satuan Pendidikan</a>
-            <a href="#" class="btn" style="background:#10B981; text-decoration:none; text-align:center;">📄 Rekomendasi Pengawas</a>
+            <a href="#" id="btn-dl-permohonan" target="_blank" class="btn" style="background:#2563EB; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Surat Permohonan</a>
+            <a href="#" id="btn-dl-spjtm" target="_blank" class="btn" style="background:#F59E0B; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 SPJTM Satuan Pendidikan</a>
+            <a href="#" id="btn-dl-rekomendasi" target="_blank" class="btn" style="background:#10B981; text-decoration:none; text-align:center;" onclick="checkTemplate(event, this)">📄 Rekomendasi Pengawas</a>
           </div>
 
           <div class="form-divider">2. Upload Berkas Pengajuan</div>
@@ -353,6 +356,33 @@
 
           <div class="form-divider">9. Pengaturan Judul Laporan BOS</div>
           <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); max-width:600px; margin-bottom:35px;"><p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Ubah judul utama yang dicetak pada Word/PDF Laporan BOS.</p><div class="form-group"><label>Judul Saat Ini</label><input type="text" id="admin-judul-spjtm" placeholder="Contoh: LAPORAN DANA BOS TAHAP 2 TAHUN 2026" style="background:var(--bg-container); font-weight:bold;"></div><button class="btn" id="btn-save-judul" onclick="updateJudulSpjtm()">Simpan Judul Baru</button></div>
+          
+          <div class="form-divider">10. Upload Template Berkas Pengajuan Izop</div>
+          <div style="background:var(--bg-body); padding:25px; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:35px;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Upload format file (Word/PDF) yang akan didownload oleh satuan pendidikan pada menu Pengajuan Izop.</p>
+            <form id="form-upload-template-izop" onsubmit="event.preventDefault(); submitUploadTemplateIzop();">
+              <div class="form-group">
+                <label>Pilih Jenis Template</label>
+                <select id="admin-template-type" required style="background:var(--bg-container);">
+                  <option value="">-- Pilih Jenis Template --</option>
+                  <option value="PERMOHONAN">1. Surat Permohonan</option>
+                  <option value="SPJTM">2. SPJTM Satuan Pendidikan</option>
+                  <option value="REKOMENDASI">3. Rekomendasi Pengawas</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Pilih File (.DOCX / .PDF / .XLSX)</label>
+                <div class="upload-area" id="admin-template-drop" onclick="document.getElementById('admin-template-file').click()" style="padding:20px;">
+                  <span class="upload-icon" style="font-size:2rem; margin-bottom:10px;">📁</span>
+                  <p style="font-weight:600; color:var(--text-main); font-size:0.9rem;">Klik di sini untuk memilih file</p>
+                  <input type="file" id="admin-template-file" class="file-input-hidden" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleAdminTemplateSelect(this)">
+                  <div id="admin-template-info" class="file-info"></div>
+                </div>
+                <input type="hidden" id="admin-template-base64"><input type="hidden" id="admin-template-filename">
+              </div>
+              <button type="submit" class="btn" id="btn-submit-template-izop" style="width:100%; background:var(--primary-solid);">🚀 Upload & Simpan Template</button>
+            </form>
+          </div>
         </section>
 
       </main>
@@ -392,7 +422,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwSBPAkckV5noW-_Bky-8ZvNWazAT0hT05lMkk-ZqNXM3pTY3RYGUWoLOG4kv2qZz6-yA/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPpRkc6Q8I7ug3xcYvj76AU9bfzBpW5-_2UUvWSf-c9UWTn6Qbh5r1KyyMdcVVRaY4/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -469,6 +499,13 @@
     function validateNumberOnlyInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
     function validateWaInput(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
 
+    function checkTemplate(event, el) {
+      if (el.getAttribute('href') === '#' || !el.getAttribute('href')) {
+        event.preventDefault();
+        showToast("Template belum diupload oleh Admin!", "error");
+      }
+    }
+
     function openPinModal(target) {
       pinModalTarget = target || 'admin-emis';
       var titleEl = document.getElementById('pin-modal-title');
@@ -498,6 +535,7 @@
         else if (actionName === "deleteSpjtmFileObj") runner.deleteSpjtmFileObj(payload.idLembaga);
         else if (actionName === "uploadSpjtmObj") runner.uploadSpjtmObj(payload);
         else if (actionName === "uploadIzopObj") runner.uploadIzopObj(payload);
+        else if (actionName === "uploadTemplateIzopObj") runner.uploadTemplateIzopObj(payload);
         else if (actionName === "getSecureSpjtmLinkObj") runner.getSecureSpjtmLinkObj(payload.idLembaga);
         else if (actionName === "togglePeriodePengisianObj") runner.togglePeriodePengisianObj(payload.statusPeriode, payload.tipePeriode);
         else if (actionName === "getDriveFolderUrlObj") runner.getDriveFolderUrlObj();
@@ -556,6 +594,15 @@
       
       var judulEl = document.getElementById('admin-judul-spjtm');
       if (judulEl && res.judulSpjtm) judulEl.value = res.judulSpjtm;
+
+      if (res.templates) {
+        var btnPermohonan = document.getElementById('btn-dl-permohonan');
+        var btnSpjtm = document.getElementById('btn-dl-spjtm');
+        var btnRekomendasi = document.getElementById('btn-dl-rekomendasi');
+        if (btnPermohonan && res.templates.permohonan) btnPermohonan.href = res.templates.permohonan;
+        if (btnSpjtm && res.templates.spjtm) btnSpjtm.href = res.templates.spjtm;
+        if (btnRekomendasi && res.templates.rekomendasi) btnRekomendasi.href = res.templates.rekomendasi;
+      }
       
       applyPeriodeStatusUI();
       renderMasterLembagaDropdown();
@@ -569,7 +616,6 @@
       renderTableSpjtm();
       renderMonitoringTable();
       
-      // INISIALISASI DROPDOWN IZOP DAN TABEL
       filterDropdown('izop-search-input', 'izop-lembaga');
       renderTableIzop();
     }
@@ -911,6 +957,48 @@
       }, function(err) {
         btn.innerText = "🚀 Upload & Simpan Laporan Dana BOS"; btn.disabled = false;
         document.getElementById('spjtm-progress-container').style.display = "none";
+        showToast("Gagal upload: " + err.message, "error");
+      });
+    }
+
+    // === HANDLER UPLOAD TEMPLATE IZOP ADMIN ===
+    function handleAdminTemplateSelect(input) {
+      if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('admin-template-base64').value = e.target.result;
+          document.getElementById('admin-template-filename').value = file.name;
+          document.getElementById('admin-template-info').innerHTML = "✅ " + file.name;
+          document.getElementById('admin-template-info').style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitUploadTemplateIzop() {
+      var tType = document.getElementById('admin-template-type').value;
+      var b64 = document.getElementById('admin-template-base64').value;
+      var fName = document.getElementById('admin-template-filename').value;
+
+      if (!tType || !b64) { showToast("Pilih jenis template dan file terlebih dahulu!", "error"); return; }
+
+      var btn = document.getElementById('btn-submit-template-izop');
+      btn.disabled = true; btn.innerText = "Proses Upload... ⏳";
+
+      var payload = { action: "uploadTemplateIzop", templateType: tType, fileBase64: b64, fileName: "TEMPLATE_IZOP_" + tType + "_" + fName };
+
+      callBackendApi("uploadTemplateIzop", payload, function(resp) {
+        btn.innerText = "🚀 Upload & Simpan Template"; btn.disabled = false;
+        if (resp && resp.status === 'success') {
+          showToast(resp.message, "success");
+          document.getElementById('form-upload-template-izop').reset();
+          document.getElementById('admin-template-info').style.display = "none";
+          document.getElementById('admin-template-base64').value = "";
+          fetchInitialData(); 
+        } else { showToast(resp ? resp.message : "Gagal", "error"); }
+      }, function(err) {
+        btn.innerText = "🚀 Upload & Simpan Template"; btn.disabled = false;
         showToast("Gagal upload: " + err.message, "error");
       });
     }
