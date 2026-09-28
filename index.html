@@ -69,7 +69,8 @@
           </div>
 
           <div class="form-divider">2. Upload Berkas Pengajuan</div>
-          <form id="form-upload-izop" onsubmit="event.preventDefault(); submitUploadIzop();">
+          <!-- INTERCEPT FORM SUBMIT UNTUK MEMUNCULKAN NOTIFIKASI -->
+          <form id="form-upload-izop" onsubmit="event.preventDefault(); showConfirmIzopModal();">
             <div class="grid-cards" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label>Cari & Pilih Lembaga</label>
@@ -329,7 +330,7 @@
               <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>Nama Lembaga</label><input type="text" id="adm-k-nama" class="uppercase-input" required placeholder="CONTOH: MIS AL-IKHLAS"></div><div class="form-group"><label>NSM (Wajib Unik)</label><input type="text" id="adm-k-nsm" required placeholder="Contoh: 111216050001" maxlength="15" oninput="validateNumberOnlyInput(this)"></div><div class="form-group"><label>NPSN (Wajib Unik)</label><input type="text" id="adm-k-npsn" required placeholder="Contoh: 69812345" maxlength="10" oninput="validateNumberOnlyInput(this)"></div></div>
               <div class="grid-cards"><div class="form-group"><label>Desa / Kelurahan</label><input type="text" id="adm-k-desa" class="uppercase-input" required></div><div class="form-group"><label>Kecamatan</label><input type="text" id="adm-k-kecamatan" class="uppercase-input" required></div></div>
               <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>Nomor SK Izin Operasional</label><input type="text" id="adm-k-no-izin" class="uppercase-input" required></div><div class="form-group"><label>Tanggal SK Izin</label><input type="date" id="adm-k-tgl-izin" required></div><div class="form-group"><label>Akhir Berlaku Izin</label><input type="date" id="adm-k-akhir-izin" required></div><div class="form-group"><label>Status Akreditasi</label><select id="adm-k-akreditasi" required><option value="">Pilih Status</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="Belum Terakreditasi">Belum Terakreditasi</option></select></div><div class="form-group"><label>Tanggal SK Akreditasi</label><input type="date" id="adm-k-tgl-akred"></div><div class="form-group"><label>Akhir Berlaku Akreditasi</label><input type="date" id="adm-k-akhir-akred"></div></div>
-              <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>NPWP Lembaga</label><input type="text" id="adm-k-npwp" class="uppercase-input" required></div><div class="form-group"><label>Nama Kepala Lembaga</label><input type="text" id="adm-k-kepala" class="uppercase-input" required></div><div class="form-group"><label>No WA Kepala</label><input type="text" id="adm-k-wa-kepala" required maxlength="13" oninput="validateWaInput(this)"></div><div class="form-group"><label>Nama Operator</label><input type="text" id="adm-k-operator" class="uppercase-input" required></div><div class="form-group"><label>No WA Operator</label><input type="text" id="k-wa-operator" required placeholder="081234567890" maxlength="13" oninput="validateWaInput(this)"></div></div>
+              <div class="grid-cards"><div class="form-group" style="grid-column: 1 / -1;"><label>NPWP Lembaga</label><input type="text" id="adm-k-npwp" class="uppercase-input" required></div><div class="form-group"><label>Nama Kepala Lembaga</label><input type="text" id="adm-k-kepala" class="uppercase-input" required></div><div class="form-group"><label>No WA Kepala</label><input type="text" id="adm-k-wa-kepala" required maxlength="13" oninput="validateWaInput(this)"></div><div class="form-group"><label>Nama Operator</label><input type="text" id="adm-k-operator" class="uppercase-input" required></div><div class="form-group"><label>No WA Operator</label><input type="text" id="adm-k-wa-operator" required placeholder="081234567890" maxlength="13" oninput="validateWaInput(this)"></div></div>
               <div class="grid-cards"><div class="form-group"><label>Latitude</label><input type="text" id="adm-k-lat" required></div><div class="form-group"><label>Longitude</label><input type="text" id="adm-k-lng" required></div></div>
               <button type="submit" class="btn" id="btn-submit-adm-lbg" style="width: 100%; margin-top: 15px; background:var(--primary-solid);">➕ Daftarkan Lembaga Baru ke Master</button>
             </form>
@@ -393,6 +394,19 @@
   <!-- MODALS -->
   <div class="modal-overlay" id="pin-modal"><div class="modal-content"><h3 id="pin-modal-title" style="margin-bottom:8px; color:var(--text-main); font-weight:700;">Otorisasi Akses</h3><p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Masukkan Password</p><input type="password" id="pin-input" placeholder="••••" style="margin-bottom:25px; text-align:center; letter-spacing:12px; font-weight:700; font-size:1.5rem; background:var(--bg-body);" onkeydown="handlePinKeydown(event)"><div style="display:flex; gap:15px;"><button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 1px solid var(--border-color); box-shadow:none;" onclick="closePinModal()">Batal</button><button class="btn" style="flex:1;" onclick="verifyPinSubmit()">Masuk</button></div></div></div>
 
+  <!-- MODAL KONFIRMASI IZOP -->
+  <div class="modal-overlay" id="modal-confirm-izop">
+    <div class="modal-content" style="max-width: 500px; border: 2px solid var(--primary-solid);">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">⚠️</div>
+      <h3 style="color: var(--primary-solid); font-weight: 700; margin-bottom: 15px; font-size: 1.4rem;">Konfirmasi Pengajuan</h3>
+      <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; line-height: 1.6;">APAKAH BERKAS SUDAH DI TANDA TANGANI SEMUA DAN DI BERI METERAI PADA SPTJM?</p>
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="flex:1; background:transparent; color:var(--text-muted); border: 2px solid var(--border-color); box-shadow:none;" onclick="cancelUploadIzop()">Batal</button>
+        <button class="btn" style="flex:1; background:var(--primary-solid);" onclick="proceedUploadIzop()">YA, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL PERINGATAN PERIODE DITUTUP -->
   <div class="modal-overlay" id="modal-period-warning">
     <div class="modal-content" style="max-width: 425px; border: 2px solid #EF4444;">
@@ -421,7 +435,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdmg5AkxiFlU6cXIHjc2Bstfs3eNFF3xw2RB6lrBQRF14ka80yBPQv-usKPsIJig0/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt_Bh3Dt5RWID2_LjppAjs6x3uAm6C0K1QFLWe-09vpiQ6WXx3hny6xXwwq2JNuStq/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -1031,11 +1045,35 @@
       }
     }
 
-    function submitUploadIzop() {
+    // Menampilkan Modal Konfirmasi sebelum Upload
+    function showConfirmIzopModal() {
+      var idLembaga = document.getElementById('izop-lembaga').value;
+      var base64Data = document.getElementById('izop-base64-data').value;
+      if (!idLembaga || !base64Data) {
+        showToast("Silakan pilih lembaga dan file ZIP/RAR terlebih dahulu!", "error");
+        return;
+      }
+      document.getElementById('modal-confirm-izop').classList.add('active');
+    }
+
+    // Aksi ketika tombol Batal pada Modal diklik
+    function cancelUploadIzop() {
+      document.getElementById('modal-confirm-izop').classList.remove('active');
+      document.getElementById('form-upload-izop').reset();
+      document.getElementById('izop-file-info').style.display = "none";
+      document.getElementById('izop-base64-data').value = "";
+      
+      // Mengarahkan kembali ke Dashboard
+      navigate('dashboard', document.querySelector('.nav-item[onclick*="dashboard"]'));
+    }
+
+    // Aksi ketika tombol YA pada Modal diklik (Upload dilanjutkan)
+    function proceedUploadIzop() {
+      document.getElementById('modal-confirm-izop').classList.remove('active');
+      
       var idLembaga = document.getElementById('izop-lembaga').value;
       var base64Data = document.getElementById('izop-base64-data').value;
       var fileName = document.getElementById('izop-filename').value;
-      if (!idLembaga || !base64Data) { showToast("Silakan pilih lembaga dan file ZIP/RAR terlebih dahulu!", "error"); return; }
       
       var selectEl = document.getElementById('izop-lembaga');
       var optionEl = selectEl.options[selectEl.selectedIndex];
@@ -1108,22 +1146,26 @@
         if (filterJj === "MTS") { if (jg !== "MTS" && jg.indexOf("MT") === -1) continue; }
 
         r.calculatedDiffDays = getSisaMasaIzinDays(r.akhirIzin);
-        
-        // HANYA tampilkan yang sudah habis masa berlakunya (Kadaluarsa = diffDays < 0)
-        if (r.calculatedDiffDays === Infinity || r.calculatedDiffDays >= 0) {
-            continue;
-        }
-
         izopData.push(r);
       }
 
-      // Urutkan berdasarkan NSM
-      izopData.sort(function(a, b) {
+      // Filter: Hanya tampilkan lembaga yang sudah Kadaluarsa ATAU yang sudah Upload
+      var filteredData = izopData.filter(function(r) {
+        return r.hasIzop || (r.calculatedDiffDays !== Infinity && r.calculatedDiffDays < 0);
+      });
+
+      // Sorting Logic
+      filteredData.sort(function(a, b) {
+        // Prioritas 1: Yang "Sudah Upload" taruh paling atas
+        if (a.hasIzop && !b.hasIzop) return -1;
+        if (!a.hasIzop && b.hasIzop) return 1;
+        
+        // Prioritas 2: Urutkan berdasarkan NSM (Ascending/Terkecil ke Terbesar)
         return String(a.nsm || "").localeCompare(String(b.nsm || ""), undefined, { numeric: true });
       });
 
-      for (var j = 0; j < izopData.length; j++) {
-        var r = izopData[j];
+      for (var j = 0; j < filteredData.length; j++) {
+        var r = filteredData[j];
         var jg = String(r.jenjang || "").toUpperCase();
         
         var statusUpload = r.hasIzop 
@@ -1137,7 +1179,8 @@
         html += '<tr><td style="text-align:center;">' + idx + '</td><td>' + (r.nsm || '-') + '</td><td style="font-weight:600;">' + (r.nama || '-') + '</td><td style="text-align:center;"><span class="summary-badge" style="background:' + jgBadgeBg + '; color:' + jgBadgeColor + ';">' + jg + '</span></td><td>' + sisaMasa + '</td><td style="text-align:center;">' + statusUpload + '</td></tr>';
         idx++;
       }
-      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Alhamdulillah, tidak ada lembaga yang masa izinnya kadaluarsa.</td></tr>' : html;
+      
+      tbody.innerHTML = html === '' ? '<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada lembaga yang izinnya kadaluarsa.</td></tr>' : html;
     }
 
     function openSecureSpjtmLink(idLembaga, btnElement) {
