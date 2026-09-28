@@ -37,7 +37,7 @@
           
           <div class="nav-item" onclick="navigate('izop-perpanjangan', this)"><span>📑</span> Pengajuan Perpanjangan Izop</div>
           
-          <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> Upload Laporan Dana BOP/BOS Tahap 2 Tahun 2026 <span id="nav-badge-sekunder" style="font-size:0.65rem; padding:2px 6px; border-radius:10px; background:rgba(0,192,90,0.3); margin-left:auto;">BUKA</span></div>
+          <div class="nav-item" onclick="navigate('spjtm-siswa', this)"><span>📄</span> Upload Laporan Dana BOP/BOS Tahap 2 Tahun 2026</div>
           
           <!-- Master Data Menu (Halaman Utama Tunggal) -->
           <div class="nav-item" id="nav-master-data" onclick="navigate('master-data', this)"><span>🗂️</span> Master Data</div>
@@ -523,7 +523,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxK_VVexKNxWsdJ9-lHyXNHXoWWRMJZmsZiimOj_K87N6wopzT372sS74JWg9PEH3-F/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQCZMsMlsZ_6DQTSCB98pZY0WJBIxi2ALc-wSApT7uCVTJBBPxMsVNSJJ5LhEALp4g/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -605,7 +605,7 @@
       if (sectionId === 'spjtm-siswa') { renderMonitoringTable(); renderTableSpjtm(); }
       if (sectionId === 'izop-perpanjangan') { renderTableIzop(); }
     }
-
+    
     function showToast(message, type) {
       var container = document.getElementById('toast-container');
       var toast = document.createElement('div'); toast.className = 'toast ' + (type || 'success'); toast.innerText = message;
@@ -1233,15 +1233,53 @@
       });
     }
     
+    // === FITUR PENGAJUAN IZOP ===
+    
+    // Fitur Paste Screenshot khusus untuk Izop
+    document.addEventListener('paste', function(e) {
+      var izopSection = document.getElementById('izop-perpanjangan');
+      var izopModal = document.getElementById('modal-confirm-izop');
+      
+      // Pastikan berada di menu Izop dan modal konfirmasi belum terbuka
+      if (izopSection && izopSection.classList.contains('active')) {
+        if (izopModal && izopModal.classList.contains('active')) return;
+        
+        var clipboardData = e.clipboardData || window.clipboardData;
+        if (!clipboardData || !clipboardData.items) return;
+        
+        for (var i = 0; i < clipboardData.items.length; i++) {
+          var item = clipboardData.items[i];
+          if (item.type.indexOf('image') !== -1) {
+            var blob = item.getAsFile();
+            if (!blob) continue;
+
+            var reader = new FileReader();
+            reader.onload = function(event) {
+              document.getElementById('izop-base64-data').value = event.target.result;
+              var ext = item.type.split('/')[1] || 'png';
+              var fileName = "Screenshot_Pasted_" + new Date().getTime() + "." + ext;
+              document.getElementById('izop-filename').value = fileName;
+              document.getElementById('izop-file-info').innerHTML = "✅ Bukti Terpilih (Paste): " + fileName;
+              document.getElementById('izop-file-info').style.display = "block";
+              
+              // Langsung konfirmasi
+              showConfirmIzopModal();
+            };
+            reader.readAsDataURL(blob);
+            e.preventDefault(); 
+            return; // Keluar dari loop setelah menemukan gambar
+          }
+        }
+      }
+    });
+
     function handleFileIzopSelect(input) {
       if (input.files && input.files[0]) {
         var file = input.files[0];
         var ext = file.name.split('.').pop().toLowerCase();
         if (ext !== "jpg" && ext !== "jpeg" && ext !== "png") { 
           showToast("Hanya file berformat JPG, JPEG, atau PNG!", "error"); 
-          input.value = ""; 
-          document.getElementById('btn-action-upload-izop').style.display = "none";
-          return; 
+          input.value = ""; return; 
         }
         var reader = new FileReader();
         reader.onload = function(e) { 
@@ -1250,7 +1288,8 @@
           document.getElementById('izop-file-info').innerHTML = "✅ Bukti Terpilih: " + file.name; 
           document.getElementById('izop-file-info').style.display = "block"; 
           
-          document.getElementById('btn-action-upload-izop').style.display = "block";
+          // Langsung tampilkan konfirmasi upload karena tombol submit utama sudah dihapus
+          showConfirmIzopModal();
         };
         reader.readAsDataURL(file);
       }
