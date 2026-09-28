@@ -78,18 +78,36 @@
                 <select id="izop-lembaga" required onchange="onIzopLembagaChange()"><option value="">-- Memuat Data Lembaga... --</option></select>
               </div>
             </div>
-            <div class="form-group" style="margin-top: 15px;">
-              <label>Upload File Berkas (Hanya .ZIP / .RAR)</label>
-              <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()">
-                <span class="upload-icon">📦</span>
-                <p style="font-weight:600; color:var(--text-main);">Klik di sini untuk memilih file ZIP/RAR</p>
-                <input type="file" id="izop-file-input" class="file-input-hidden" accept=".zip,.rar,application/zip,application/x-rar-compressed,application/vnd.rar" onchange="handleFileIzopSelect(this)">
-                <div id="izop-file-info" class="file-info"></div>
+            
+            <div class="grid-cards" style="margin-top: 15px; align-items: stretch;">
+              <!-- Tombol Link Pengajuan (Kiri) -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <label>1. Link Pengajuan Izop</label>
+                <a href="https://bit.ly/UsulPerpanjanganIJOP" target="_blank" class="upload-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-decoration: none; height: 100%; padding: 25px 20px; border: 2px solid var(--primary-solid); background: rgba(0, 192, 90, 0.05);">
+                  <span class="upload-icon" style="font-size: 2.5rem; margin-bottom: 10px;">🔗</span>
+                  <p style="font-weight:700; color:var(--primary-solid); font-size: 1.1rem; text-align: center;">Tombol Link Pengajuan</p>
+                  <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px; text-align: center;">Klik untuk mengisi form ajuan secara online</p>
+                </a>
               </div>
-              <input type="hidden" id="izop-base64-data"><input type="hidden" id="izop-filename">
-              <div id="izop-progress-container" style="display:none; margin-top:15px; height:10px; background:var(--border-color); border-radius:20px;"><div id="izop-progress-bar" style="width:0%; height:100%; background:var(--primary-solid); transition:width 0.4s ease; border-radius:20px;"></div></div>
+
+              <!-- Upload Bukti Ajuan (Kanan) -->
+              <div class="form-group" style="margin-bottom: 0;">
+                <label>2. Upload Bukti Ajuan</label>
+                <div class="upload-area" id="izop-drop-area" onclick="document.getElementById('izop-file-input').click()" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px 20px;">
+                  <span class="upload-icon" style="font-size: 2.5rem; margin-bottom: 10px;">📸</span>
+                  <p style="font-weight:600; color:var(--text-main); text-align: center;">Screenshoot Ajuan<br>(format JPG atau JPEG)</p>
+                  <input type="file" id="izop-file-input" class="file-input-hidden" accept=".jpg,.jpeg,image/jpeg" onchange="handleFileIzopSelect(this)">
+                  <div id="izop-file-info" class="file-info"></div>
+                </div>
+                <input type="hidden" id="izop-base64-data"><input type="hidden" id="izop-filename">
+              </div>
             </div>
-            <button type="submit" class="btn" id="btn-submit-izop" style="width: 100%; font-size: 1.1rem; padding: 15px;">🚀 Upload Berkas Pengajuan</button>
+
+            <!-- Progress Bar & Tombol Submit Bukti -->
+            <div id="izop-progress-container" style="display:none; margin-top:15px; margin-bottom:15px; height:10px; background:var(--border-color); border-radius:20px;">
+              <div id="izop-progress-bar" style="width:0%; height:100%; background:var(--primary-solid); transition:width 0.4s ease; border-radius:20px;"></div>
+            </div>
+            <button type="submit" class="btn" id="btn-submit-izop" style="width: 100%; font-size: 1.1rem; padding: 15px;">🚀 Upload Bukti Ajuan</button>
           </form>
 
           <div class="form-divider" style="margin-top: 40px;">3. Monitoring Status Pengajuan & Sisa Masa Izin Operasional</div>
@@ -435,7 +453,7 @@
   <div id="print-spjtm-container"><div id="print-spjtm-body"></div></div>
 
   <script>
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhCZ8RBXWaxqJHVu421FxdbxJV_2jSFRGdVraubjmWDTAuaFqWMdIeGeAuHeZi4Z92/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRroXxbTGZv3X0fgrdNsK1MB2RxCB3-PJTBekXXGSyMbvFvxttWeq7iO3IHKtbD0fM/exec";
     var CACHE_KEY = "PENMAD_MURA_DATA_CACHE_V6";
     var globalInstitutions = [], fullRekapData = [], kecamatanListGlobal = [];
     var pinRekapStatus = "NONAKTIF", currentStatusPeriodeUtama = "DIBUKA", currentStatusPeriodeSekunder = "DIBUKA", currentTahunPelajaran = "2026/2027";
@@ -1107,15 +1125,15 @@
       if (input.files && input.files[0]) {
         var file = input.files[0];
         var ext = file.name.split('.').pop().toLowerCase();
-        if (ext !== "zip" && ext !== "rar") { 
-          showToast("Hanya file berformat ZIP atau RAR!", "error"); 
+        if (ext !== "jpg" && ext !== "jpeg") { 
+          showToast("Hanya file berformat JPG atau JPEG!", "error"); 
           input.value = ""; return; 
         }
         var reader = new FileReader();
         reader.onload = function(e) { 
           document.getElementById('izop-base64-data').value = e.target.result; 
           document.getElementById('izop-filename').value = file.name; 
-          document.getElementById('izop-file-info').innerHTML = "✅ File Terpilih: " + file.name; 
+          document.getElementById('izop-file-info').innerHTML = "✅ Bukti Terpilih: " + file.name; 
           document.getElementById('izop-file-info').style.display = "block"; 
         };
         reader.readAsDataURL(file);
@@ -1127,14 +1145,14 @@
       var idLembaga = document.getElementById('izop-lembaga').value;
       var base64Data = document.getElementById('izop-base64-data').value;
       if (!idLembaga || !base64Data) {
-        showToast("Silakan pilih lembaga dan file ZIP/RAR terlebih dahulu!", "error");
+        showToast("Silakan pilih lembaga dan Bukti Screenshoot (JPG/JPEG) terlebih dahulu!", "error");
         return;
       }
 
       // Cek apakah lembaga ini sudah upload sebelumnya
       var lembagaRecord = fullRekapData.find(function(x) { return x.id === idLembaga; });
       if (lembagaRecord && lembagaRecord.hasIzop) {
-        var isReplace = confirm("⚠️ PERINGATAN: LEMBAGA SUDAH UPLOAD BERKAS!\n\nLembaga ini sudah memiliki berkas pengajuan di database. Apakah Anda ingin MENGGANTI file yang lama dengan yang baru ini?\n\n(Jika YA, file lama akan dihapus permanen dari sistem & Google Drive)");
+        var isReplace = confirm("⚠️ PERINGATAN: LEMBAGA SUDAH UPLOAD BUKTI!\n\nLembaga ini sudah memiliki bukti pengajuan di database. Apakah Anda ingin MENGGANTI file yang lama dengan yang baru ini?\n\n(Jika YA, file lama akan dihapus permanen dari sistem & Google Drive)");
         if (!isReplace) {
           cancelUploadIzop();
           return;
@@ -1180,7 +1198,7 @@
       callBackendApi("uploadIzop", payload, function(resp) {
         document.getElementById('izop-progress-bar').style.width = "100%";
         setTimeout(function() { 
-          btn.innerText = "🚀 Upload Berkas Pengajuan"; btn.disabled = false; 
+          btn.innerText = "🚀 Upload Bukti Ajuan"; btn.disabled = false; 
           document.getElementById('izop-progress-container').style.display = "none"; 
           if (resp && resp.status === 'success') {
             showToast(resp.message, "success");
@@ -1190,7 +1208,7 @@
           } else { showToast(resp ? resp.message : "Gagal", "error"); }
         }, 400);
       }, function(err) {
-        btn.innerText = "🚀 Upload Berkas Pengajuan"; btn.disabled = false;
+        btn.innerText = "🚀 Upload Bukti Ajuan"; btn.disabled = false;
         document.getElementById('izop-progress-container').style.display = "none";
         showToast("Gagal upload: " + err.message, "error");
       });
